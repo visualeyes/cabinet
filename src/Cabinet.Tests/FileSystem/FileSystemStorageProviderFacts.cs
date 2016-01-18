@@ -1,4 +1,5 @@
-﻿using Cabinet.FileSystem;
+﻿using Cabinet.Core.Providers;
+using Cabinet.FileSystem;
 using Cabinet.Tests.Core;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace Cabinet.Tests.FileSystem {
 
         [Theory]
         [MemberData("GetSafeTestPaths")]
-        public async Task Exists_Missing_File(string basePath, string key, string expectedFilePath) {
+        public async Task Exists_Missing_File(string basePath, string key, string expectedFilePath, string expectedFileKey) {
             var provider = GetProvider(basePath);
 
             Assert.False(this.mockFileSystem.FileExists(expectedFilePath));
@@ -32,7 +33,7 @@ namespace Cabinet.Tests.FileSystem {
 
         [Theory]
         [MemberData("GetSafeTestPaths")]
-        public async Task Get_File_Existing_File(string basePath, string key, string expectedFilePath) {
+        public async Task Get_File_Existing_File(string basePath, string key, string expectedFilePath, string expectedFileKey) {
             var provider = GetProvider(basePath);
 
             this.mockFileSystem.AddFile(expectedFilePath, new MockFileData("test"));
@@ -42,7 +43,7 @@ namespace Cabinet.Tests.FileSystem {
             var fileInfo = await provider.GetFileAsync(key);
 
             Assert.Equal(FileSystemStorageProvider.ProviderType, fileInfo.ProviderType);
-            Assert.Equal(key, fileInfo.Key);
+            Assert.Equal(expectedFileKey, fileInfo.Key);
             Assert.True(fileInfo.Exists);
 
             using (var stream = fileInfo.GetFileReadStream()) {
@@ -51,8 +52,24 @@ namespace Cabinet.Tests.FileSystem {
         }
 
         [Theory]
+        [MemberData("GetListTestPaths")]
+        public async Task List_Keys(string basePath, IDictionary<string, string> files, string keyPrefix, bool recursive, IDictionary<string, string> expectedFiles) {
+            var provider = GetProvider(basePath);
+
+            foreach(var file in files) {
+                var filePath = Path.Combine(basePath, file.Key);
+                this.mockFileSystem.AddFile(filePath, file.Value);
+            }
+
+            var keys = await provider.ListKeysAsync(keyPrefix: keyPrefix, recursive: recursive);
+
+            Assert.Equal(expectedFiles.Count, keys.Count());
+            Assert.Equal(expectedFiles.Keys, keys);
+        }
+
+        [Theory]
         [MemberData("GetSafeTestPaths")]
-        public async Task Get_File_Missing_File(string basePath, string key, string expectedFilePath) {
+        public async Task Get_File_Missing_File(string basePath, string key, string expectedFilePath, string expectedFileKey) {
             var provider = GetProvider(basePath);
 
             Assert.False(this.mockFileSystem.FileExists(expectedFilePath));
@@ -60,21 +77,37 @@ namespace Cabinet.Tests.FileSystem {
             var fileInfo = await provider.GetFileAsync(key);
 
             Assert.Equal(FileSystemStorageProvider.ProviderType, fileInfo.ProviderType);
-            Assert.Equal(key, fileInfo.Key);
+            Assert.Equal(expectedFileKey, fileInfo.Key);
             Assert.False(fileInfo.Exists);
             Assert.Throws<InvalidOperationException>(() => fileInfo.GetFileReadStream());
         }
 
         [Theory]
+        [MemberData("GetListTestPaths")]
+        public async Task Get_Files(string basePath, IDictionary<string, string> files, string keyPrefix, bool recursive, IDictionary<string, string> expectedFiles) {
+            var provider = GetProvider(basePath);
+
+            foreach (var file in files) {
+                var filePath = Path.Combine(basePath, file.Key);
+                this.mockFileSystem.AddFile(filePath, file.Value);
+            }
+
+            var actualFiles = await provider.GetFilesAsync(keyPrefix: keyPrefix, recursive: recursive);
+
+            Assert.Equal(expectedFiles.Count, actualFiles.Count());
+            Assert.Equal(expectedFiles.Keys, actualFiles.Select(a => a.Key));
+        }
+
+        [Theory]
         [MemberData("GetSafeTestPaths")]
-        public async Task Save_File(string basePath, string key, string expectedFilePath) {
+        public async Task Save_File(string basePath, string key, string expectedFilePath, string expectedFileKey) {
             var provider = GetProvider(basePath);
 
             Assert.False(this.mockFileSystem.FileExists(expectedFilePath));
             string content = "test";
 
             using (var contentStream = GetStream(content)) {
-                var result = await provider.SaveFileAsync(key, contentStream, false);
+                var result = await provider.SaveFileAsync(key, contentStream, HandleExistingMethod.Throw);
 
                 Assert.Null(result.Exception);
                 Assert.True(result.Success);
@@ -87,7 +120,7 @@ namespace Cabinet.Tests.FileSystem {
 
         [Theory]
         [MemberData("GetSafeTestPaths")]
-        public async Task Save_File_Overwrites_Existing(string basePath, string key, string expectedFilePath) {
+        public async Task Save_File_Overwrites_Existing(string basePath, string key, string expectedFilePath, string expectedFileKey) {
             var provider = GetProvider(basePath);
             string content = "test";
 
@@ -96,7 +129,7 @@ namespace Cabinet.Tests.FileSystem {
             Assert.True(this.mockFileSystem.FileExists(expectedFilePath));
 
             using (var contentStream = GetStream(content)) {
-                var result = await provider.SaveFileAsync(key, contentStream, true);
+                var result = await provider.SaveFileAsync(key, contentStream, HandleExistingMethod.Overwrite);
 
                 Assert.Null(result.Exception);
                 Assert.True(result.Success);
@@ -109,7 +142,7 @@ namespace Cabinet.Tests.FileSystem {
 
         [Theory]
         [MemberData("GetSafeTestPaths")]
-        public async Task Save_File_No_Overwrites_Throws(string basePath, string key, string expectedFilePath) {
+        public async Task Save_File_No_Overwrites_Throws(string basePath, string key, string expectedFilePath, string expectedFileKey) {
             var provider = GetProvider(basePath);
             string content = "test";
 
@@ -120,7 +153,7 @@ namespace Cabinet.Tests.FileSystem {
             using (var contentStream = GetStream(content)) {
 
                 await Assert.ThrowsAsync<ApplicationException>(async () => {
-                    await provider.SaveFileAsync(key, contentStream, false);
+                    await provider.SaveFileAsync(key, contentStream, HandleExistingMethod.Throw);
                 });
             }
         }
@@ -138,7 +171,7 @@ namespace Cabinet.Tests.FileSystem {
 
             var fromFile = await provider.GetFileAsync(fromKey);
 
-            var result = await provider.MoveFileAsync(fromFile, toKey, false);
+            var result = await provider.MoveFileAsync(fromFile, toKey, HandleExistingMethod.Throw);
 
             Assert.Null(result.Exception);
             Assert.True(result.Success);
@@ -161,7 +194,7 @@ namespace Cabinet.Tests.FileSystem {
 
             var fromFile = await provider.GetFileAsync(fromKey);
 
-            var result = await provider.MoveFileAsync(fromFile, toKey, true);
+            var result = await provider.MoveFileAsync(fromFile, toKey, HandleExistingMethod.Overwrite);
 
             Assert.Null(result.Exception);
             Assert.True(result.Success);
@@ -185,7 +218,7 @@ namespace Cabinet.Tests.FileSystem {
             var fromFile = await provider.GetFileAsync(fromKey);
             
             await Assert.ThrowsAsync<ApplicationException>(async () => {
-                await provider.MoveFileAsync(fromFile, toKey, false);
+                await provider.MoveFileAsync(fromFile, toKey, HandleExistingMethod.Throw);
             });
         }
 
@@ -199,7 +232,7 @@ namespace Cabinet.Tests.FileSystem {
 
             var fromFile = new TestCabinetFileInfo("from.txt", true, GetStream(content));
 
-            var result = await provider.MoveFileAsync(fromFile, toKey, false);
+            var result = await provider.MoveFileAsync(fromFile, toKey, HandleExistingMethod.Throw);
 
             Assert.Null(result.Exception);
             Assert.True(result.Success);
@@ -209,7 +242,7 @@ namespace Cabinet.Tests.FileSystem {
 
         [Theory]
         [MemberData("GetSafeTestPaths")]
-        public async Task Delete_Existing_File(string basePath, string key, string expectedFilePath) {
+        public async Task Delete_Existing_File(string basePath, string key, string expectedFilePath, string expectedFileKey) {
             var provider = GetProvider(basePath);
 
             this.mockFileSystem.AddFile(expectedFilePath, new MockFileData("test"));
@@ -226,7 +259,7 @@ namespace Cabinet.Tests.FileSystem {
 
         [Theory]
         [MemberData("GetSafeTestPaths")]
-        public async Task Delete_Missing_File(string basePath, string key, string expectedFilePath) {
+        public async Task Delete_Missing_File(string basePath, string key, string expectedFilePath, string expectedFileKey) {
             var provider = GetProvider(basePath);
 
             Assert.False(this.mockFileSystem.FileExists(expectedFilePath));
@@ -241,7 +274,7 @@ namespace Cabinet.Tests.FileSystem {
 
         [Theory]
         [MemberData("GetSafeTestPaths")]
-        public async Task Exists_Existing_File(string basePath, string key, string expectedFilePath) {
+        public async Task Exists_Existing_File(string basePath, string key, string expectedFilePath, string expectedFileKey) {
             var provider = GetProvider(basePath);
 
             this.mockFileSystem.AddFile(expectedFilePath, new MockFileData("test"));
@@ -255,7 +288,7 @@ namespace Cabinet.Tests.FileSystem {
 
         [Theory]
         [MemberData("GetSafeTestPaths")]
-        public void Get_File_Path(string basePath, string key, string expectedFilePath) {
+        public void Get_File_Path(string basePath, string key, string expectedFilePath, string expectedFileKey) {
             var provider = GetProvider(basePath);
 
             var fileInfo = provider.GetFileInfo(key);
@@ -288,17 +321,60 @@ namespace Cabinet.Tests.FileSystem {
 
         public static object[] GetSafeTestPaths() {
             return new object[] {
-                new object[] { @"c:\foo", @"file.txt", @"c:\foo\file.txt" },
-                new object[] { @"c:\foo", @"bar\file.txt", @"c:\foo\bar\file.txt" },
-                new object[] { @"c:\foo", @"bar\baz", @"c:\foo\bar\baz" },
-                new object[] { @"c:\foo", @"./bar/baz", @"c:\foo\bar\baz" },
-                new object[] { @"c:\foo", @"../foo/bar/baz", @"c:\foo\bar\baz" },
+                new object[] { @"c:\foo", @"file.txt", @"c:\foo\file.txt", @"file.txt" },
+                new object[] { @"c:\foo", @"bar\file.txt", @"c:\foo\bar\file.txt", @"bar/file.txt" },
+                new object[] { @"c:\foo", @"bar\baz", @"c:\foo\bar\baz", @"bar/baz" },
+                new object[] { @"c:\foo", @"./bar/baz", @"c:\foo\bar\baz", @"bar/baz" },
+                new object[] { @"c:\foo", @"../foo/bar/baz", @"c:\foo\bar\baz", @"bar/baz" },
             };
         }
 
         public static object[] GetMoveTestPaths() {
             return new object[] {
                 new object[] { @"c:\foo", @"from.txt", @"c:\foo\from.txt", @"to.txt", @"c:\foo\to.txt" },
+            };
+        }
+
+        public static object[] GetListTestPaths() {
+            string baseDir = @"C:\data";
+
+            var files = new Dictionary<string, string> {
+                { "file.txt", "test-file" },
+                { @"bar\one.txt", "one" },
+                { @"bar\two.txt", "two" },
+                { @"bar\baz\three", "three" },
+                { @"foo\one.txt", "one" },
+            };
+
+
+            return new object[] {
+                new object[] { baseDir, files, "", true, new Dictionary<string, string> {
+                        { "file.txt", "test-file" },
+                        { @"bar/one.txt", "one" },
+                        { @"bar/two.txt", "two" },
+                        { @"bar/baz/three", "three" },
+                        { @"foo/one.txt", "one" },
+                    }
+                },
+                new object[] { baseDir, files, "", false, new Dictionary<string, string> {
+                        { "file.txt", "test-file" },
+                    }
+                },
+                new object[] { baseDir, files, "bar", true, new Dictionary<string, string> {
+                        { @"bar/one.txt", "one" },
+                        { @"bar/two.txt", "two" },
+                        { @"bar/baz/three", "three" },
+                    }
+                },
+                new object[] { baseDir, files, "bar", false, new Dictionary<string, string> {
+                        { @"bar/one.txt", "one" },
+                        { @"bar/two.txt", "two" },
+                    }
+                },
+                new object[] { baseDir, files, @"bar\baz", false, new Dictionary<string, string> {
+                        { @"bar/baz/three", "three" },
+                    }
+                },
             };
         }
 

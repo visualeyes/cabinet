@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="ICabinetFileInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\HandleExistingMethod.cs" />
     <Compile Include="Providers\Results\IDeleteResult.cs" />
     <Compile Include="Providers\Results\IFileOperationResult.cs" />
     <Compile Include="Providers\Results\IMoveResult.cs" />

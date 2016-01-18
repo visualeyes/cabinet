@@ -10,6 +10,15 @@ namespace Cabinet.Tests.FileSystem {
     public class PathExtensionFacts {
 
         [Theory]
+        [InlineData(@"c:\foo", @"C:\foo\bar", @"bar")]
+        [InlineData(@"c:\foo\", @"C:\foo\bar", @"bar")]
+        [InlineData(@"c:\foo\", @"C:\foo\bar\baz.txt", @"bar/baz.txt")]
+        public void Make_Relative(string basePath, string subPath, string expectedRelativePath) {
+            string actual = subPath.MakeRelativeTo(basePath);
+            Assert.Equal(expectedRelativePath, actual);
+        }
+
+        [Theory]
         [MemberData("GetTestPaths")]
         public void Is_SameDirectory(string subPath, string basePath, bool isChildOf, bool isSameDir) {
             var actualResult = subPath.IsSameDirectory(basePath);

@@ -6,5 +6,6 @@ using System.Threading.Tasks;
 
 namespace Cabinet.Core.Providers.Results {
     public interface IMoveResult : IFileOperationResult {
+        bool AlreadyExists { get; }
     }
 }

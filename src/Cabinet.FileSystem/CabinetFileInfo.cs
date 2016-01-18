@@ -8,15 +8,18 @@ using System.IO;
 using System.IO.Abstractions;
 
 namespace Cabinet.FileSystem {
-    public class CabinetFileInfo : ICabinetFileInfo {
+    internal class CabinetFileInfo : ICabinetFileInfo {
         private readonly FileInfoBase fileInfo;
 
         public string ProviderType {
             get { return FileSystemStorageProvider.ProviderType; }
         }
 
-        public CabinetFileInfo(string key, FileInfoBase fileInfo) {
-            this.Key = key;
+        public CabinetFileInfo(FileInfoBase fileInfo, string baseDirectory) {
+            if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
+            if (String.IsNullOrWhiteSpace(baseDirectory)) throw new ArgumentNullException(nameof(baseDirectory));
+
+            this.Key = GetFileKey(fileInfo, baseDirectory);
             this.fileInfo = fileInfo;
         }
 
@@ -32,6 +35,10 @@ namespace Cabinet.FileSystem {
             }
 
             return fileInfo.OpenRead();
+        }
+
+        public static string GetFileKey(FileInfoBase fileInfo, string baseDirectory) {
+            return fileInfo.FullName.MakeRelativeTo(baseDirectory);
         }
     }
 }

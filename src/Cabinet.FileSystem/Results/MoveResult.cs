@@ -24,6 +24,8 @@ namespace Cabinet.FileSystem.Results {
 
         public Exception Exception { get; private set; }
 
+        public bool AlreadyExists { get; set; }
+
         public string GetErrorMessage() {
             return errorMsg;
         }

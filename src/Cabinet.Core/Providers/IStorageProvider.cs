@@ -12,10 +12,13 @@ namespace Cabinet.Core.Providers {
         // Task<string> GetUniqueFileNameAsync(string path, string name);
         
         Task<bool> ExistsAsync(string key);
-        Task<ICabinetFileInfo> GetFileAsync(string key);
+        Task<IEnumerable<string>> ListKeysAsync(string keyPrefix = "", bool recursive = true);
 
-        Task<ISaveResult> SaveFileAsync(string key, Stream content, bool overwriteExisting);
-        Task<IMoveResult> MoveFileAsync(ICabinetFileInfo file, string destKey, bool overwriteExisting);
+        Task<ICabinetFileInfo> GetFileAsync(string key);
+        Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(string keyPrefix = "", bool recursive = true);
+
+        Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting);
+        Task<IMoveResult> MoveFileAsync(ICabinetFileInfo file, string destKey, HandleExistingMethod handleExisting);
         Task<IDeleteResult> DeleteFileAsync(string key);
     }
 }

@@ -8,6 +8,18 @@ using System.Threading.Tasks;
 
 namespace Cabinet.FileSystem {
     public static class PathExtensions {
+        public static string MakeRelativeTo(this string fullPath, string basePath) {
+            if (!basePath.EndsWith(Path.DirectorySeparatorChar.ToString())) {
+                basePath += Path.DirectorySeparatorChar;
+            }
+
+            var fullPathUri = new Uri(fullPath, UriKind.Absolute);
+            var basePathUri = new Uri(basePath, UriKind.Absolute);
+
+            var relUri = basePathUri.MakeRelativeUri(fullPathUri);
+            return relUri.ToString();
+        }
+
         public static bool IsSameDirectory(this string path1, string path2) {
             if (String.IsNullOrWhiteSpace(path1)) throw new ArgumentNullException(nameof(path1));
             if (String.IsNullOrWhiteSpace(path2)) throw new ArgumentNullException(nameof(path2));

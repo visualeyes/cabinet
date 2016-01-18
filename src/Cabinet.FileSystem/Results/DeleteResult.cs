@@ -22,6 +22,8 @@ namespace Cabinet.FileSystem.Results {
 
         public Exception Exception { get; private set; }
 
+        public bool AlreadyDeleted { get; set; }
+
         public string GetErrorMessage() {
             string errorMsg = null;
 
@@ -40,6 +42,5 @@ namespace Cabinet.FileSystem.Results {
             return errorMsg;
         }
 
-        public bool AlreadyDeleted { get; set; }
     }
 }
