@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Cabinet.Core</id>
+    <version>$version$</version>
+    <authors>CareerHub</authors>
+    <owners>CareerHub</owners>
+    <projectUrl>https://github.com/visualeyes/cabinet</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>File Storage Services for .NET</description>
+    <releaseNotes>This is the initial release.</releaseNotes>
+    <copyright>Copyright 2016</copyright>
+    <tags>Files IO S3</tags>
+    <dependencies>
+    </dependencies>
+    <frameworkAssemblies>
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <file src="bin\Release\Cabinet.Core.dll" target="lib" />
+    <file src="bin\Release\Cabinet.Core.pdb" target="lib" />
+  </files>
+</package>

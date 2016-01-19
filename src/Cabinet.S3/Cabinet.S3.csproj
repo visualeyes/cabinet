@@ -59,6 +59,7 @@
     <Compile Include="S3CabinetFileInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Cabinet.S3.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
