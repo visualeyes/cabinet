@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cabinet.FileSystem {
-    internal class FileSystemStorageProvider : IStorageProvider<IFileCabinentConfig> {
+    internal class FileSystemStorageProvider : IStorageProvider<FileSystemCabinetConfig> {
         public const string ProviderType = "FileSystem";
         
         private readonly Func<IFileSystem> fileSystemFactory;
@@ -41,7 +41,7 @@ namespace Cabinet.FileSystem {
         }
         */
 
-        public Task<bool> ExistsAsync(string key, IFileCabinentConfig config) {
+        public Task<bool> ExistsAsync(string key, FileSystemCabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
 
@@ -49,7 +49,7 @@ namespace Cabinet.FileSystem {
             return Task.FromResult(fileInfo.Exists);
         }
 
-        public Task<IEnumerable<string>> ListKeysAsync(IFileCabinentConfig config, string keyPrefix = "", bool recursive = true) {
+        public Task<IEnumerable<string>> ListKeysAsync(FileSystemCabinetConfig config, string keyPrefix = "", bool recursive = true) {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
             var cabinetFiles = GetFilesRecursive(keyPrefix, recursive, config);
@@ -58,7 +58,7 @@ namespace Cabinet.FileSystem {
             return Task.FromResult(keys);
         }
 
-        public Task<ICabinetFileInfo> GetFileAsync(string key, IFileCabinentConfig config) {
+        public Task<ICabinetFileInfo> GetFileAsync(string key, FileSystemCabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
 
@@ -66,7 +66,7 @@ namespace Cabinet.FileSystem {
             return Task.FromResult<ICabinetFileInfo>(new FileSystemCabinetFileInfo(fileInfo, config.Directory));
         }
 
-        public Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(IFileCabinentConfig config, string keyPrefix = "", bool recursive = true) {
+        public Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(FileSystemCabinetConfig config, string keyPrefix = "", bool recursive = true) {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
             var cabinetFiles = GetFilesRecursive(keyPrefix, recursive, config);
@@ -78,7 +78,7 @@ namespace Cabinet.FileSystem {
             return Task.FromResult<IEnumerable<ICabinetFileInfo>>(cabinetFileInfos);
         }
 
-        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IFileCabinentConfig config) {
+        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, FileSystemCabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -106,7 +106,7 @@ namespace Cabinet.FileSystem {
             }
         }
 
-        public Task<IMoveResult> MoveFileAsync(string sourceKey, string destKey, HandleExistingMethod handleExisting, IFileCabinentConfig config) {
+        public Task<IMoveResult> MoveFileAsync(string sourceKey, string destKey, HandleExistingMethod handleExisting, FileSystemCabinetConfig config) {
             if (String.IsNullOrWhiteSpace(sourceKey)) throw new ArgumentNullException(nameof(sourceKey));
             if (String.IsNullOrWhiteSpace(destKey)) throw new ArgumentNullException(nameof(destKey));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -135,7 +135,7 @@ namespace Cabinet.FileSystem {
             }
         }
 
-        public Task<IDeleteResult> DeleteFileAsync(string key, IFileCabinentConfig config) {
+        public Task<IDeleteResult> DeleteFileAsync(string key, FileSystemCabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
 
@@ -151,7 +151,7 @@ namespace Cabinet.FileSystem {
             return Task.FromResult(result);
         }
 
-        public FileInfoBase GetFileInfo(string key, IFileCabinentConfig config) {
+        public FileInfoBase GetFileInfo(string key, FileSystemCabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
             if (String.IsNullOrWhiteSpace(config.Directory)) {
@@ -173,7 +173,7 @@ namespace Cabinet.FileSystem {
             return keyFile;
         }
 
-        public DirectoryInfoBase GetDirectoryInfo(string key, IFileCabinentConfig config) {
+        public DirectoryInfoBase GetDirectoryInfo(string key, FileSystemCabinetConfig config) {
             if (key == null) throw new ArgumentNullException(nameof(key)); // Allow empty strings
             if (config == null) throw new ArgumentNullException(nameof(config));
             if (String.IsNullOrWhiteSpace(config.Directory)) {
@@ -194,7 +194,7 @@ namespace Cabinet.FileSystem {
             return keyFile;
         }
 
-        private IFileSystem GetFileSystem(IFileCabinentConfig config) {
+        private IFileSystem GetFileSystem(FileSystemCabinetConfig config) {
             var fs = fileSystemFactory();
 
             bool directoryExists = fs.Directory.Exists(config.Directory);
@@ -229,7 +229,7 @@ namespace Cabinet.FileSystem {
             }
         }
         
-        private FileInfoBase[] GetFilesRecursive(string keyPrefix, bool recursive, IFileCabinentConfig config) {
+        private FileInfoBase[] GetFilesRecursive(string keyPrefix, bool recursive, FileSystemCabinetConfig config) {
             var dirInfo = this.GetDirectoryInfo(keyPrefix, config);
 
             var searchOption = recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;

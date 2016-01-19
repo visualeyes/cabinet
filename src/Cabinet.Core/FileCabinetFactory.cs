@@ -10,7 +10,7 @@ namespace Cabinet.Core {
     public class FileCabinetFactory : IFileCabinetFactory {
         private static ConcurrentDictionary<Type, Func<object>> providerCache = new ConcurrentDictionary<Type, Func<object>>();
 
-        public IFileCabinet GetCabinet<T>(T config) where T : IProviderConfiguration {
+        public IFileCabinet GetCabinet<T>(T config) where T : IStorageProviderConfig {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
             var configType = typeof(T); // this is what it was registered with - config.GetType() would get the implementation
@@ -31,13 +31,13 @@ namespace Cabinet.Core {
             return cabinet;
         }
 
-        public void RegisterProvider<T>(Func<IStorageProvider<T>> providerFactory) where T : IProviderConfiguration {
+        public void RegisterProvider<T>(Func<IStorageProvider<T>> providerFactory) where T : IStorageProviderConfig {
             if (providerFactory == null) throw new ArgumentNullException(nameof(providerFactory));
 
             providerCache.AddOrUpdate(typeof(T), providerFactory, (key, existing) => providerFactory);
         }
 
-        public void RegisterProvider<T>(IStorageProvider<T> provider) where T : IProviderConfiguration {
+        public void RegisterProvider<T>(IStorageProvider<T> provider) where T : IStorageProviderConfig {
             if (provider == null) throw new ArgumentNullException(nameof(provider));
 
             Func<IStorageProvider<T>> providerFactory = () => provider;

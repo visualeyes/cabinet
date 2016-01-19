@@ -5,6 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cabinet.Core.Providers {
-    public interface IProviderConfiguration {
+    public interface IStorageProviderConfig {
     }
 }

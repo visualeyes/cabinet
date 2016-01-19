@@ -13,7 +13,7 @@ namespace Cabinet.Core.Providers {
     /// Ideally it should be implemented in a thread safe maner so it can be used as a singleton
     /// </summary>
     /// <typeparam name="T">Provider Configuration</typeparam>
-    public interface IStorageProvider<T> where T : IProviderConfiguration {
+    public interface IStorageProvider<T> where T : IStorageProviderConfig {
         // Task<string> GetUniqueFileNameAsync(string path, string name);
         
         Task<bool> ExistsAsync(string key, T config);

@@ -6,6 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cabinet.Tests.Core {
-    public interface ITestProviderConfiguration : IProviderConfiguration {
+    public interface ITestProviderConfiguration : IStorageProviderConfig {
     }
 }

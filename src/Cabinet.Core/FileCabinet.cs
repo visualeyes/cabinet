@@ -8,7 +8,7 @@ using Cabinet.Core.Providers;
 using Cabinet.Core.Results;
 
 namespace Cabinet.Core {
-    internal class FileCabinet<T> : IFileCabinet where T : IProviderConfiguration {
+    internal class FileCabinet<T> : IFileCabinet where T : IStorageProviderConfig {
         private readonly T config;
         private readonly IStorageProvider<T> provider;
 

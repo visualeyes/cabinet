@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Cabinet.Core.Providers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Cabinet.FileSystem {
-    public class FileSystemCabinetConfig : IFileCabinentConfig {
+    public class FileSystemCabinetConfig : IStorageProviderConfig {
         public FileSystemCabinetConfig(string directory, bool createIfNotExists = false) {
             if (String.IsNullOrWhiteSpace(directory)) throw new ArgumentNullException(nameof(directory));
             this.Directory = directory;
