@@ -7,7 +7,7 @@ branches:
 
 environment:
     COVERALLS_REPO_TOKEN:
-       secure: TODO
+       secure: taR6Lo8ItJ2wz57yn2n8wwkTuiULP+n8EicEJck1CaxeDGLWHmZzw6NX1a7RR0Cd
 
 cache:
   - packages -> **\packages.config  # preserve "packages" directory in the root of build folder but will reset it if packages.config is modified
@@ -37,7 +37,7 @@ after_test:
 deploy:
   provider: NuGet
   api_key:
-    secure: TODO
+    secure: +AIEY0E9rURDXqzW7YM/RoRXDhOxdTZQ4XyUxNCKR6zaHvj7ha/uZHnhqofdaUu3
   skip_symbols: false
   artifact: /.*\.nupkg/
   on:

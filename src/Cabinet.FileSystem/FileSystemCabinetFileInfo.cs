@@ -8,14 +8,14 @@ using System.IO;
 using System.IO.Abstractions;
 
 namespace Cabinet.FileSystem {
-    internal class CabinetFileInfo : ICabinetFileInfo {
+    internal class FileSystemCabinetFileInfo : ICabinetFileInfo {
         private readonly FileInfoBase fileInfo;
 
         public string ProviderType {
             get { return FileSystemStorageProvider.ProviderType; }
         }
 
-        public CabinetFileInfo(FileInfoBase fileInfo, string baseDirectory) {
+        public FileSystemCabinetFileInfo(FileInfoBase fileInfo, string baseDirectory) {
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
             if (String.IsNullOrWhiteSpace(baseDirectory)) throw new ArgumentNullException(nameof(baseDirectory));
 

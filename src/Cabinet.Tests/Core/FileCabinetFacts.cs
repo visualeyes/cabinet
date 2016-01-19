@@ -80,18 +80,17 @@ namespace Cabinet.Tests.Core {
         }
 
         [Theory]
-        [InlineData("destKey", HandleExistingMethod.Overwrite)]
-        [InlineData("destKey", HandleExistingMethod.Skip)]
-        [InlineData("destKey", HandleExistingMethod.Throw)]
-        public async Task Move_File(string destKey, HandleExistingMethod handleExisting) {
-            var mockFile = new Mock<ICabinetFileInfo>();
+        [InlineData("sourceKey", "destKey", HandleExistingMethod.Overwrite)]
+        [InlineData("sourceKey", "destKey", HandleExistingMethod.Skip)]
+        [InlineData("sourceKey", "destKey", HandleExistingMethod.Throw)]
+        public async Task Move_File(string sourceKey, string destKey, HandleExistingMethod handleExisting) {
             var mockResult = new Mock<IMoveResult>();
 
-            this.mockStorageProvider.Setup(s => s.MoveFileAsync(mockFile.Object, destKey, handleExisting, mockConfig.Object)).ReturnsAsync(mockResult.Object);
+            this.mockStorageProvider.Setup(s => s.MoveFileAsync(sourceKey, destKey, handleExisting, mockConfig.Object)).ReturnsAsync(mockResult.Object);
 
-            var actualResult = await this.fileCabinet.MoveFileAsync(mockFile.Object, destKey, handleExisting);
+            var actualResult = await this.fileCabinet.MoveFileAsync(sourceKey, destKey, handleExisting);
 
-            this.mockStorageProvider.Verify(s => s.MoveFileAsync(mockFile.Object, destKey, handleExisting, mockConfig.Object), Times.Once);
+            this.mockStorageProvider.Verify(s => s.MoveFileAsync(sourceKey, destKey, handleExisting, mockConfig.Object), Times.Once);
 
             Assert.Equal(mockResult.Object, actualResult);
         }

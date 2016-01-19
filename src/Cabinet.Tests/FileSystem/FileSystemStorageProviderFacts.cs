@@ -177,10 +177,8 @@ namespace Cabinet.Tests.FileSystem {
 
             Assert.True(this.mockFileSystem.FileExists(fromPath));
             Assert.False(this.mockFileSystem.FileExists(toPath));
-
-            var fromFile = await provider.GetFileAsync(fromKey, config);
-
-            var result = await provider.MoveFileAsync(fromFile, toKey, HandleExistingMethod.Throw, config);
+            
+            var result = await provider.MoveFileAsync(fromKey, toKey, HandleExistingMethod.Throw, config);
 
             Assert.Null(result.Exception);
             Assert.True(result.Success);
@@ -201,10 +199,8 @@ namespace Cabinet.Tests.FileSystem {
 
             Assert.True(this.mockFileSystem.FileExists(fromPath));
             Assert.True(this.mockFileSystem.FileExists(toPath));
-
-            var fromFile = await provider.GetFileAsync(fromKey, config);
-
-            var result = await provider.MoveFileAsync(fromFile, toKey, HandleExistingMethod.Overwrite, config);
+            
+            var result = await provider.MoveFileAsync(fromKey, toKey, HandleExistingMethod.Overwrite, config);
 
             Assert.Null(result.Exception);
             Assert.True(result.Success);
@@ -225,33 +221,12 @@ namespace Cabinet.Tests.FileSystem {
 
             Assert.True(this.mockFileSystem.FileExists(fromPath));
             Assert.True(this.mockFileSystem.FileExists(toPath));
-
-            var fromFile = await provider.GetFileAsync(fromKey, config);
-            
+                        
             await Assert.ThrowsAsync<ApplicationException>(async () => {
-                await provider.MoveFileAsync(fromFile, toKey, HandleExistingMethod.Throw, config);
+                await provider.MoveFileAsync(fromKey, toKey, HandleExistingMethod.Throw, config);
             });
         }
-
-        [Theory]
-        [InlineData(@"c:\foo", @"to.txt", @"c:\foo\to.txt")]
-        public async Task Move_Other_File_To_Missing(string basePath, string toKey, string toPath) {
-            var provider = GetProvider(basePath);
-            var config = GetConfig(basePath);
-            string content = "test";
-            
-            Assert.False(this.mockFileSystem.FileExists(toPath));
-
-            var fromFile = new TestCabinetFileInfo("from.txt", true, GetStream(content));
-
-            var result = await provider.MoveFileAsync(fromFile, toKey, HandleExistingMethod.Throw, config);
-
-            Assert.Null(result.Exception);
-            Assert.True(result.Success);
-            
-            Assert.True(this.mockFileSystem.FileExists(toPath));
-        }
-
+        
         [Theory]
         [MemberData("GetSafeTestPaths")]
         public async Task Delete_Existing_File(string basePath, string key, string expectedFilePath, string expectedFileKey) {

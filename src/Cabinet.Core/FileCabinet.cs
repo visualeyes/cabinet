@@ -36,8 +36,8 @@ namespace Cabinet.Core {
             return await provider.ListKeysAsync(keyPrefix: keyPrefix, recursive: recursive, config: config);
         }
 
-        public async Task<IMoveResult> MoveFileAsync(ICabinetFileInfo file, string destKey, HandleExistingMethod handleExisting) {
-            return await provider.MoveFileAsync(file, destKey, handleExisting, config);
+        public async Task<IMoveResult> MoveFileAsync(string sourceKey, string destKey, HandleExistingMethod handleExisting) {
+            return await provider.MoveFileAsync(sourceKey, destKey, handleExisting, config);
         }
 
         public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting) {

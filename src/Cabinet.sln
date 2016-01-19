@@ -22,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Info", "Info", "{21B0400E-D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cabinet.FileSystem", "Cabinet.FileSystem\Cabinet.FileSystem.csproj", "{0896C531-C5C4-4CB3-99EF-73B264E0DDE0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cabinet.Migrator", "Cabinet.Migrator\Cabinet.Migrator.csproj", "{FEC7949E-6925-4B44-B2C0-2D695C750C72}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{0896C531-C5C4-4CB3-99EF-73B264E0DDE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0896C531-C5C4-4CB3-99EF-73B264E0DDE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0896C531-C5C4-4CB3-99EF-73B264E0DDE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEC7949E-6925-4B44-B2C0-2D695C750C72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEC7949E-6925-4B44-B2C0-2D695C750C72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEC7949E-6925-4B44-B2C0-2D695C750C72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEC7949E-6925-4B44-B2C0-2D695C750C72}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

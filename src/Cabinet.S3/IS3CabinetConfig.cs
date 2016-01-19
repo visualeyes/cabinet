@@ -1,8 +1,9 @@
-﻿using Cabinet.Core.Providers;
+﻿using Amazon.S3;
+using Cabinet.Core.Providers;
 
 namespace Cabinet.S3 {
     public interface IS3CabinetConfig : IProviderConfiguration {
-        string AccessKey { get; }
-        string SecretKey { get; }
+        AmazonS3Config AmazonS3Config { get; }
+        string BucketName { get; }
     }
 }

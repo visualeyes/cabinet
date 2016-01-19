@@ -53,7 +53,7 @@ namespace Cabinet.FileSystem {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
             var cabinetFiles = GetFilesRecursive(keyPrefix, recursive, config);
-            var keys = cabinetFiles.Select(f => CabinetFileInfo.GetFileKey(f, config.Directory));
+            var keys = cabinetFiles.Select(f => FileSystemCabinetFileInfo.GetFileKey(f, config.Directory));
 
             return Task.FromResult(keys);
         }
@@ -63,7 +63,7 @@ namespace Cabinet.FileSystem {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
             var fileInfo = this.GetFileInfo(key, config);
-            return Task.FromResult<ICabinetFileInfo>(new CabinetFileInfo(fileInfo, config.Directory));
+            return Task.FromResult<ICabinetFileInfo>(new FileSystemCabinetFileInfo(fileInfo, config.Directory));
         }
 
         public Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(IFileCabinentConfig config, string keyPrefix = "", bool recursive = true) {
@@ -72,7 +72,7 @@ namespace Cabinet.FileSystem {
             var cabinetFiles = GetFilesRecursive(keyPrefix, recursive, config);
 
             var cabinetFileInfos = cabinetFiles.Select(f => {
-                return new CabinetFileInfo(f, config.Directory);
+                return new FileSystemCabinetFileInfo(f, config.Directory);
             });
 
             return Task.FromResult<IEnumerable<ICabinetFileInfo>>(cabinetFileInfos);
@@ -106,8 +106,8 @@ namespace Cabinet.FileSystem {
             }
         }
 
-        public async Task<IMoveResult> MoveFileAsync(ICabinetFileInfo file, string destKey, HandleExistingMethod handleExisting, IFileCabinentConfig config) {
-            if (file == null) throw new ArgumentNullException(nameof(file));
+        public async Task<IMoveResult> MoveFileAsync(string sourceKey, string destKey, HandleExistingMethod handleExisting, IFileCabinentConfig config) {
+            if (String.IsNullOrWhiteSpace(sourceKey)) throw new ArgumentNullException(nameof(sourceKey));
             if (String.IsNullOrWhiteSpace(destKey)) throw new ArgumentNullException(nameof(destKey));
             if (config == null) throw new ArgumentNullException(nameof(config));
 
@@ -124,19 +124,10 @@ namespace Cabinet.FileSystem {
 
             try {
                 var fs = fileSystemFactory();
-
-                if (file.ProviderType == ProviderType) {
-                    var fileInfo = this.GetFileInfo(file.Key, config);
-                    // Do file system move
-                    fs.File.Move(fileInfo.FullName, destFileInfo.FullName);
-                } else {
-                    // Save file via stream
-                    using (var fileStream = file.GetFileReadStream()) {
-                        using (var destStream = fs.File.OpenWrite(destFileInfo.FullName)) {
-                            await fileStream.CopyToAsync(destStream);
-                        }
-                    }
-                }
+                
+                var fileInfo = this.GetFileInfo(sourceKey, config);
+                // Do file system move
+                fs.File.Move(fileInfo.FullName, destFileInfo.FullName);
                 
                 return new MoveResult(true);
             } catch (Exception e) {

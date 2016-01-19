@@ -51,7 +51,11 @@
     <Compile Include="AmazonS3StorageProvider.cs" />
     <Compile Include="IS3CabinetConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Results\DeleteResult.cs" />
+    <Compile Include="Results\MoveResult.cs" />
+    <Compile Include="Results\SaveResult.cs" />
     <Compile Include="S3CabinetConfig.cs" />
+    <Compile Include="S3CabinetFileInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
