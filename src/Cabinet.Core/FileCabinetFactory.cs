@@ -43,5 +43,9 @@ namespace Cabinet.Core {
             Func<IStorageProvider<T>> providerFactory = () => provider;
             this.RegisterProvider(providerFactory);
         }
+
+        internal void ClearCache() {
+            providerCache.Clear();
+        }
     }
 }

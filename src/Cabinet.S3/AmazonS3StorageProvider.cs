@@ -40,7 +40,7 @@ namespace Cabinet.S3 {
             }
         }
 
-        public async Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(IS3CabinetConfig config, string keyPrefix = null, bool recursive = true) {
+        public Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(IS3CabinetConfig config, string keyPrefix = null, bool recursive = true) {
             throw new NotImplementedException();
         }
 

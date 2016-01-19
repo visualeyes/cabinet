@@ -9,11 +9,14 @@ using System.Threading.Tasks;
 using Xunit;
 
 namespace Cabinet.Tests.Core {
+    [Collection("FileCabinetFactory")]
     public class FileCabinetFactoryFacts {
         private readonly IFileCabinetFactory cabinetFactory;
 
         public FileCabinetFactoryFacts() {
-            this.cabinetFactory = new FileCabinetFactory();
+            var factory = new FileCabinetFactory();
+            factory.ClearCache();
+            this.cabinetFactory = factory;
         }
 
         [Fact]

@@ -78,6 +78,7 @@
     <Compile Include="FileSystem\FileSystemStorageProviderFacts.cs" />
     <Compile Include="FileSystem\PathExtensionFacts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

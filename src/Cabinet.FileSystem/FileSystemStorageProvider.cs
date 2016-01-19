@@ -106,7 +106,7 @@ namespace Cabinet.FileSystem {
             }
         }
 
-        public async Task<IMoveResult> MoveFileAsync(string sourceKey, string destKey, HandleExistingMethod handleExisting, IFileCabinentConfig config) {
+        public Task<IMoveResult> MoveFileAsync(string sourceKey, string destKey, HandleExistingMethod handleExisting, IFileCabinentConfig config) {
             if (String.IsNullOrWhiteSpace(sourceKey)) throw new ArgumentNullException(nameof(sourceKey));
             if (String.IsNullOrWhiteSpace(destKey)) throw new ArgumentNullException(nameof(destKey));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -119,7 +119,7 @@ namespace Cabinet.FileSystem {
             );
 
             if (handleExisingResult != null) {
-                return handleExisingResult;
+                return Task.FromResult(handleExisingResult);
             }
 
             try {
@@ -129,9 +129,9 @@ namespace Cabinet.FileSystem {
                 // Do file system move
                 fs.File.Move(fileInfo.FullName, destFileInfo.FullName);
                 
-                return new MoveResult(true);
+                return Task.FromResult<IMoveResult>(new MoveResult(true));
             } catch (Exception e) {
-                return new MoveResult(e);
+                return Task.FromResult<IMoveResult>(new MoveResult(e));
             }
         }
 
