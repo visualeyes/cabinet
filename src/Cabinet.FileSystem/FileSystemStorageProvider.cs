@@ -96,6 +96,11 @@ namespace Cabinet.FileSystem {
 
             try {
                 var fs = GetFileSystem(config);
+                
+                if(!fileInfo.Directory.Exists) {
+                    fileInfo.Directory.Create();
+                }
+
                 using (var writeStream = fs.File.OpenWrite(fileInfo.FullName)) {
                     await content.CopyToAsync(writeStream);
 
@@ -126,6 +131,11 @@ namespace Cabinet.FileSystem {
                 var fs = GetFileSystem(config);
 
                 var fileInfo = this.GetFileInfo(sourceKey, config);
+
+                if (!destFileInfo.Directory.Exists) {
+                    destFileInfo.Directory.Create();
+                }
+
                 // Do file system move
                 fs.File.Move(fileInfo.FullName, destFileInfo.FullName);
                 
