@@ -29,7 +29,7 @@ cabinetFactory
     .RegisterS3Provider(); // Register an Amazon S3 provider
 
 IFileCabinet fileCabinet = cabinetFactory.GetCabinet(new FileSystemCabinetConfig() {
-    Directory = "C:\data\"
+    Directory = @"C:\data\"
 });
 
 IFileCabinet s3Cabinet = cabinetFactory.GetCabinet(new S3CabinetConfig() {
