@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cabinet.FileSystem {
-    public class FileCabinetConfig : IFileCabinentConfig {
+    public class FileSystemCabinetConfig : IFileCabinentConfig {
         public string Directory { get; set; }
     }
 }

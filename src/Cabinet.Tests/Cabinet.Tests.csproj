@@ -83,6 +83,16 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="S3\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cabinet.Core\Cabinet.Core.csproj">
+      <Project>{dbdf6ca2-31d3-469e-a9d6-9e3f13b01001}</Project>
+      <Name>Cabinet.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cabinet.FileSystem\Cabinet.FileSystem.csproj">
       <Project>{0896c531-c5c4-4cb3-99ef-73b264e0dde0}</Project>
       <Name>Cabinet.FileSystem</Name>
@@ -91,16 +101,6 @@
       <Project>{790f406f-acdc-4cd1-8541-21f42c844ec2}</Project>
       <Name>Cabinet.S3</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cabinet.Core\Cabinet.Core.csproj">
-      <Project>{dbdf6ca2-31d3-469e-a9d6-9e3f13b01001}</Project>
-      <Name>Cabinet.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="S3\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

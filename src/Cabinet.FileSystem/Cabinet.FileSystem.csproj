@@ -45,7 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CabinetFileInfo.cs" />
-    <Compile Include="FileCabinetConfig.cs" />
+    <Compile Include="FileSystemCabinetConfig.cs" />
     <Compile Include="FileCabinetFactoryExtensions.cs" />
     <Compile Include="FileSystemStorageProvider.cs" />
     <Compile Include="IFileCabinentConfig.cs" />
@@ -56,13 +56,13 @@
     <Compile Include="Results\DeleteResult.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Cabinet.Core\Cabinet.Core.csproj">
       <Project>{dbdf6ca2-31d3-469e-a9d6-9e3f13b01001}</Project>
       <Name>Cabinet.Core</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

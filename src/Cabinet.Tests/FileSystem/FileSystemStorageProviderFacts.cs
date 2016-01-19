@@ -332,8 +332,8 @@ namespace Cabinet.Tests.FileSystem {
             return provider;
         }
 
-        private FileCabinetConfig GetConfig(string basePath) {
-            var config = new FileCabinetConfig() {
+        private FileSystemCabinetConfig GetConfig(string basePath) {
+            var config = new FileSystemCabinetConfig() {
                 Directory = basePath
             };
 
