@@ -12,6 +12,7 @@
     <copyright>Copyright 2016</copyright>
     <tags>Files IO S3</tags>
     <dependencies>
+      <dependency id="Cabinet.Core" version="1.0.5" />
       <dependency id="System.IO.Abstractions" version="2.0.0.123" />
     </dependencies>
     <frameworkAssemblies>

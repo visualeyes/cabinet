@@ -12,6 +12,7 @@
     <copyright>Copyright 2016</copyright>
     <tags>Files IO S3</tags>
     <dependencies>
+      <dependency id="Cabinet.Core" version="1.0.5" />
       <dependency id="AWSSDK.S3" version="3.1.3.10" />
     </dependencies>
     <frameworkAssemblies>
