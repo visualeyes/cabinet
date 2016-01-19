@@ -8,11 +8,11 @@ Cabinet provides abstractions over various file storage providers.
 This allows you to develop IO code without having to worry about where the file is actually stored.
 
 Plugging in a new provider is easy as:
-```c#
+``` csharp
 cabinetFactory.RegisterFileSystemProvider()
 ``` 
 and 
-```c#
+``` csharp
 IFileCabinet fileCabinet = cabinetFactory.GetCabinet(new FileSystemCabinetConfig() {
     Directory = "C:\data\"
 })
@@ -21,7 +21,7 @@ IFileCabinet fileCabinet = cabinetFactory.GetCabinet(new FileSystemCabinetConfig
 ## Getting Started with Cabinet
 // TODO: Description
 
-```c#
+``` csharp
 IFileCabinetFactory cabinetFactory = new FileCabinetFactory(); // or inject IFileCabinetFactory with IOC
 
 cabinetFactory
