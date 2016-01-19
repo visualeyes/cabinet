@@ -308,9 +308,7 @@ namespace Cabinet.Tests.FileSystem {
         }
 
         private FileSystemCabinetConfig GetConfig(string basePath) {
-            var config = new FileSystemCabinetConfig() {
-                Directory = basePath
-            };
+            var config = new FileSystemCabinetConfig(basePath, true);
 
             return config;
         }

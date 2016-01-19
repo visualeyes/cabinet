@@ -2,6 +2,7 @@
 
 namespace Cabinet.FileSystem {
     public interface IFileCabinentConfig : IProviderConfiguration {
-        string Directory { get; set; }
+        string Directory { get; }
+        bool CreateIfNotExists { get; }
     }
 }

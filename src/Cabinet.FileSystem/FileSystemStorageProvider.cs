@@ -95,7 +95,7 @@ namespace Cabinet.FileSystem {
             }
 
             try {
-                var fs = fileSystemFactory();
+                var fs = GetFileSystem(config);
                 using (var writeStream = fs.File.OpenWrite(fileInfo.FullName)) {
                     await content.CopyToAsync(writeStream);
 
@@ -123,8 +123,8 @@ namespace Cabinet.FileSystem {
             }
 
             try {
-                var fs = fileSystemFactory();
-                
+                var fs = GetFileSystem(config);
+
                 var fileInfo = this.GetFileInfo(sourceKey, config);
                 // Do file system move
                 fs.File.Move(fileInfo.FullName, destFileInfo.FullName);
@@ -160,7 +160,7 @@ namespace Cabinet.FileSystem {
 
             string fullKeyPath = GetKeyFullPath(config.Directory, key);
 
-            var fs = fileSystemFactory();
+            var fs = GetFileSystem(config);
 
             var keyFile = fs.FileInfo.FromFileName(fullKeyPath);
             var baseDir = fs.DirectoryInfo.FromDirectoryName(config.Directory);
@@ -181,8 +181,7 @@ namespace Cabinet.FileSystem {
             }
 
             string fullKeyPath = GetKeyFullPath(config.Directory, key);
-
-            var fs = fileSystemFactory();
+            var fs = GetFileSystem(config);
 
             var keyFile = fs.DirectoryInfo.FromDirectoryName(fullKeyPath);
             var baseDir = fs.DirectoryInfo.FromDirectoryName(config.Directory);
@@ -193,6 +192,22 @@ namespace Cabinet.FileSystem {
             }
 
             return keyFile;
+        }
+
+        private IFileSystem GetFileSystem(IFileCabinentConfig config) {
+            var fs = fileSystemFactory();
+
+            bool directoryExists = fs.Directory.Exists(config.Directory);
+
+            if (!directoryExists) {
+                if(!config.CreateIfNotExists) {
+                    throw new ApplicationException(String.Format("{0} does not exist and CreateIfNotExists is set to false.", config.Directory));
+                }
+
+                fs.Directory.CreateDirectory(config.Directory);
+            }
+
+            return fs;
         }
 
         private string GetKeyFullPath(string directory, string key) {
