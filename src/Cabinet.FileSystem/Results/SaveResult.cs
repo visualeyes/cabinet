@@ -1,4 +1,4 @@
-﻿using Cabinet.Core.Providers.Results;
+﻿using Cabinet.Core.Results;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cabinet.FileSystem.Results {
-    public class SaveResult : ISaveResult {
+    internal class SaveResult : ISaveResult {
         private readonly string errorMsg;
 
         public SaveResult(bool success = true) {

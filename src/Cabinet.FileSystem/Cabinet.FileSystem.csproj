@@ -45,7 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CabinetFileInfo.cs" />
-    <Compile Include="FileCabinentConfig.cs" />
+    <Compile Include="FileCabinetConfig.cs" />
+    <Compile Include="FileCabinetFactoryExtensions.cs" />
     <Compile Include="FileSystemStorageProvider.cs" />
     <Compile Include="IFileCabinentConfig.cs" />
     <Compile Include="PathExtensions.cs" />

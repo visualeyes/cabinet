@@ -1,6 +1,6 @@
 ﻿using Cabinet.Core;
 using Cabinet.Core.Providers;
-using Cabinet.Core.Providers.Results;
+using Cabinet.Core.Results;
 using Cabinet.FileSystem.Results;
 using System;
 using System.Collections.Generic;
@@ -12,15 +12,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cabinet.FileSystem {
-    public class FileSystemStorageProvider : IStorageProvider {
+    internal class FileSystemStorageProvider : IStorageProvider<IFileCabinentConfig> {
         public const string ProviderType = "FileSystem";
+        
+        private readonly Func<IFileSystem> fileSystemFactory;
 
-        private readonly IFileCabinentConfig config;
-        private readonly IFileSystem fs;
-
-        public FileSystemStorageProvider(IFileCabinentConfig config, IFileSystem fileSystem) {
-            this.config = config;
-            this.fs = fileSystem;
+        public FileSystemStorageProvider(Func<IFileSystem> fileSystemFactory) {
+            this.fileSystemFactory = fileSystemFactory;
         }
         
         /*
@@ -43,25 +41,35 @@ namespace Cabinet.FileSystem {
         }
         */
 
-        public Task<bool> ExistsAsync(string key) {
-            var fileInfo = this.GetFileInfo(key);
+        public Task<bool> ExistsAsync(string key, IFileCabinentConfig config) {
+            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
+            if (config == null) throw new ArgumentNullException(nameof(config));
+
+            var fileInfo = this.GetFileInfo(key, config);
             return Task.FromResult(fileInfo.Exists);
         }
 
-        public Task<IEnumerable<string>> ListKeysAsync(string keyPrefix = "", bool recursive = true) {
-            var cabinetFiles = GetFilesRecursive(keyPrefix, recursive);
+        public Task<IEnumerable<string>> ListKeysAsync(IFileCabinentConfig config, string keyPrefix = "", bool recursive = true) {
+            if (config == null) throw new ArgumentNullException(nameof(config));
+
+            var cabinetFiles = GetFilesRecursive(keyPrefix, recursive, config);
             var keys = cabinetFiles.Select(f => CabinetFileInfo.GetFileKey(f, config.Directory));
 
             return Task.FromResult(keys);
         }
 
-        public Task<ICabinetFileInfo> GetFileAsync(string key) {
-            var fileInfo = this.GetFileInfo(key);
+        public Task<ICabinetFileInfo> GetFileAsync(string key, IFileCabinentConfig config) {
+            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
+            if (config == null) throw new ArgumentNullException(nameof(config));
+
+            var fileInfo = this.GetFileInfo(key, config);
             return Task.FromResult<ICabinetFileInfo>(new CabinetFileInfo(fileInfo, config.Directory));
         }
 
-        public Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(string keyPrefix = "", bool recursive = true) {
-            var cabinetFiles = GetFilesRecursive(keyPrefix, recursive);
+        public Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(IFileCabinentConfig config, string keyPrefix = "", bool recursive = true) {
+            if (config == null) throw new ArgumentNullException(nameof(config));
+
+            var cabinetFiles = GetFilesRecursive(keyPrefix, recursive, config);
 
             var cabinetFileInfos = cabinetFiles.Select(f => {
                 return new CabinetFileInfo(f, config.Directory);
@@ -70,8 +78,12 @@ namespace Cabinet.FileSystem {
             return Task.FromResult<IEnumerable<ICabinetFileInfo>>(cabinetFileInfos);
         }
 
-        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting) {
-            var fileInfo = this.GetFileInfo(key);
+        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IFileCabinentConfig config) {
+            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (config == null) throw new ArgumentNullException(nameof(config));
+
+            var fileInfo = this.GetFileInfo(key, config);
 
             var handleExisingResult = HandleExistingFile<ISaveResult>(fileInfo, key, handleExisting,
                 () => new SaveResult(true) { AlreadyExists = true },
@@ -83,7 +95,8 @@ namespace Cabinet.FileSystem {
             }
 
             try {
-                using (var writeStream = this.fs.File.OpenWrite(fileInfo.FullName)) {
+                var fs = fileSystemFactory();
+                using (var writeStream = fs.File.OpenWrite(fileInfo.FullName)) {
                     await content.CopyToAsync(writeStream);
 
                     return new SaveResult(true);
@@ -93,8 +106,12 @@ namespace Cabinet.FileSystem {
             }
         }
 
-        public async Task<IMoveResult> MoveFileAsync(ICabinetFileInfo file, string destKey, HandleExistingMethod handleExisting) {
-            var destFileInfo = this.GetFileInfo(destKey);
+        public async Task<IMoveResult> MoveFileAsync(ICabinetFileInfo file, string destKey, HandleExistingMethod handleExisting, IFileCabinentConfig config) {
+            if (file == null) throw new ArgumentNullException(nameof(file));
+            if (String.IsNullOrWhiteSpace(destKey)) throw new ArgumentNullException(nameof(destKey));
+            if (config == null) throw new ArgumentNullException(nameof(config));
+
+            var destFileInfo = this.GetFileInfo(destKey, config);
             
             var handleExisingResult = HandleExistingFile<IMoveResult>(destFileInfo, destKey, handleExisting,
                 () => new MoveResult(true) { AlreadyExists = true },
@@ -106,15 +123,16 @@ namespace Cabinet.FileSystem {
             }
 
             try {
+                var fs = fileSystemFactory();
 
                 if (file.ProviderType == ProviderType) {
-                    var fileInfo = this.GetFileInfo(file.Key);
+                    var fileInfo = this.GetFileInfo(file.Key, config);
                     // Do file system move
-                    this.fs.File.Move(fileInfo.FullName, destFileInfo.FullName);
+                    fs.File.Move(fileInfo.FullName, destFileInfo.FullName);
                 } else {
                     // Save file via stream
                     using (var fileStream = file.GetFileReadStream()) {
-                        using (var destStream = this.fs.File.OpenWrite(destFileInfo.FullName)) {
+                        using (var destStream = fs.File.OpenWrite(destFileInfo.FullName)) {
                             await fileStream.CopyToAsync(destStream);
                         }
                     }
@@ -126,8 +144,11 @@ namespace Cabinet.FileSystem {
             }
         }
 
-        public Task<IDeleteResult> DeleteFileAsync(string key) {
-            var fileInfo = this.GetFileInfo(key);
+        public Task<IDeleteResult> DeleteFileAsync(string key, IFileCabinentConfig config) {
+            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
+            if (config == null) throw new ArgumentNullException(nameof(config));
+
+            var fileInfo = this.GetFileInfo(key, config);
 
             if (!fileInfo.Exists) {
                 return Task.FromResult<IDeleteResult>(new DeleteResult(true) {
@@ -139,16 +160,19 @@ namespace Cabinet.FileSystem {
             return Task.FromResult(result);
         }
 
-        public FileInfoBase GetFileInfo(string key) {
+        public FileInfoBase GetFileInfo(string key, IFileCabinentConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
+            if (config == null) throw new ArgumentNullException(nameof(config));
             if (String.IsNullOrWhiteSpace(config.Directory)) {
                 throw new ApplicationException("The config directory has not been configured.");
             }
 
-            string fullKeyPath = GetKeyFullPath(key);
+            string fullKeyPath = GetKeyFullPath(config.Directory, key);
 
-            var keyFile = this.fs.FileInfo.FromFileName(fullKeyPath);
-            var baseDir = this.fs.DirectoryInfo.FromDirectoryName(config.Directory);
+            var fs = fileSystemFactory();
+
+            var keyFile = fs.FileInfo.FromFileName(fullKeyPath);
+            var baseDir = fs.DirectoryInfo.FromDirectoryName(config.Directory);
 
             // Prevent backpaths
             if (!keyFile.Directory.IsSameDirectory(baseDir) && !keyFile.Directory.IsChildOf(baseDir)) {
@@ -158,16 +182,19 @@ namespace Cabinet.FileSystem {
             return keyFile;
         }
 
-        public DirectoryInfoBase GetDirectoryInfo(string key) {
+        public DirectoryInfoBase GetDirectoryInfo(string key, IFileCabinentConfig config) {
             if (key == null) throw new ArgumentNullException(nameof(key)); // Allow empty strings
+            if (config == null) throw new ArgumentNullException(nameof(config));
             if (String.IsNullOrWhiteSpace(config.Directory)) {
                 throw new ApplicationException("The config directory has not been configured.");
             }
 
-            string fullKeyPath = GetKeyFullPath(key);
+            string fullKeyPath = GetKeyFullPath(config.Directory, key);
 
-            var keyFile = this.fs.DirectoryInfo.FromDirectoryName(fullKeyPath);
-            var baseDir = this.fs.DirectoryInfo.FromDirectoryName(config.Directory);
+            var fs = fileSystemFactory();
+
+            var keyFile = fs.DirectoryInfo.FromDirectoryName(fullKeyPath);
+            var baseDir = fs.DirectoryInfo.FromDirectoryName(config.Directory);
 
             // Prevent backpaths
             if (!keyFile.IsSameDirectory(baseDir) && !keyFile.IsChildOf(baseDir)) {
@@ -177,8 +204,11 @@ namespace Cabinet.FileSystem {
             return keyFile;
         }
 
-        private string GetKeyFullPath(string key) {
-            string keyPath = Path.Combine(config.Directory, key);
+        private string GetKeyFullPath(string directory, string key) {
+            if (String.IsNullOrWhiteSpace(directory)) throw new ArgumentNullException(nameof(directory));
+            if (key == null) throw new ArgumentNullException(nameof(key)); // Allow empty strings
+
+            string keyPath = Path.Combine(directory, key);
             string fullKeyPath = Path.GetFullPath(keyPath);
 
             return fullKeyPath;
@@ -193,8 +223,8 @@ namespace Cabinet.FileSystem {
             }
         }
         
-        private FileInfoBase[] GetFilesRecursive(string keyPrefix, bool recursive) {
-            var dirInfo = this.GetDirectoryInfo(keyPrefix);
+        private FileInfoBase[] GetFilesRecursive(string keyPrefix, bool recursive, IFileCabinentConfig config) {
+            var dirInfo = this.GetDirectoryInfo(keyPrefix, config);
 
             var searchOption = recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
             var files = dirInfo.GetFiles("*", searchOption);

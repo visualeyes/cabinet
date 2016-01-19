@@ -1,4 +1,4 @@
-﻿using Cabinet.Core.Providers.Results;
+﻿using Cabinet.Core.Results;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,17 +8,22 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cabinet.Core.Providers {
-    public interface IStorageProvider {
+    /// <summary>
+    /// Provides IO operations for a storage provider i.e. FileSystem, S3, AzureBlobStorage
+    /// Ideally it should be implemented in a thread safe maner so it can be used as a singleton
+    /// </summary>
+    /// <typeparam name="T">Provider Configuration</typeparam>
+    public interface IStorageProvider<T> where T : IProviderConfiguration {
         // Task<string> GetUniqueFileNameAsync(string path, string name);
         
-        Task<bool> ExistsAsync(string key);
-        Task<IEnumerable<string>> ListKeysAsync(string keyPrefix = "", bool recursive = true);
+        Task<bool> ExistsAsync(string key, T config);
+        Task<IEnumerable<string>> ListKeysAsync(T config, string keyPrefix = "", bool recursive = true);
 
-        Task<ICabinetFileInfo> GetFileAsync(string key);
-        Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(string keyPrefix = "", bool recursive = true);
+        Task<ICabinetFileInfo> GetFileAsync(string key, T config);
+        Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(T config, string keyPrefix = "", bool recursive = true);
 
-        Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting);
-        Task<IMoveResult> MoveFileAsync(ICabinetFileInfo file, string destKey, HandleExistingMethod handleExisting);
-        Task<IDeleteResult> DeleteFileAsync(string key);
+        Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, T config);
+        Task<IMoveResult> MoveFileAsync(ICabinetFileInfo file, string destKey, HandleExistingMethod handleExisting, T config);
+        Task<IDeleteResult> DeleteFileAsync(string key, T config);
     }
 }

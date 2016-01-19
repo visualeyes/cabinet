@@ -40,13 +40,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileCabinet.cs" />
+    <Compile Include="FileCabinetFactory.cs" />
     <Compile Include="ICabinetFileInfo.cs" />
+    <Compile Include="IFileCabinet.cs" />
+    <Compile Include="IFileCabinetFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\HandleExistingMethod.cs" />
-    <Compile Include="Providers\Results\IDeleteResult.cs" />
-    <Compile Include="Providers\Results\IFileOperationResult.cs" />
-    <Compile Include="Providers\Results\IMoveResult.cs" />
-    <Compile Include="Providers\Results\ISaveResult.cs" />
+    <Compile Include="Providers\IProviderConfiguration.cs" />
+    <Compile Include="Results\IDeleteResult.cs" />
+    <Compile Include="Results\IFileOperationResult.cs" />
+    <Compile Include="Results\IMoveResult.cs" />
+    <Compile Include="Results\ISaveResult.cs" />
     <Compile Include="Providers\IStorageProvider.cs" />
   </ItemGroup>
   <ItemGroup />

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cabinet.FileSystem {
-    public static class PathExtensions {
+    internal static class PathExtensions {
         public static string MakeRelativeTo(this string fullPath, string basePath) {
             if (!basePath.EndsWith(Path.DirectorySeparatorChar.ToString())) {
                 basePath += Path.DirectorySeparatorChar;

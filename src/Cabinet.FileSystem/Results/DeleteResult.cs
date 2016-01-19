@@ -1,4 +1,4 @@
-﻿using Cabinet.Core.Providers.Results;
+﻿using Cabinet.Core.Results;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cabinet.FileSystem.Results {
-    public class DeleteResult : IDeleteResult {
+    internal class DeleteResult : IDeleteResult {
 
         public DeleteResult(bool success = true) {
             this.Success = success;

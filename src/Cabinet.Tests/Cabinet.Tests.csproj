@@ -33,6 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Moq, Version=4.2.1510.2205, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Abstractions, Version=2.0.0.123, Culture=neutral, PublicKeyToken=d480b5b72fb413da, processorArchitecture=MSIL">
@@ -67,6 +71,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\FileCabinetFactoryFacts.cs" />
+    <Compile Include="Core\FileCabinetFacts.cs" />
+    <Compile Include="Core\ITestProviderConfiguration.cs" />
     <Compile Include="Core\TestCabinetFileInfo.cs" />
     <Compile Include="FileSystem\FileSystemStorageProviderFacts.cs" />
     <Compile Include="FileSystem\PathExtensionFacts.cs" />
