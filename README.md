@@ -14,7 +14,7 @@ cabinetFactory.RegisterFileSystemProvider()
 and 
 ```csharp
 IFileCabinet fileCabinet = cabinetFactory.GetCabinet(new FileSystemCabinetConfig() {
-    Directory = "C:\data\"
+    Directory = @"C:\data\"
 })
 ```
 
