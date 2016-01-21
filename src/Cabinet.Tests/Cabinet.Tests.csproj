@@ -76,6 +76,7 @@
     <Compile Include="Core\FileCabinetFacts.cs" />
     <Compile Include="Core\ITestProviderConfiguration.cs" />
     <Compile Include="Core\TestCabinetFileInfo.cs" />
+    <Compile Include="FileSystem\FileCabinetFactoryExtensionsFacts.cs" />
     <Compile Include="FileSystem\FileCabinetFileInfoFacts.cs" />
     <Compile Include="FileSystem\FileSystemCabinetConfigFacts.cs" />
     <Compile Include="FileSystem\FileSystemStorageProviderFacts.cs" />

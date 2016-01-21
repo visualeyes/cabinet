@@ -23,11 +23,13 @@ namespace Cabinet.Tests.Core {
 
             this.fileCabinet = new FileCabinet<ITestProviderConfiguration>(mockStorageProvider.Object, mockConfig.Object);
         }
-
+        
+        [Fact]
         public void Null_Provider_Throws() {
             Assert.Throws<ArgumentNullException>(() => new FileCabinet<ITestProviderConfiguration>(null, this.mockConfig.Object));
         }
 
+        [Fact]
         public void Null_Config_Throws() {
             Assert.Throws<ArgumentNullException>(() => new FileCabinet<ITestProviderConfiguration>(mockStorageProvider.Object, null));
         }
