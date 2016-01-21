@@ -9,7 +9,8 @@ namespace Cabinet.S3 {
     public static class FileCabinetFactoryExtensions {
 
         public static IFileCabinetFactory RegisterS3Provider(this IFileCabinetFactory factory) {
-            var provider = new AmazonS3StorageProvider();
+            var clientFactory = new S3ClientFactory();
+            var provider = new AmazonS3StorageProvider(clientFactory);
             factory.RegisterProvider(provider);
             return factory;
         }

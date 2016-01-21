@@ -12,11 +12,18 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using System.Net;
 using Cabinet.S3.Results;
+using System.Threading;
 
 namespace Cabinet.S3 {
     // TOCONSIDER: Should GetFile ect get an object or just return info that can be used to get the stream
-    public class AmazonS3StorageProvider : IStorageProvider<S3CabinetConfig> {
+    internal class AmazonS3StorageProvider : IStorageProvider<S3CabinetConfig> {
         public const string ProviderType = "AmazonS3";
+
+        private readonly IS3ClientFactory clientFactory;
+
+        internal AmazonS3StorageProvider(IS3ClientFactory clientFactory) {
+            this.clientFactory = clientFactory;
+        }
 
         public async Task<bool> ExistsAsync(string key, S3CabinetConfig config) {
             using (var s3Client = GetS3Client(config)) {
@@ -34,7 +41,7 @@ namespace Cabinet.S3 {
 
         public async Task<ICabinetFileInfo> GetFileAsync(string key, S3CabinetConfig config) {
             using (var s3Client = GetS3Client(config)) {
-                using (var response = await GetS3Object(s3Client, key, config)) {
+                using (var response = await GetS3Object(s3Client, key, config, CancellationToken.None)) {
                     return new S3CabinetFileInfo(response);
                 }
             }
@@ -106,13 +113,13 @@ namespace Cabinet.S3 {
             }
         }
 
-        private static async Task<bool> ExistsInternalAsync(string key, S3CabinetConfig config, AmazonS3Client s3Client) {
-            using (var response = await GetS3Object(s3Client, key, config)) {
+        private static async Task<bool> ExistsInternalAsync(string key, S3CabinetConfig config, IAmazonS3 s3Client) {
+            using (var response = await GetS3Object(s3Client, key, config, CancellationToken.None)) {
                 return response.HttpStatusCode == HttpStatusCode.OK;
             }
         }
 
-        private static async Task<bool> SkipUploadAsync(string key, HandleExistingMethod handleExisting, S3CabinetConfig config, AmazonS3Client s3Client) {
+        private static async Task<bool> SkipUploadAsync(string key, HandleExistingMethod handleExisting, S3CabinetConfig config, IAmazonS3 s3Client) {
             if (handleExisting == HandleExistingMethod.Overwrite) {
                 return false;
             }
@@ -129,7 +136,7 @@ namespace Cabinet.S3 {
             throw new NotImplementedException();
         }
 
-        private static async Task<List<S3Object>> GetS3Objects(S3CabinetConfig config, string keyPrefix, AmazonS3Client s3Client) {
+        private static async Task<List<S3Object>> GetS3Objects(S3CabinetConfig config, string keyPrefix, IAmazonS3 s3Client) {
             var s3Objects = new List<S3Object>();
 
             var request = new ListObjectsRequest {
@@ -152,18 +159,18 @@ namespace Cabinet.S3 {
             return s3Objects;
         }
 
-        private static async Task<GetObjectResponse> GetS3Object(AmazonS3Client s3Client, string key, S3CabinetConfig config) {
+        private static async Task<GetObjectResponse> GetS3Object(IAmazonS3 s3Client, string key, S3CabinetConfig config, CancellationToken cancellationToken) {
             var request = new GetObjectRequest {
                 BucketName = config.BucketName,
                 Key = key
             };
 
-            using (var response = await s3Client.GetObjectAsync(request)) {
+            using (var response = await s3Client.GetObjectAsync(request, cancellationToken)) {
                 return response;
             }
         }
 
-        private static async Task<PutObjectResponse> UploadInternal(string key, Stream content, S3CabinetConfig config, AmazonS3Client s3Client) {
+        private static async Task<PutObjectResponse> UploadInternal(string key, Stream content, S3CabinetConfig config, IAmazonS3 s3Client) {
             var request = new PutObjectRequest {
                 BucketName = config.BucketName,
                 Key = key,
@@ -174,7 +181,7 @@ namespace Cabinet.S3 {
             return response;
         }
 
-        private static async Task<IDeleteResult> DeleteInternal(string key, S3CabinetConfig config, AmazonS3Client s3Client) {
+        private static async Task<IDeleteResult> DeleteInternal(string key, S3CabinetConfig config, IAmazonS3 s3Client) {
             try {
                 var deleteObjectRequest = new DeleteObjectRequest {
                     BucketName = config.BucketName,
@@ -189,8 +196,8 @@ namespace Cabinet.S3 {
             }
         }
 
-        private static AmazonS3Client GetS3Client(S3CabinetConfig config) {
-            return new AmazonS3Client(config.AmazonS3Config);
+        private IAmazonS3 GetS3Client(S3CabinetConfig config) {
+            return clientFactory.GetS3Client(config);
         }
     }
 }
