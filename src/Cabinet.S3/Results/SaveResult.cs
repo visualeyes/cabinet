@@ -37,7 +37,7 @@ namespace Cabinet.S3.Results {
         }
 
         public static string GetErrorMessage(Exception exception) {
-            return exception?.ToString();
+            return exception?.Message;
         }
 
         public static string GetErrorMessage(HttpStatusCode httpStatusCode) {
