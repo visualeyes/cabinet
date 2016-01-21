@@ -241,7 +241,11 @@ namespace Cabinet.FileSystem {
         
         private FileInfoBase[] GetFilesRecursive(string keyPrefix, bool recursive, FileSystemCabinetConfig config) {
             var dirInfo = this.GetDirectoryInfo(keyPrefix, config);
-
+                        
+            if(!dirInfo.Exists) {
+                return new FileInfoBase[0];
+            }
+            
             var searchOption = recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
             var files = dirInfo.GetFiles("*", searchOption);
             return files;

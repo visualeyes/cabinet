@@ -103,6 +103,18 @@ namespace Cabinet.Tests.FileSystem {
             Assert.Equal(expectedFiles.Keys, actualFiles.Select(a => a.Key));
         }
 
+        [Fact]
+        public async Task Get_Files_Missing_Directory() {
+            string basePath = @"C:\test";
+
+            var provider = GetProvider(basePath);
+            var config = GetConfig(basePath);
+
+            var actualFiles = await provider.GetFilesAsync(config, keyPrefix: "missingDir", recursive: true);
+
+            Assert.Empty(actualFiles);
+        }
+
         [Theory]
         [MemberData("GetSafeTestPaths")]
         public async Task Save_File(string basePath, string key, string expectedFilePath, string expectedFileKey) {
