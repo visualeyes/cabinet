@@ -13,10 +13,26 @@ using Xunit;
 
 namespace Cabinet.Tests.FileSystem {
     public class FileSystemStorageProviderFacts {
+        private const string ValidBasePath = @"C:\tests";
+
         private readonly MockFileSystem mockFileSystem;
 
         public FileSystemStorageProviderFacts() {
             this.mockFileSystem = new MockFileSystem();
+        }
+
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public async Task Exists_Empty_Key_Throws(string key) {
+            var provider = GetProvider(ValidBasePath);
+            var config = GetConfig(ValidBasePath);
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.ExistsAsync(key, config));
+        }
+
+        [Fact]
+        public async Task Exists_Null_Config_Throws() {
+            var provider = GetProvider(ValidBasePath);
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.ExistsAsync("key", null));
         }
 
         [Theory]
@@ -30,6 +46,20 @@ namespace Cabinet.Tests.FileSystem {
             var exists = await provider.ExistsAsync(key, config);
 
             Assert.False(exists);
+        }
+
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public async Task GetFile_Empty_Key_Throws(string key) {
+            var provider = GetProvider(ValidBasePath);
+            var config = GetConfig(ValidBasePath);
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.GetFileAsync(key, config));
+        }
+
+        [Fact]
+        public async Task GetFile_Null_Config_Throws() {
+            var provider = GetProvider(ValidBasePath);
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.GetFileAsync("key", null));
         }
 
         [Theory]
@@ -116,6 +146,31 @@ namespace Cabinet.Tests.FileSystem {
         }
 
         [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public async Task SaveFile_Empty_Key_Throws(string key) {
+            var provider = GetProvider(ValidBasePath);
+            var config = GetConfig(ValidBasePath);
+            using (var stream = new MemoryStream()) {
+                await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.SaveFileAsync(key, stream, HandleExistingMethod.Overwrite, config));
+            }
+        }
+
+        [Fact]
+        public async Task SaveFile_Null_Stream_Throws() {
+            var provider = GetProvider(ValidBasePath);
+            var config = GetConfig(ValidBasePath);
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.SaveFileAsync("key", null, HandleExistingMethod.Overwrite, config));
+        }
+
+        [Fact]
+        public async Task SaveFile_Null_Config_Throws() {
+            var provider = GetProvider(ValidBasePath);
+            using (var stream = new MemoryStream()) {
+                await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.SaveFileAsync("key", stream, HandleExistingMethod.Overwrite, null));
+            }
+        }
+
+        [Theory]
         [MemberData("GetSafeTestPaths")]
         public async Task Save_File(string basePath, string key, string expectedFilePath, string expectedFileKey) {
             var provider = GetProvider(basePath);
@@ -179,6 +234,28 @@ namespace Cabinet.Tests.FileSystem {
         }
 
         [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public async Task MoveFile_Empty_SourceKey_Throws(string sourcekey) {
+            var provider = GetProvider(ValidBasePath);
+            var config = GetConfig(ValidBasePath);
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.MoveFileAsync(sourcekey, "destkey", HandleExistingMethod.Overwrite, config));
+        }
+
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public async Task MoveFile_Empty_DestKey_Throws(string destkey) {
+            var provider = GetProvider(ValidBasePath);
+            var config = GetConfig(ValidBasePath);
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.MoveFileAsync("sourcekey", destkey, HandleExistingMethod.Overwrite, config));
+        }
+
+        [Fact]
+        public async Task MoveFile_Null_Config_Throws() {
+            var provider = GetProvider(ValidBasePath);
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.MoveFileAsync("sourcekey", "destkey", HandleExistingMethod.Overwrite, null));
+        }
+
+        [Theory]
         [MemberData("GetMoveTestPaths")]
         public async Task Move_FileSystem_File_To_Missing(string basePath, string fromKey, string fromPath, string toKey, string toPath) {
             var provider = GetProvider(basePath);
@@ -238,7 +315,21 @@ namespace Cabinet.Tests.FileSystem {
                 await provider.MoveFileAsync(fromKey, toKey, HandleExistingMethod.Throw, config);
             });
         }
-        
+
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public async Task DeleteFile_Empty_Key_Throws(string key) {
+            var provider = GetProvider(ValidBasePath);
+            var config = GetConfig(ValidBasePath);
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.DeleteFileAsync(key, config));
+        }
+
+        [Fact]
+        public async Task Delete_Null_Config_Throws() {
+            var provider = GetProvider(ValidBasePath);
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.DeleteFileAsync("key", null));
+        }
+
         [Theory]
         [MemberData("GetSafeTestPaths")]
         public async Task Delete_Existing_File(string basePath, string key, string expectedFilePath, string expectedFileKey) {
@@ -286,6 +377,21 @@ namespace Cabinet.Tests.FileSystem {
             var exists = await provider.ExistsAsync(key, config);
 
             Assert.True(exists);
+        }
+
+
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public void GetFileInfo_Empty_Key_Throws(string key) {
+            var provider = GetProvider(ValidBasePath);
+            var config = GetConfig(ValidBasePath);
+            Assert.Throws<ArgumentNullException>(() => provider.GetFileInfo(key, config));
+        }
+
+        [Fact]
+        public void GetFileInfo_Null_Config_Throws() {
+            var provider = GetProvider(ValidBasePath);
+            Assert.Throws<ArgumentNullException>(() => provider.GetFileInfo("key", null));
         }
 
         [Theory]
