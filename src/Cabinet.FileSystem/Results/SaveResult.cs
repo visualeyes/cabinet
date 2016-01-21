@@ -15,6 +15,7 @@ namespace Cabinet.FileSystem.Results {
         }
 
         public SaveResult(Exception e, string errorMsg = null) {
+            if (e == null) throw new ArgumentNullException(nameof(e));
             this.Exception = e;
             this.errorMsg = errorMsg ?? GetMoveFileErrorMessage(e);
             this.Success = false;

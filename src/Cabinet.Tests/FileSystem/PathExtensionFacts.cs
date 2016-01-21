@@ -1,6 +1,8 @@
 ﻿using Cabinet.FileSystem;
+using Moq;
 using System;
 using System.Collections.Generic;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +18,39 @@ namespace Cabinet.Tests.FileSystem {
         public void Make_Relative(string basePath, string subPath, string expectedRelativePath) {
             string actual = subPath.MakeRelativeTo(basePath);
             Assert.Equal(expectedRelativePath, actual);
+        }
+
+        [Theory]
+        [InlineData(null, @"C:\foo")]
+        [InlineData("", @"C:\foo")]
+        [InlineData("   ", @"C:\foo")]
+        [InlineData(@"C:\foo", null)]
+        [InlineData(@"C:\foo", "")]
+        [InlineData(@"C:\foo", "   ")]
+        public void Is_SameDirectory_Throws_If_Null_Or_Empty_Path(string path1, string path2) {
+            Assert.Throws<ArgumentNullException>(() => {
+                path1.IsSameDirectory(path2);
+            });
+        }
+
+        [Fact]
+        public void Is_SameDirectory_Throws_If_Null_Dir1() {
+            DirectoryInfoBase item1 = null;
+            DirectoryInfoBase item2 = new Mock<DirectoryInfoBase>().Object;
+
+            Assert.Throws<ArgumentNullException>(() => {
+                item1.IsSameDirectory(item2);
+            });
+        }
+
+        [Fact]
+        public void Is_SameDirectory_Throws_If_Null_Dir2() {
+            DirectoryInfoBase item1 = new Mock<DirectoryInfoBase>().Object;
+            DirectoryInfoBase item2 = null;
+
+            Assert.Throws<ArgumentNullException>(() => {
+                item1.IsSameDirectory(item2);
+            });
         }
 
         [Theory]

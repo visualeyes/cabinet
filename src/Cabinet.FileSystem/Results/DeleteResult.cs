@@ -14,6 +14,7 @@ namespace Cabinet.FileSystem.Results {
         }
 
         public DeleteResult(Exception e) {
+            if (e == null) throw new ArgumentNullException(nameof(e));
             this.Exception = e;
             this.Success = false;
         }

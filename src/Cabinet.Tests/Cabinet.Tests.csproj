@@ -76,17 +76,23 @@
     <Compile Include="Core\FileCabinetFacts.cs" />
     <Compile Include="Core\ITestProviderConfiguration.cs" />
     <Compile Include="Core\TestCabinetFileInfo.cs" />
+    <Compile Include="FileSystem\FileCabinetFileInfoFacts.cs" />
+    <Compile Include="FileSystem\FileSystemCabinetConfigFacts.cs" />
     <Compile Include="FileSystem\FileSystemStorageProviderFacts.cs" />
     <Compile Include="FileSystem\PathExtensionFacts.cs" />
+    <Compile Include="FileSystem\Results\DeleteResultFacts.cs" />
+    <Compile Include="FileSystem\Results\MoveResultFacts.cs" />
+    <Compile Include="FileSystem\Results\SaveResultFacts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="S3\Results\DeleteResultFacts.cs" />
+    <Compile Include="S3\Results\MoveResultFacts.cs" />
+    <Compile Include="S3\Results\SaveResultFacts.cs" />
     <Compile Include="TestSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="S3\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
