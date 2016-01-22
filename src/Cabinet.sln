@@ -24,6 +24,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cabinet.FileSystem", "Cabin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cabinet.Migrator", "Cabinet.Migrator\Cabinet.Migrator.csproj", "{FEC7949E-6925-4B44-B2C0-2D695C750C72}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cabinet.Web", "Cabinet.Web\Cabinet.Web.csproj", "{C74037B5-9D95-4806-9BE7-89BBA1B07F4E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cabinet.Web.SelfHostTest", "Cabinet.Web.SelfHostTest\Cabinet.Web.SelfHostTest.csproj", "{AC2A8304-DBC8-452D-AA16-02423EDBB571}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +54,14 @@ Global
 		{FEC7949E-6925-4B44-B2C0-2D695C750C72}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEC7949E-6925-4B44-B2C0-2D695C750C72}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEC7949E-6925-4B44-B2C0-2D695C750C72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C74037B5-9D95-4806-9BE7-89BBA1B07F4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C74037B5-9D95-4806-9BE7-89BBA1B07F4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C74037B5-9D95-4806-9BE7-89BBA1B07F4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C74037B5-9D95-4806-9BE7-89BBA1B07F4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC2A8304-DBC8-452D-AA16-02423EDBB571}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC2A8304-DBC8-452D-AA16-02423EDBB571}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC2A8304-DBC8-452D-AA16-02423EDBB571}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC2A8304-DBC8-452D-AA16-02423EDBB571}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
