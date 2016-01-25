@@ -22,6 +22,10 @@ namespace Cabinet.S3 {
 
         private readonly IS3ClientFactory clientFactory;
 
+        string IStorageProvider<S3CabinetConfig>.ProviderType {
+            get { return ProviderType; }
+        }
+
         internal AmazonS3StorageProvider(IS3ClientFactory clientFactory) {
             this.clientFactory = clientFactory;
         }
@@ -49,16 +53,30 @@ namespace Cabinet.S3 {
 
             using (var s3Client = GetS3Client(config)) {
                 using (var response = await GetS3Object(key, config, s3Client, CancellationToken.None)) {
-                    return new S3CabinetFileInfo(response);
+                    bool exists = response.HttpStatusCode == HttpStatusCode.OK;
+                    return new S3CabinetFileInfo(response.Key, exists);
                 }
             }
         }
 
-        public Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(S3CabinetConfig config, string keyPrefix = null, bool recursive = true) {
+        public async Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(S3CabinetConfig config, string keyPrefix = null, bool recursive = true) {
             if (String.IsNullOrWhiteSpace(keyPrefix)) throw new ArgumentNullException(nameof(keyPrefix));
             if (config == null) throw new ArgumentNullException(nameof(config));
+            using(var s3Client = GetS3Client(config)) {
+                var s3Objects = await GetS3Objects(keyPrefix, config, s3Client);
 
-            throw new NotImplementedException();
+                return s3Objects.Select(o => new S3CabinetFileInfo(o.Key, true));
+            }
+        }
+
+        public async Task<Stream> OpenFileReadStream(string key, S3CabinetConfig config) {
+            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
+            if (config == null) throw new ArgumentNullException(nameof(config));
+
+            using (var s3Client = GetS3Client(config)) {
+                var transferUtility = new TransferUtility(s3Client);
+                return await transferUtility.OpenStreamAsync(config.BucketName, key);
+            }
         }
 
         public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, S3CabinetConfig config) {

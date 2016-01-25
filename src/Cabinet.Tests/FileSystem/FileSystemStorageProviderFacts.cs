@@ -79,10 +79,6 @@ namespace Cabinet.Tests.FileSystem {
             Assert.Equal(FileSystemStorageProvider.ProviderType, fileInfo.ProviderType);
             Assert.Equal(expectedFileKey, fileInfo.Key);
             Assert.True(fileInfo.Exists);
-
-            using (var stream = fileInfo.GetFileReadStream()) {
-                Assert.NotNull(stream);
-            }
         }
 
         [Theory]
@@ -115,7 +111,6 @@ namespace Cabinet.Tests.FileSystem {
             Assert.Equal(FileSystemStorageProvider.ProviderType, fileInfo.ProviderType);
             Assert.Equal(expectedFileKey, fileInfo.Key);
             Assert.False(fileInfo.Exists);
-            Assert.Throws<InvalidOperationException>(() => fileInfo.GetFileReadStream());
         }
 
         [Theory]

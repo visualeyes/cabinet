@@ -10,6 +10,5 @@ namespace Cabinet.Core {
         string ProviderType { get; }
         string Key { get; }
         bool Exists { get; }
-        Stream GetFileReadStream();
     }
 }

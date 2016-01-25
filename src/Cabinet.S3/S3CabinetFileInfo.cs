@@ -10,26 +10,17 @@ using System.Threading.Tasks;
 
 namespace Cabinet.S3 {
     public class S3CabinetFileInfo : ICabinetFileInfo {
-        private readonly GetObjectResponse response;
 
-        public S3CabinetFileInfo(GetObjectResponse response) {
-            this.response = response;
+        public S3CabinetFileInfo(string key, bool exists) {
+            this.Key = key;
+            this.Exists = exists;
         }
 
-        public bool Exists {
-            get { return response.HttpStatusCode == HttpStatusCode.OK; }
-        }
-
-        public string Key {
-            get { return this.response.Key; }
-        }
+        public string Key { get; private set; }
+        public bool Exists { get; private set; }
 
         public string ProviderType {
             get { return AmazonS3StorageProvider.ProviderType; }
-        }
-
-        public Stream GetFileReadStream() {
-            return this.response.ResponseStream;
         }
     }
 }

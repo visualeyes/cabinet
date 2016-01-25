@@ -14,13 +14,15 @@ namespace Cabinet.Core.Providers {
     /// </summary>
     /// <typeparam name="T">Provider Configuration</typeparam>
     public interface IStorageProvider<T> where T : IStorageProviderConfig {
-        // Task<string> GetUniqueFileNameAsync(string path, string name);
+        string ProviderType { get; }
         
         Task<bool> ExistsAsync(string key, T config);
         Task<IEnumerable<string>> ListKeysAsync(T config, string keyPrefix = "", bool recursive = true);
 
         Task<ICabinetFileInfo> GetFileAsync(string key, T config);
         Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(T config, string keyPrefix = "", bool recursive = true);
+
+        Task<Stream> OpenFileReadStream(string key, T config);
 
         Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, T config);
         Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, T config);

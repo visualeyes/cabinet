@@ -17,29 +17,13 @@ namespace Cabinet.FileSystem {
         
         private readonly Func<IFileSystem> fileSystemFactory;
 
+        string IStorageProvider<FileSystemCabinetConfig>.ProviderType {
+            get { return ProviderType; }
+        }
+
         public FileSystemStorageProvider(Func<IFileSystem> fileSystemFactory) {
             this.fileSystemFactory = fileSystemFactory;
         }
-        
-        /*
-        public string GetUniqueFileName(string keyPrefix, string fileName) {
-            // TODO - Prevent back paths
-            string fullKeyPath = GetKeyFullPath(keyPrefix);
-            
-            string filePath = Path.Combine(fullKeyPath, fileName);
-
-            string extensionlessName = Path.GetFileNameWithoutExtension(filePath);
-            string extension = Path.GetExtension(filePath);
-            int count = 1;
-
-            while (this.fs.File.Exists(filePath)) {
-                filePath = Path.Combine(fullKeyPath, String.Format("{0} ({1}){2}", extensionlessName, count, extension));
-                count++;
-            }
-
-            return filePath;
-        }
-        */
 
         public Task<bool> ExistsAsync(string key, FileSystemCabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
@@ -76,6 +60,15 @@ namespace Cabinet.FileSystem {
             });
 
             return Task.FromResult<IEnumerable<ICabinetFileInfo>>(cabinetFileInfos);
+        }
+
+        public Task<Stream> OpenFileReadStream(string key, FileSystemCabinetConfig config) {
+            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
+            if (config == null) throw new ArgumentNullException(nameof(config));
+
+            var fileInfo = this.GetFileInfo(key, config);
+            var stream = fileInfo.OpenRead();
+            return Task.FromResult(stream);
         }
 
         public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, FileSystemCabinetConfig config) {

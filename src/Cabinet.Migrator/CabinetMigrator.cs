@@ -3,6 +3,7 @@ using Cabinet.Core.Providers;
 using Cabinet.Core.Results;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,7 +29,7 @@ namespace Cabinet.Migrator {
             }
 
             ISaveResult saveResult;
-            using (var stream = file.GetFileReadStream()) {
+            using (var stream = await sourceCabinet.OpenFileReadStream(file)) {
                 saveResult = await destCabinet.SaveFileAsync(file.Key, stream, handleExisting);
             }
 

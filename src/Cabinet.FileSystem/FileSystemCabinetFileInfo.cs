@@ -29,14 +29,6 @@ namespace Cabinet.FileSystem {
             get { return this.fileInfo.Exists; }
         }
 
-        public Stream GetFileReadStream() {
-            if(!this.Exists) {
-                throw new InvalidOperationException("Cannot get a read stream for a missing file");
-            }
-
-            return fileInfo.OpenRead();
-        }
-
         public static string GetFileKey(FileInfoBase fileInfo, string baseDirectory) {
             return fileInfo.FullName.MakeRelativeTo(baseDirectory);
         }

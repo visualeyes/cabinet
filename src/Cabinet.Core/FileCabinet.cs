@@ -32,6 +32,18 @@ namespace Cabinet.Core {
             return await provider.GetFilesAsync(keyPrefix: keyPrefix, recursive: recursive, config: config);
         }
 
+        public async Task<Stream> OpenFileReadStream(ICabinetFileInfo file) {
+            if(file.ProviderType != provider.ProviderType) {
+                throw new InvalidOperationException(String.Format("A file with the provider {0} cannot be used with a provider of type {1}", file.ProviderType, provider.ProviderType));
+            }
+
+            if(!file.Exists) {
+                throw new InvalidOperationException("Cannot open a read stream for a file that does not exist");
+            }
+
+            return await provider.OpenFileReadStream(file.Key, config);
+        }
+
         public async Task<IEnumerable<string>> ListKeysAsync(string keyPrefix = "", bool recursive = true) {
             return await provider.ListKeysAsync(keyPrefix: keyPrefix, recursive: recursive, config: config);
         }
