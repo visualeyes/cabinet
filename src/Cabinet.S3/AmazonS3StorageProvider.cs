@@ -69,7 +69,7 @@ namespace Cabinet.S3 {
             }
         }
 
-        public async Task<Stream> OpenFileReadStream(string key, S3CabinetConfig config) {
+        public async Task<Stream> OpenReadStreamAsync(string key, S3CabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
 

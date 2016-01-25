@@ -62,7 +62,7 @@ namespace Cabinet.FileSystem {
             return Task.FromResult<IEnumerable<ICabinetFileInfo>>(cabinetFileInfos);
         }
 
-        public Task<Stream> OpenFileReadStream(string key, FileSystemCabinetConfig config) {
+        public Task<Stream> OpenReadStreamAsync(string key, FileSystemCabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
 

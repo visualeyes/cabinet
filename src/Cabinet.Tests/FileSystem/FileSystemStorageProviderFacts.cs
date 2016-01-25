@@ -88,6 +88,28 @@ namespace Cabinet.Tests.FileSystem {
         }
 
         [Theory]
+        [MemberData("GetSafeTestPaths")]
+        public async Task Get_File_Missing_File(string basePath, string key, string expectedFilePath, string expectedFileKey) {
+            var provider = GetProvider(basePath);
+            var config = GetConfig(basePath);
+
+            Assert.False(this.mockFileSystem.FileExists(expectedFilePath));
+
+            var fileInfo = await provider.GetFileAsync(key, config);
+
+            Assert.Equal(FileSystemStorageProvider.ProviderType, fileInfo.ProviderType);
+            Assert.Equal(expectedFileKey, fileInfo.Key);
+            Assert.False(fileInfo.Exists);
+        }
+
+        [Fact]
+        public async Task List_Keys_Null_Config_Throws() {
+            var provider = GetProvider(ValidBasePath);
+            FileSystemCabinetConfig config = null;
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.ListKeysAsync(config));
+        }
+
+        [Theory]
         [MemberData("GetListTestPaths")]
         public async Task List_Keys(string basePath, IDictionary<string, string> files, string keyPrefix, bool recursive, IDictionary<string, string> expectedFiles) {
             var provider = GetProvider(basePath);
@@ -104,19 +126,11 @@ namespace Cabinet.Tests.FileSystem {
             Assert.Equal(expectedFiles.Keys, keys);
         }
 
-        [Theory]
-        [MemberData("GetSafeTestPaths")]
-        public async Task Get_File_Missing_File(string basePath, string key, string expectedFilePath, string expectedFileKey) {
-            var provider = GetProvider(basePath);
-            var config = GetConfig(basePath);
-
-            Assert.False(this.mockFileSystem.FileExists(expectedFilePath));
-
-            var fileInfo = await provider.GetFileAsync(key, config);
-
-            Assert.Equal(FileSystemStorageProvider.ProviderType, fileInfo.ProviderType);
-            Assert.Equal(expectedFileKey, fileInfo.Key);
-            Assert.False(fileInfo.Exists);
+        [Fact]
+        public async Task Get_Files_Null_Config_Throws() {
+            var provider = GetProvider(ValidBasePath);
+            FileSystemCabinetConfig config = null;
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.GetFilesAsync(config));
         }
 
         [Theory]
@@ -148,9 +162,42 @@ namespace Cabinet.Tests.FileSystem {
             Assert.Empty(actualFiles);
         }
 
+
         [Theory]
         [InlineData(null), InlineData(""), InlineData(" ")]
-        public async Task SaveFile_Empty_Key_Throws(string key) {
+        public async Task Open_Read_Stream_Empty_Key_Throws(string key) {
+            var provider = GetProvider(ValidBasePath);
+            var config = GetConfig(ValidBasePath);
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.OpenReadStreamAsync(key, config));
+        }
+
+        [Fact]
+        public async Task Open_Read_Stream_Null_Config_Throws() {
+            var provider = GetProvider(ValidBasePath);
+            FileSystemCabinetConfig config = null;
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.OpenReadStreamAsync("key", config));
+        }
+
+        [Theory]
+        [InlineData(@"C:\tests\test.txt", "test")]
+        public async Task Open_Read_Stream(string key, string content) {
+            var provider = GetProvider(ValidBasePath);
+            var config = GetConfig(ValidBasePath);
+
+            this.mockFileSystem.AddFile(key, new MockFileData(content));
+
+            using (var stream = await provider.OpenReadStreamAsync(key, config)) {
+                using (var reader = new StreamReader(stream)) {
+                    string actualContents = reader.ReadToEnd();
+
+                    Assert.Equal(content, actualContents);
+                }
+            }
+        }
+
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public async Task Save_File_Stream_Empty_Key_Throws(string key) {
             var provider = GetProvider(ValidBasePath);
             var config = GetConfig(ValidBasePath);
             var mockProgress = new Mock<IProgress<WriteProgress>>();
@@ -159,8 +206,19 @@ namespace Cabinet.Tests.FileSystem {
             }
         }
 
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public async Task Save_File_FilePath_Empty_Key_Throws(string key) {
+            var provider = GetProvider(ValidBasePath);
+            var config = GetConfig(ValidBasePath);
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            using (var stream = new MemoryStream()) {
+                await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.SaveFileAsync(key, @"C:\tests\blah.txt", HandleExistingMethod.Overwrite, mockProgress.Object, config));
+            }
+        }
+
         [Fact]
-        public async Task SaveFile_Null_Stream_Throws() {
+        public async Task Save_File_Stream_Null_Stream_Throws() {
             var provider = GetProvider(ValidBasePath);
             var config = GetConfig(ValidBasePath);
             var mockProgress = new Mock<IProgress<WriteProgress>>();
@@ -169,7 +227,7 @@ namespace Cabinet.Tests.FileSystem {
         }
 
         [Fact]
-        public async Task SaveFile_Null_Config_Throws() {
+        public async Task Save_File_Stream_Null_Config_Throws() {
             var provider = GetProvider(ValidBasePath);
             var mockProgress = new Mock<IProgress<WriteProgress>>();
 
@@ -178,9 +236,17 @@ namespace Cabinet.Tests.FileSystem {
             }
         }
 
+        [Fact]
+        public async Task Save_File_FilePath_Null_Config_Throws() {
+            var provider = GetProvider(ValidBasePath);
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.SaveFileAsync("key", @"C:\foo", HandleExistingMethod.Overwrite, mockProgress.Object, null));
+        }
+
         [Theory]
         [MemberData("GetSafeTestPaths")]
-        public async Task Save_File(string basePath, string key, string expectedFilePath, string expectedFileKey) {
+        public async Task Save_File_Stream(string basePath, string key, string expectedFilePath, string expectedFileKey) {
             var provider = GetProvider(basePath);
             var config = GetConfig(basePath);
             var mockProgress = new Mock<IProgress<WriteProgress>>();
@@ -202,7 +268,7 @@ namespace Cabinet.Tests.FileSystem {
 
         [Theory]
         [MemberData("GetSafeTestPaths")]
-        public async Task Save_File_Overwrites_Existing(string basePath, string key, string expectedFilePath, string expectedFileKey) {
+        public async Task Save_File_Stream_Overwrites_Existing(string basePath, string key, string expectedFilePath, string expectedFileKey) {
             var provider = GetProvider(basePath);
             var config = GetConfig(basePath);
             var mockProgress = new Mock<IProgress<WriteProgress>>();
@@ -227,7 +293,7 @@ namespace Cabinet.Tests.FileSystem {
 
         [Theory]
         [MemberData("GetSafeTestPaths")]
-        public async Task Save_File_No_Overwrites_Throws(string basePath, string key, string expectedFilePath, string expectedFileKey) {
+        public async Task Save_File_Stream_No_Overwrites_Throws(string basePath, string key, string expectedFilePath, string expectedFileKey) {
             var provider = GetProvider(basePath);
             var config = GetConfig(basePath);
             var mockProgress = new Mock<IProgress<WriteProgress>>();
@@ -244,6 +310,49 @@ namespace Cabinet.Tests.FileSystem {
                     await provider.SaveFileAsync(key, contentStream, HandleExistingMethod.Throw, mockProgress.Object, config);
                 });
             }
+        }
+
+        [Theory]
+        [MemberData("GetSafeTestPaths")]
+        public async Task Save_File_File_Path(string basePath, string key, string expectedFilePath, string expectedFileKey) {
+            var provider = GetProvider(basePath);
+            var config = GetConfig(basePath);
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            Assert.False(this.mockFileSystem.FileExists(expectedFilePath));
+
+            string filePath = @"C:\foo\blah.txt";
+            string content = "test";
+
+            this.mockFileSystem.AddFile(filePath, new MockFileData(content));
+
+            var result = await provider.SaveFileAsync(key, filePath, HandleExistingMethod.Throw, mockProgress.Object, config);
+
+            Assert.Null(result.Exception);
+            Assert.True(result.Success);
+            Assert.True(this.mockFileSystem.FileExists(expectedFilePath));
+
+            var mockFile = this.mockFileSystem.GetFile(expectedFilePath);
+            Assert.Equal(content, mockFile.TextContents);
+        }
+
+        [Theory]
+        [MemberData("GetSafeTestPaths")]
+        public async Task Save_File_File_Path_Missing_File(string basePath, string key, string expectedFilePath, string expectedFileKey) {
+            var provider = GetProvider(basePath);
+            var config = GetConfig(basePath);
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            Assert.False(this.mockFileSystem.FileExists(expectedFilePath));
+
+            string filePath = @"C:\foo\blah.txt";
+
+            var result = await provider.SaveFileAsync(key, filePath, HandleExistingMethod.Throw, mockProgress.Object, config);
+
+            Assert.Null(result.Exception);
+            Assert.False(result.Success);
+            Assert.Equal("File does not exist at path " + filePath, result.GetErrorMessage());
+            Assert.False(this.mockFileSystem.FileExists(expectedFilePath));
         }
 
         [Theory]

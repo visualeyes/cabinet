@@ -85,7 +85,7 @@ namespace Cabinet.Tests.Core {
             };
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () => {
-                await this.fileCabinet.OpenFileReadStream(file);
+                await this.fileCabinet.OpenReadStreamAsync(file);
             });
         }
 
@@ -96,7 +96,7 @@ namespace Cabinet.Tests.Core {
             };
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () => {
-                await this.fileCabinet.OpenFileReadStream(file);
+                await this.fileCabinet.OpenReadStreamAsync(file);
             });
         }
 
@@ -105,15 +105,15 @@ namespace Cabinet.Tests.Core {
             string key = "key";
             var mockStream = new Mock<Stream>();
 
-            this.mockStorageProvider.Setup(p => p.OpenFileReadStream(key, this.mockConfig.Object)).ReturnsAsync(mockStream.Object);
+            this.mockStorageProvider.Setup(p => p.OpenReadStreamAsync(key, this.mockConfig.Object)).ReturnsAsync(mockStream.Object);
 
             var file = new TestCabinetFileInfo(key, true) {
                 ProviderType = TestProviderType
             };
 
-            var stream = await this.fileCabinet.OpenFileReadStream(file);
+            var stream = await this.fileCabinet.OpenReadStreamAsync(file);
 
-            this.mockStorageProvider.Verify(p => p.OpenFileReadStream(key, this.mockConfig.Object), Times.Once);
+            this.mockStorageProvider.Verify(p => p.OpenReadStreamAsync(key, this.mockConfig.Object), Times.Once);
 
             Assert.Equal(mockStream.Object, stream);
         }
