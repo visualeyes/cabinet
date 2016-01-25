@@ -44,6 +44,7 @@ IFileCabinet fileCabinet = cabinetFactory.GetCabinet(new FileSystemCabinetConfig
 });
 
 IFileCabinet s3Cabinet = cabinetFactory.GetCabinet(new S3CabinetConfig() {
+    AWSCredentials = new BasicAWSCredentials("accessKey", "secretKey"), 
     AmazonS3Config = new AmazonS3Config(),
     BucketName = "test-bucket"
 });
