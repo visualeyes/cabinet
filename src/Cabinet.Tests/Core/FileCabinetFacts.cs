@@ -12,6 +12,8 @@ using System.IO;
 
 namespace Cabinet.Tests.Core {
     public class FileCabinetFacts {
+        private const string TestProviderType = "Test";
+
         private readonly Mock<ITestProviderConfiguration> mockConfig;
         private readonly Mock<IStorageProvider<ITestProviderConfiguration>> mockStorageProvider;
 
@@ -20,6 +22,7 @@ namespace Cabinet.Tests.Core {
         public FileCabinetFacts() {
             this.mockConfig = new Mock<ITestProviderConfiguration>();
             this.mockStorageProvider = new Mock<IStorageProvider<ITestProviderConfiguration>>();
+            this.mockStorageProvider.SetupGet(p => p.ProviderType).Returns(TestProviderType);
 
             this.fileCabinet = new FileCabinet<ITestProviderConfiguration>(mockStorageProvider.Object, mockConfig.Object);
         }
@@ -73,6 +76,46 @@ namespace Cabinet.Tests.Core {
             this.mockStorageProvider.Verify(s => s.GetFilesAsync(mockConfig.Object, keyPrefix, recursive), Times.Once);
 
             Assert.Equal(expectedFiles, actualFiles);
+        }
+
+        [Fact]
+        public async Task OpenRead_Invalid_Provider_Throws() {
+            var file = new TestCabinetFileInfo("key", true) {
+                ProviderType = "SomeRandomType"
+            };
+
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => {
+                await this.fileCabinet.OpenFileReadStream(file);
+            });
+        }
+
+        [Fact]
+        public async Task OpenRead_Missing_File_Throws() {
+            var file = new TestCabinetFileInfo("key", false) {
+                ProviderType = TestProviderType
+            };
+
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => {
+                await this.fileCabinet.OpenFileReadStream(file);
+            });
+        }
+
+        [Fact]
+        public async Task OpenRead() {
+            string key = "key";
+            var mockStream = new Mock<Stream>();
+
+            this.mockStorageProvider.Setup(p => p.OpenFileReadStream(key, this.mockConfig.Object)).ReturnsAsync(mockStream.Object);
+
+            var file = new TestCabinetFileInfo(key, true) {
+                ProviderType = TestProviderType
+            };
+
+            var stream = await this.fileCabinet.OpenFileReadStream(file);
+
+            this.mockStorageProvider.Verify(p => p.OpenFileReadStream(key, this.mockConfig.Object), Times.Once);
+
+            Assert.Equal(mockStream.Object, stream);
         }
 
         [Theory]

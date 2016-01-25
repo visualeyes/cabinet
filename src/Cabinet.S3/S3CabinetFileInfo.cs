@@ -12,6 +12,8 @@ namespace Cabinet.S3 {
     public class S3CabinetFileInfo : ICabinetFileInfo {
 
         public S3CabinetFileInfo(string key, bool exists) {
+            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
+
             this.Key = key;
             this.Exists = exists;
         }

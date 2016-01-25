@@ -23,6 +23,12 @@ namespace Cabinet.Tests.FileSystem {
             this.mockFileSystem = new MockFileSystem();
         }
 
+        [Fact]
+        public void Provider_Type() {
+            IStorageProvider<FileSystemCabinetConfig> provider = GetProvider(ValidBasePath);
+            Assert.Equal(FileSystemStorageProvider.ProviderType, provider.ProviderType);
+        }
+
         [Theory]
         [InlineData(null), InlineData(""), InlineData(" ")]
         public async Task Exists_Empty_Key_Throws(string key) {

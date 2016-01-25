@@ -94,9 +94,12 @@
     <Compile Include="FileSystem\Results\SaveResultFacts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="S3\AmazonS3StorageProviderFacts.cs" />
+    <Compile Include="S3\FileCabinetFactoryExtensionsFacts.cs" />
     <Compile Include="S3\Results\DeleteResultFacts.cs" />
     <Compile Include="S3\Results\MoveResultFacts.cs" />
     <Compile Include="S3\Results\SaveResultFacts.cs" />
+    <Compile Include="S3\S3CabinetConfigFacts.cs" />
+    <Compile Include="S3\S3CabinetFileInfoFacts.cs" />
     <Compile Include="TestSettings.cs" />
   </ItemGroup>
   <ItemGroup>

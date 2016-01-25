@@ -1,5 +1,6 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
+using Cabinet.Core.Providers;
 using Cabinet.S3;
 using Moq;
 using System;
@@ -22,7 +23,13 @@ namespace Cabinet.Tests.S3 {
 
             this.mockS3ClientFactory.Setup(f => f.GetS3Client(It.IsAny<S3CabinetConfig>())).Returns(this.mockS3Client.Object);
         }
-        
+
+        [Fact]
+        public void Provider_Type() {
+            IStorageProvider<S3CabinetConfig> provider = GetProvider();
+            Assert.Equal(AmazonS3StorageProvider.ProviderType, provider.ProviderType);
+        }
+
         [Theory]
         [InlineData("test-bucket", "test-key", HttpStatusCode.OK, true)]
         [InlineData("test-bucket", "test-key", HttpStatusCode.NotFound, false)]

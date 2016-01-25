@@ -52,7 +52,6 @@
     <Compile Include="AmazonS3StorageProvider.cs" />
     <Compile Include="FileCabinetFactoryExtensions.cs" />
     <Compile Include="IS3ClientFactory.cs" />
-    <Compile Include="MultiPartStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Results\DeleteResult.cs" />
     <Compile Include="Results\MoveResult.cs" />

@@ -16,9 +16,30 @@ namespace Cabinet.Tests.FileSystem.Results {
             Assert.Equal(success, result.Success);
         }
 
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public void Null_Key_Throws_Success(string key) {
+            Assert.Throws<ArgumentNullException>(() => new SaveResult(key));
+        }
+
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public void Null_Key_Throws_Exception(string key) {
+            var e = new Exception();
+            Assert.Throws<ArgumentNullException>(() => new SaveResult(key, e));
+        }
+
         [Fact]
         public void Null_Exception_Throws() {
-            Assert.Throws<ArgumentNullException>(() => new SaveResult(null));
+            Exception e = null;
+            Assert.Throws<ArgumentNullException>(() => new SaveResult("key", e));
+        }
+
+        [Theory]
+        [InlineData(true), InlineData(false)]
+        public void Sets_Already_Exists(bool success) {
+            var result = new SaveResult("key", success: success);
+            Assert.Equal(success, result.Success);
         }
 
         [Fact]
