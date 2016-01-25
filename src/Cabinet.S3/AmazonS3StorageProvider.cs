@@ -37,7 +37,6 @@ namespace Cabinet.S3 {
         }
 
         public async Task<IEnumerable<string>> ListKeysAsync(S3CabinetConfig config, string keyPrefix = null, bool recursive = true) {
-            if (String.IsNullOrWhiteSpace(keyPrefix)) throw new ArgumentNullException(nameof(keyPrefix));
             if (config == null) throw new ArgumentNullException(nameof(config));
 
             using (var s3Client = GetS3Client(config)) {
@@ -60,9 +59,9 @@ namespace Cabinet.S3 {
         }
 
         public async Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(S3CabinetConfig config, string keyPrefix = null, bool recursive = true) {
-            if (String.IsNullOrWhiteSpace(keyPrefix)) throw new ArgumentNullException(nameof(keyPrefix));
             if (config == null) throw new ArgumentNullException(nameof(config));
-            using(var s3Client = GetS3Client(config)) {
+
+            using (var s3Client = GetS3Client(config)) {
                 var s3Objects = await GetS3Objects(keyPrefix, config, s3Client);
 
                 return s3Objects.Select(o => new S3CabinetFileInfo(o.Key, true));
@@ -229,21 +228,27 @@ namespace Cabinet.S3 {
         }
 
         private static async Task<List<S3Object>> GetS3Objects(string keyPrefix, S3CabinetConfig config, IAmazonS3 s3Client) {
-            if (String.IsNullOrWhiteSpace(keyPrefix)) throw new ArgumentNullException(nameof(keyPrefix));
             if (config == null) throw new ArgumentNullException(nameof(config));
             if (s3Client == null) throw new ArgumentNullException(nameof(s3Client));
 
             var s3Objects = new List<S3Object>();
 
+            // See http://stackoverflow.com/questions/8932469/how-can-i-non-recursively-browse-the-contents-of-a-directory-with-the-aws-s3-api
+
             var request = new ListObjectsRequest {
                 BucketName = config.BucketName,
-                Prefix = keyPrefix,
+                Prefix = keyPrefix,    
             };
 
+            // recursive ?
+            // request.Delimiter = "/";
+            
             do {
                 var response = await s3Client.ListObjectsAsync(request);
 
-                s3Objects.AddRange(s3Objects);
+                // response.CommonPrefixes ? get items
+
+                s3Objects.AddRange(response.S3Objects);
 
                 if (response.IsTruncated) {
                     request.Marker = response.NextMarker;

@@ -58,6 +58,7 @@
     <Compile Include="Results\SaveResult.cs" />
     <Compile Include="S3CabinetConfig.cs" />
     <Compile Include="S3CabinetFileInfo.cs" />
+    <Compile Include="S3CabinetFileInfoComparer.cs" />
     <Compile Include="S3ClientFactory.cs" />
   </ItemGroup>
   <ItemGroup>
