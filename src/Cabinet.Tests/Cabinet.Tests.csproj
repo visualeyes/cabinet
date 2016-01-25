@@ -83,6 +83,7 @@
     <Compile Include="Core\FileCabinetFactoryFacts.cs" />
     <Compile Include="Core\FileCabinetFacts.cs" />
     <Compile Include="Core\ITestProviderConfiguration.cs" />
+    <Compile Include="Core\ProgressStreamFacts.cs" />
     <Compile Include="Core\TestCabinetFileInfo.cs" />
     <Compile Include="FileSystem\FileCabinetFactoryExtensionsFacts.cs" />
     <Compile Include="FileSystem\FileCabinetFileInfoFacts.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="S3\Results\SaveResultFacts.cs" />
     <Compile Include="S3\S3CabinetConfigFacts.cs" />
     <Compile Include="S3\S3CabinetFileInfoFacts.cs" />
+    <Compile Include="S3\S3ClientFactoryFacts.cs" />
     <Compile Include="TestSettings.cs" />
   </ItemGroup>
   <ItemGroup>

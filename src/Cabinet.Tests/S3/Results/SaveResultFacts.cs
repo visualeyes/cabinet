@@ -29,9 +29,23 @@ namespace Cabinet.Tests.S3.Results {
             Assert.Equal(errorMsg, result.GetErrorMessage());
         }
 
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public void Null_Key_Throws_Success(string key) {
+            Assert.Throws<ArgumentNullException>(() => new SaveResult(key));
+        }
+
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public void Null_Key_Throws_Exception(string key) {
+            var e = new Exception();
+            Assert.Throws<ArgumentNullException>(() => new SaveResult(key, e));
+        }
+
         [Fact]
         public void Null_Exception_Throws() {
-            Assert.Throws<ArgumentNullException>(() => new SaveResult(null));
+            Exception e = null;
+            Assert.Throws<ArgumentNullException>(() => new SaveResult("key", e));
         }
 
         [Fact]
@@ -41,6 +55,15 @@ namespace Cabinet.Tests.S3.Results {
 
             Assert.False(result.Success);
             Assert.Equal(exception, result.Exception);
+        }
+
+        [Theory]
+        [InlineData(true), InlineData(false)]
+        public void Get_Sets_Already_Exists(bool exists) {
+            var result = new SaveResult("key") {
+                AlreadyExists = exists
+            };
+            Assert.Equal(exists, result.AlreadyExists);
         }
 
         [Theory]

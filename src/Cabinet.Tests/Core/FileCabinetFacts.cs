@@ -152,7 +152,7 @@ namespace Cabinet.Tests.Core {
         [InlineData("key", HandleExistingMethod.Overwrite)]
         [InlineData("key", HandleExistingMethod.Skip)]
         [InlineData("key", HandleExistingMethod.Throw)]
-        public async Task Save_File(string key, HandleExistingMethod handleExisting) {
+        public async Task Save_File_Stream(string key, HandleExistingMethod handleExisting) {
             var mockStream = new Mock<Stream>();
             var mockResult = new Mock<ISaveResult>();
             var mockProgress = new Mock<IProgress<WriteProgress>>();
@@ -162,6 +162,24 @@ namespace Cabinet.Tests.Core {
             var actualResult = await this.fileCabinet.SaveFileAsync(key, mockStream.Object, handleExisting, mockProgress.Object);
 
             this.mockStorageProvider.Verify(s => s.SaveFileAsync(key, mockStream.Object, handleExisting, mockProgress.Object, mockConfig.Object), Times.Once);
+
+            Assert.Equal(mockResult.Object, actualResult);
+        }
+
+        [Theory]
+        [InlineData("key", HandleExistingMethod.Overwrite)]
+        [InlineData("key", HandleExistingMethod.Skip)]
+        [InlineData("key", HandleExistingMethod.Throw)]
+        public async Task Save_File_Path(string key, HandleExistingMethod handleExisting) {
+            string filePath = "C:\test";
+            var mockResult = new Mock<ISaveResult>();
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            this.mockStorageProvider.Setup(s => s.SaveFileAsync(key, filePath, handleExisting, mockProgress.Object, mockConfig.Object)).ReturnsAsync(mockResult.Object);
+
+            var actualResult = await this.fileCabinet.SaveFileAsync(key, filePath, handleExisting, mockProgress.Object);
+
+            this.mockStorageProvider.Verify(s => s.SaveFileAsync(key, filePath, handleExisting, mockProgress.Object, mockConfig.Object), Times.Once);
 
             Assert.Equal(mockResult.Object, actualResult);
         }

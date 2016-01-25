@@ -37,9 +37,11 @@ namespace Cabinet.Tests.FileSystem.Results {
 
         [Theory]
         [InlineData(true), InlineData(false)]
-        public void Sets_Already_Exists(bool success) {
-            var result = new SaveResult("key", success: success);
-            Assert.Equal(success, result.Success);
+        public void Get_Sets_Already_Exists(bool exists) {
+            var result = new SaveResult("key") {
+                AlreadyExists = exists
+            };
+            Assert.Equal(exists, result.AlreadyExists);
         }
 
         [Fact]
