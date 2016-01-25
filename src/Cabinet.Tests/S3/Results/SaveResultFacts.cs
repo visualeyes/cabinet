@@ -13,7 +13,7 @@ namespace Cabinet.Tests.S3.Results {
         [Theory]
         [InlineData(true), InlineData(false)]
         public void Sets_Success(bool success) {
-            var result = new SaveResult(success);
+            var result = new SaveResult("key", success);
             Assert.Equal(success, result.Success);
         }
 
@@ -24,7 +24,7 @@ namespace Cabinet.Tests.S3.Results {
         [InlineData(HttpStatusCode.Unauthorized, false, "Access to the bucket is denied")]
         [InlineData(HttpStatusCode.InternalServerError, false, null)]
         public void Sets_Success(HttpStatusCode code, bool success, string errorMsg) {
-            var result = new SaveResult(code);
+            var result = new SaveResult("key", code);
             Assert.Equal(success, result.Success);
             Assert.Equal(errorMsg, result.GetErrorMessage());
         }
@@ -37,7 +37,7 @@ namespace Cabinet.Tests.S3.Results {
         [Fact]
         public void Sets_Exception() {
             var exception = new Exception("Test");
-            var result = new SaveResult(exception);
+            var result = new SaveResult("key", exception);
 
             Assert.False(result.Success);
             Assert.Equal(exception, result.Exception);
@@ -47,7 +47,7 @@ namespace Cabinet.Tests.S3.Results {
         [InlineData(""), InlineData("test")]
         public void Sets_ErrorMsg(string msg) {
             var exception = new Exception(msg);
-            var result = new SaveResult(exception);
+            var result = new SaveResult("key", exception);
             
             Assert.Equal(msg, result.GetErrorMessage());
         }
@@ -55,7 +55,7 @@ namespace Cabinet.Tests.S3.Results {
         [Theory]
         [MemberData("GetExceptionMessages")]
         public void Get_Exception_Message(Exception e, string msg) {
-            var result = new SaveResult(e);
+            var result = new SaveResult("key", e);
             Assert.Equal(msg, result.GetErrorMessage());
         }
 

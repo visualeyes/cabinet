@@ -112,12 +112,13 @@ namespace Cabinet.Tests.Core {
         public async Task Save_File(string key, HandleExistingMethod handleExisting) {
             var mockStream = new Mock<Stream>();
             var mockResult = new Mock<ISaveResult>();
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
 
-            this.mockStorageProvider.Setup(s => s.SaveFileAsync(key, mockStream.Object, handleExisting, mockConfig.Object)).ReturnsAsync(mockResult.Object);
+            this.mockStorageProvider.Setup(s => s.SaveFileAsync(key, mockStream.Object, handleExisting, mockProgress.Object, mockConfig.Object)).ReturnsAsync(mockResult.Object);
 
-            var actualResult = await this.fileCabinet.SaveFileAsync(key, mockStream.Object, handleExisting);
+            var actualResult = await this.fileCabinet.SaveFileAsync(key, mockStream.Object, handleExisting, mockProgress.Object);
 
-            this.mockStorageProvider.Verify(s => s.SaveFileAsync(key, mockStream.Object, handleExisting, mockConfig.Object), Times.Once);
+            this.mockStorageProvider.Verify(s => s.SaveFileAsync(key, mockStream.Object, handleExisting, mockProgress.Object, mockConfig.Object), Times.Once);
 
             Assert.Equal(mockResult.Object, actualResult);
         }

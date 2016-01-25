@@ -10,17 +10,30 @@ namespace Cabinet.FileSystem.Results {
     internal class MoveResult : IMoveResult {
         private readonly string errorMsg;
 
-        public MoveResult(bool success = true) {
+        private MoveResult(string sourceKey, string destKey) {
+            if (String.IsNullOrWhiteSpace(sourceKey)) throw new ArgumentNullException(nameof(sourceKey));
+            if (String.IsNullOrWhiteSpace(destKey)) throw new ArgumentNullException(nameof(destKey));
+            this.SourceKey = sourceKey;
+            this.DestKey = destKey;
+        }
+
+        public MoveResult(string sourceKey, string destKey, bool success = true) 
+            : this(sourceKey, destKey) {
             this.Success = success;
         }
 
-        public MoveResult(Exception e, string errorMsg = null) {
+        public MoveResult(string sourceKey, string destKey, Exception e, string errorMsg = null)
+            : this(sourceKey, destKey) {
             if (e == null) throw new ArgumentNullException(nameof(e));
+            this.SourceKey = sourceKey;
+            this.DestKey = destKey;
             this.Exception = e;
             this.errorMsg = errorMsg ?? GetMoveFileErrorMessage(e);
             this.Success = false;
         }
 
+        public string SourceKey { get; private set; }
+        public string DestKey { get; private set; }
         public bool Success { get; private set; }
 
         public Exception Exception { get; private set; }

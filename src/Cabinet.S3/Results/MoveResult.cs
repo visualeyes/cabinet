@@ -10,27 +10,42 @@ namespace Cabinet.S3.Results {
     public class MoveResult : IMoveResult {
         private readonly string errorMsg;
 
-        public MoveResult(bool success = true) {
+        private MoveResult(string sourceKey, string destKey) {
+            if (String.IsNullOrWhiteSpace(sourceKey)) throw new ArgumentNullException(nameof(sourceKey));
+            if (String.IsNullOrWhiteSpace(destKey)) throw new ArgumentNullException(nameof(destKey));
+            this.SourceKey = sourceKey;
+            this.DestKey = destKey;
+        }
+
+        public MoveResult(string sourceKey, string destKey, bool success = true)
+            : this(sourceKey, destKey) {
+            this.SourceKey = sourceKey;
+            this.DestKey = destKey;
             this.Success = success;
         }
 
-        public MoveResult(HttpStatusCode code) {
+        public MoveResult(string sourceKey, string destKey, HttpStatusCode code) 
+            : this(sourceKey, destKey){
             this.Success = code == HttpStatusCode.OK;
             this.errorMsg = GetErrorMessage(code);
         }
 
-        public MoveResult(Exception exception, string errorMsg = null) {
+        public MoveResult(string sourceKey, string destKey, Exception exception, string errorMsg = null)
+            : this(sourceKey, destKey) {
             if (exception == null) throw new ArgumentNullException(nameof(exception));
             this.Exception = exception;
             this.errorMsg = errorMsg ?? GetErrorMessage(exception);
             this.Success = false;
         }
 
+        public string SourceKey { get; private set; }
+        public string DestKey { get; private set; }
+
+        public bool Success { get; private set; }
+
         public bool AlreadyExists { get; set; }
 
         public Exception Exception { get; private set; }
-
-        public bool Success { get; private set; }
 
         public string GetErrorMessage() {
             return errorMsg;

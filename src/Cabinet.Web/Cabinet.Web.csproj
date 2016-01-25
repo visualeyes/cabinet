@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileCabinetStreamProvider.cs" />
+    <Compile Include="IFileScanner.cs" />
     <Compile Include="IKeyProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UploadSaveResult.cs" />

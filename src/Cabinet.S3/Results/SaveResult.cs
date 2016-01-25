@@ -10,27 +10,35 @@ namespace Cabinet.S3.Results {
     public class SaveResult : ISaveResult {
         private readonly string errorMsg;
 
-        public SaveResult(bool success = true) {
+        public SaveResult(string key, bool success = true) {
+            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
+            this.Key = key;
             this.Success = success;
         }
 
-        public SaveResult(HttpStatusCode code) {
+        public SaveResult(string key, HttpStatusCode code) {
+            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
+            this.Key = key;
             this.Success = code == HttpStatusCode.OK;
             this.errorMsg = GetErrorMessage(code);
         }
 
-        public SaveResult(Exception exception) {
+        public SaveResult(string key, Exception exception) {
+            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (exception == null) throw new ArgumentNullException(nameof(exception));
+            this.Key = key;
             this.Exception = exception;
             this.errorMsg = GetErrorMessage(exception);
             this.Success = false;
         }
 
+        public string Key { get; private set; }
+
+        public bool Success { get; private set; }
+
         public bool AlreadyExists { get; set; }
 
         public Exception Exception { get; private set; }
-
-        public bool Success { get; private set; }
 
         public string GetErrorMessage() {
             return errorMsg;

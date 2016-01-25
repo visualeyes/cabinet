@@ -22,7 +22,9 @@ namespace Cabinet.Core.Providers {
         Task<ICabinetFileInfo> GetFileAsync(string key, T config);
         Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(T config, string keyPrefix = "", bool recursive = true);
 
-        Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, T config);
+        Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, T config);
+        Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, T config);
+
         Task<IMoveResult> MoveFileAsync(string sourceKey, string destKey, HandleExistingMethod handleExisting, T config);
         Task<IDeleteResult> DeleteFileAsync(string key, T config);
     }

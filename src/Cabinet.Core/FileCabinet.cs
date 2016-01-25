@@ -8,7 +8,7 @@ using Cabinet.Core.Providers;
 using Cabinet.Core.Results;
 
 namespace Cabinet.Core {
-    internal class FileCabinet<T> : IFileCabinet where T : IStorageProviderConfig {
+    internal class FileCabinet<T> : IFileCabinet where T : class, IStorageProviderConfig {
         private readonly T config;
         private readonly IStorageProvider<T> provider;
 
@@ -40,8 +40,12 @@ namespace Cabinet.Core {
             return await provider.MoveFileAsync(sourceKey, destKey, handleExisting, config);
         }
 
-        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting) {
-            return await provider.SaveFileAsync(key, content, handleExisting, config);
+        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress = null) {
+            return await provider.SaveFileAsync(key, content, handleExisting, progress, config);
+        }
+
+        public async Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress = null) {
+            return await provider.SaveFileAsync(key, filePath, handleExisting, progress, config);
         }
 
         public async Task<IDeleteResult> DeleteFileAsync(string key) {

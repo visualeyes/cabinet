@@ -21,23 +21,52 @@ namespace Cabinet.Web {
             this.keyProvider = keyProvider;
         }
 
-        public async Task<ISaveResult[]> SaveInCabinet(HandleExistingMethod handleExisting) {
+        public IProgress<WriteProgress> LocalFileUploadProgress { get; set; }
+        public IProgress<WriteProgress> CabinetFileSaveProgress { get; set; }
+
+        public async Task<ISaveResult[]> SaveInCabinet(HandleExistingMethod handleExisting, IFileScanner fileScanner = null) {
 
             var saveTasks = this.FileData.Select(async (fd) => {
                 string key = this.keyProvider.GetKey(fd.Headers.ContentDisposition.FileName, fd.Headers.ContentType?.MediaType);
 
-                var fileInfo = new FileInfo(fd.LocalFileName);
-
-                if (!fileInfo.Exists) {
-                    return new UploadSaveResult("Could not find uploaded file.");
+                if(String.IsNullOrWhiteSpace(key)) {
+                    return new UploadSaveResult(key, "No key was provided");
                 }
 
-                using (var fileStream = fileInfo.OpenRead()) {
-                    return await this.fileCabinet.SaveFileAsync(key, fileStream, handleExisting);
+                string fileName = fd.LocalFileName;
+
+                if (!File.Exists(fileName)) {
+                    return new UploadSaveResult(key, "Could not find uploaded file.");
                 }
+
+                // File scanner to optionally check the file an remove if it's unsafe
+                // note the c# 6 fileScanner?.ScanFileAsync syntax doesn't seem to work
+                if (fileScanner != null) {
+                    await fileScanner.ScanFileAsync(fileName);
+                }
+
+                if (!File.Exists(fileName)) {
+                    return new UploadSaveResult(key, "File has been removed as it is unsafe.");
+                }
+                
+                return await this.fileCabinet.SaveFileAsync(key, fileName, handleExisting, this.CabinetFileSaveProgress);
             });
 
-            return await Task.WhenAll(saveTasks);
+            var saveResults = await Task.WhenAll(saveTasks);
+
+            // cleanup temp files
+            foreach(var file in this.FileData) {
+                File.Delete(file.LocalFileName);
+            }
+
+            return saveResults;
+        }
+
+        public override Stream GetStream(HttpContent parent, HttpContentHeaders headers) {
+            var fileSize = headers.ContentDisposition.Size;
+            var fileStream = base.GetStream(parent, headers);
+
+            return new ProgressStream(fileStream, fileSize, this.LocalFileUploadProgress, disposeStream: true);
         }
     }
 }

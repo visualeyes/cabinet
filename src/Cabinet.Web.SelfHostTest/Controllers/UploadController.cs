@@ -37,14 +37,39 @@ namespace Cabinet.Web.SelfHostTest.Controllers {
             if(!Directory.Exists(tempPath)) {
                 Directory.CreateDirectory(tempPath);
             }
-            
-            var provider = new FileCabinetStreamProvider(fileCabinet, keyProvider, tempPath);
+
+            var localFileProgress = new Progress<WriteProgress>();
+            var cabinetFileProgress = new Progress<WriteProgress>();
+
+            localFileProgress.ProgressChanged += (object sender, WriteProgress e) => {
+                // Notify Message Bus to return progress to client (i.e. SignalR)
+                Console.WriteLine("Uploaded {0} bytes to temp", e.BytesWritten);
+            };
+
+            cabinetFileProgress.ProgressChanged += (object sender, WriteProgress e) => {
+                // Notify Message Bus to return progress to client (i.e. SignalR)
+                Console.WriteLine("Uploaded {0} bytes to cabinet", e.BytesWritten);
+            };
+
+            var provider = new FileCabinetStreamProvider(fileCabinet, keyProvider, tempPath) {
+                LocalFileUploadProgress = localFileProgress,
+                CabinetFileSaveProgress = cabinetFileProgress
+            };
 
             // Read to disk temporarily
             await Request.Content.ReadAsMultipartAsync(provider);
 
             // Save in cabinet
             var result = await provider.SaveInCabinet(HandleExistingMethod.Overwrite);
+
+            foreach(var r in result) {
+                if (r.Success) {
+                    Console.WriteLine("Saved file to {0}", r.Key);
+                } else {
+                    Console.WriteLine("Failed to save file to {0}.", r.Key);
+                    Console.WriteLine("Save error: {0}", r.GetErrorMessage());
+                }
+            }
 
             if(result.Any(r => !r.Success)) {
                 return this.StatusCode(HttpStatusCode.InternalServerError);

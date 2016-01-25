@@ -15,7 +15,9 @@ namespace Cabinet.Core {
         Task<ICabinetFileInfo> GetFileAsync(string key);
         Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(string keyPrefix = "", bool recursive = true);
 
-        Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting);
+        Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress = null);
+        Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress = null);
+
         Task<IMoveResult> MoveFileAsync(string sourceKey, string destKey, HandleExistingMethod handleExisting);
         Task<IDeleteResult> DeleteFileAsync(string key);
     }

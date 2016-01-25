@@ -78,7 +78,7 @@ namespace Cabinet.FileSystem {
             return Task.FromResult<IEnumerable<ICabinetFileInfo>>(cabinetFileInfos);
         }
 
-        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, FileSystemCabinetConfig config) {
+        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, FileSystemCabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -86,8 +86,8 @@ namespace Cabinet.FileSystem {
             var fileInfo = this.GetFileInfo(key, config);
 
             var handleExisingResult = HandleExistingFile<ISaveResult>(fileInfo, key, handleExisting,
-                () => new SaveResult(true) { AlreadyExists = true },
-                (deleteResult) => new SaveResult(deleteResult.Exception, deleteResult.GetErrorMessage())
+                () => new SaveResult(key, success: true) { AlreadyExists = true },
+                (deleteResult) => new SaveResult(key, deleteResult.Exception, deleteResult.GetErrorMessage())
             );
 
             if(handleExisingResult != null) {
@@ -101,13 +101,42 @@ namespace Cabinet.FileSystem {
                     fileInfo.Directory.Create();
                 }
 
-                using (var writeStream = fs.File.OpenWrite(fileInfo.FullName)) {
-                    await content.CopyToAsync(writeStream);
+                // If for some reason, a file with the same key is created,
+                // only allow it to overwrite if overwriting is allowed
+                var openMode = handleExisting == HandleExistingMethod.Overwrite ? FileMode.Create : FileMode.CreateNew;
 
-                    return new SaveResult(true);
+                using (var writeStream = fs.File.Open(fileInfo.FullName, openMode, FileAccess.Write)) {
+                    // no using block as this is simply a wrapper
+                    
+                    var progressWriteStream = new ProgressStream(writeStream, content.Length, progress);
+
+                    await content.CopyToAsync(progressWriteStream);
+
+                    return new SaveResult(key, success: true);
                 }
             } catch (Exception e) {
-                return new SaveResult(e);
+                return new SaveResult(key, e);
+            }
+        }
+
+        public async Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, FileSystemCabinetConfig config) {
+            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
+            if (String.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
+            if (config == null) throw new ArgumentNullException(nameof(config));
+
+            try {
+                var fs = GetFileSystem(config);
+                var fileInfo = fs.FileInfo.FromFileName(filePath);
+
+                if(!fileInfo.Exists) {
+                    return new SaveResult(key, success: false, errorMsg: String.Format("File does not exist at path {0}", filePath));
+                }
+
+                using(var readStream = fileInfo.OpenRead()) {
+                    return await this.SaveFileAsync(key, readStream, handleExisting, progress, config);
+                }
+            } catch (Exception e) {
+                return new SaveResult(key, e);
             }
         }
 
@@ -119,8 +148,8 @@ namespace Cabinet.FileSystem {
             var destFileInfo = this.GetFileInfo(destKey, config);
             
             var handleExisingResult = HandleExistingFile<IMoveResult>(destFileInfo, destKey, handleExisting,
-                () => new MoveResult(true) { AlreadyExists = true },
-                (deleteResult) => new MoveResult(deleteResult.Exception, deleteResult.GetErrorMessage())
+                () => new MoveResult(sourceKey, destKey, success: true) { AlreadyExists = true },
+                (deleteResult) => new MoveResult(sourceKey, destKey, deleteResult.Exception, deleteResult.GetErrorMessage())
             );
 
             if (handleExisingResult != null) {
@@ -139,9 +168,9 @@ namespace Cabinet.FileSystem {
                 // Do file system move
                 fs.File.Move(fileInfo.FullName, destFileInfo.FullName);
                 
-                return Task.FromResult<IMoveResult>(new MoveResult(true));
+                return Task.FromResult<IMoveResult>(new MoveResult(sourceKey, destKey, success: true));
             } catch (Exception e) {
-                return Task.FromResult<IMoveResult>(new MoveResult(e));
+                return Task.FromResult<IMoveResult>(new MoveResult(sourceKey, destKey, e));
             }
         }
 

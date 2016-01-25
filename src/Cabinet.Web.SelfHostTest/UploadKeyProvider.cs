@@ -10,7 +10,10 @@ namespace Cabinet.Web.SelfHostTest {
         public string GetKey(string fileName, string contentType) {
             string guid = Guid.NewGuid().ToString();
             string uploadedFileName = fileName.Trim('"').Trim('\\');
-            string extensionLessFilename = Path.GetFileNameWithoutExtension(uploadedFileName);
+
+            // Please consider security implication of selecting a key - https://www.owasp.org/index.php/Unrestricted_File_Upload
+
+            string extensionLessFilename = Path.GetFileName(uploadedFileName);
 
             return Path.Combine(guid, extensionLessFilename);
         }

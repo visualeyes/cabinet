@@ -13,7 +13,7 @@ namespace Cabinet.Tests.S3.Results {
         [Theory]
         [InlineData(true), InlineData(false)]
         public void Sets_Success(bool success) {
-            var result = new MoveResult(success);
+            var result = new MoveResult("sourceKey", "destKey", success);
             Assert.Equal(success, result.Success);
         }
 
@@ -24,20 +24,20 @@ namespace Cabinet.Tests.S3.Results {
         [InlineData(HttpStatusCode.Unauthorized, false, "Access to the bucket is denied")]
         [InlineData(HttpStatusCode.InternalServerError, false, null)]
         public void Sets_Success(HttpStatusCode code, bool success, string errorMsg) {
-            var result = new MoveResult(code);
+            var result = new MoveResult("sourceKey", "destKey", code);
             Assert.Equal(success, result.Success);
             Assert.Equal(errorMsg, result.GetErrorMessage());
         }
 
         [Fact]
         public void Null_Exception_Throws() {
-            Assert.Throws<ArgumentNullException>(() => new MoveResult(null));
+            Assert.Throws<ArgumentNullException>(() => new MoveResult("sourceKey", "destKey", null));
         }
 
         [Fact]
         public void Sets_Exception() {
             var exception = new Exception("Test");
-            var result = new MoveResult(exception);
+            var result = new MoveResult("sourceKey", "destKey", exception);
 
             Assert.False(result.Success);
             Assert.Equal(exception, result.Exception);
@@ -47,7 +47,7 @@ namespace Cabinet.Tests.S3.Results {
         [InlineData(""), InlineData("test")]
         public void Sets_ErrorMsg(string msg) {
             var exception = new Exception("Test");
-            var result = new MoveResult(exception, errorMsg: msg);
+            var result = new MoveResult("sourceKey", "destKey", exception, errorMsg: msg);
 
             Assert.Equal(msg, result.GetErrorMessage());
         }
@@ -55,7 +55,7 @@ namespace Cabinet.Tests.S3.Results {
         [Theory]
         [MemberData("GetExceptionMessages")]
         public void Get_Exception_Message(Exception e, string msg) {
-            var result = new MoveResult(e);
+            var result = new MoveResult("sourceKey", "destKey", e);
             Assert.Equal(msg, result.GetErrorMessage());
         }
 

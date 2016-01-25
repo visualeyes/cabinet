@@ -12,7 +12,7 @@ namespace Cabinet.Tests.FileSystem.Results {
         [Theory]
         [InlineData(true), InlineData(false)]
         public void Sets_Success(bool success) {
-            var result = new SaveResult(success);
+            var result = new SaveResult("key", success);
             Assert.Equal(success, result.Success);
         }
 
@@ -24,7 +24,7 @@ namespace Cabinet.Tests.FileSystem.Results {
         [Fact]
         public void Sets_Exception() {
             var exception = new Exception("Test");
-            var result = new SaveResult(exception);
+            var result = new SaveResult("key", exception);
 
             Assert.False(result.Success);
             Assert.Equal(exception, result.Exception);
@@ -34,7 +34,7 @@ namespace Cabinet.Tests.FileSystem.Results {
         [InlineData(""), InlineData("test")]
         public void Sets_ErrorMsg(string msg) {
             var exception = new Exception("Test");
-            var result = new SaveResult(exception, errorMsg: msg);
+            var result = new SaveResult("key", exception, errorMsg: msg);
             
             Assert.Equal(msg, result.GetErrorMessage());
         }
@@ -42,7 +42,7 @@ namespace Cabinet.Tests.FileSystem.Results {
         [Theory]
         [MemberData("GetExceptionMessages")]
         public void Get_Exception_Message(Exception e, string msg) {
-            var result = new SaveResult(e);
+            var result = new SaveResult("key", e);
             Assert.Equal(msg, result.GetErrorMessage());
         }
 
