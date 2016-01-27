@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cabinet.Web.SelfHostTest {
+namespace Cabinet.Web.SelfHostTest.Framework {
     public class PathMapper : IPathMapper {
         private readonly string appBase;
 

@@ -3,6 +3,7 @@ using Autofac.Integration.WebApi;
 using Cabinet.Core;
 using Cabinet.FileSystem;
 using Cabinet.S3;
+using Cabinet.Web.SelfHostTest.Framework;
 using Microsoft.Owin;
 using Microsoft.Owin.FileSystems;
 using Microsoft.Owin.Hosting;

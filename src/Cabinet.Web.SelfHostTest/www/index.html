@@ -4,43 +4,40 @@
 <head>
     <meta charset="utf-8" />
     <title></title>
+    <script>var Cabinet = {};</script>
+    <script src="js/browse.js" async></script>
+    <script src="js/upload.js" async></script>
+    <script src="js/ui.js" async defer></script>
 </head>
 <body>
-    <h1>Upload Test</h1>
-    <form id="upload-form" method="post" enctype="multipart/form-data">
-        <div>
-            <label for="upload_file">File</label>
-            <input name="upload_file" type="file" />
+    <h1>Cabinet Test</h1>
+    <div id="browse-container">
+        <h2>Browse Files</h2>
+        <div id="browse-files-list">
+
         </div>
-        <button type="submit">Upload</button>
-    </form>
+        <div>
+            <button id="browse-refresh">Refresh Files</button>
+        </div>
+    </div>
     <div>
-        <p id="result-message"></p>
+        <h2>Upload File</h2>
+        <form id="upload-form" method="post" enctype="multipart/form-data">
+            <div>
+                <label for="upload_file">File</label>
+                <input name="upload_file" type="file" />
+            </div>
+            <button type="submit">Upload</button>
+        </form>
+        <div>
+            <p id="result-message"></p>
+        </div>
     </div>
     <script>
-        // https://developer.mozilla.org/en-US/docs/Web/API/FormData/Using_FormData_Objects
-        (function () {
+        (function (window, Cabinet) {
             var form = document.getElementById('upload-form');
-            form.addEventListener('submit', function (submitEvt) {
-                var resultDisplay = document.getElementById('result-message'),
-                    data = new FormData(form);
 
-                resultDisplay.innerHTML = 'Uploading...';
-
-                var req = new XMLHttpRequest();
-                req.open('POST', '/api/upload', true);
-                req.onload = function (evt) {
-                    if (evt.status == 200) {
-                        resultDisplay.innerHTML = "Uploaded!";
-                    } else {
-                        resultDisplay.innerHTML = "Error " + req.status + " occurred when trying to upload your file.<br \/>";
-                    }
-                };
-
-                req.send(data);
-                submitEvt.preventDefault();
-            }, false);
-        })();
+        })(window, window.Cabinet);
     </script>
 </body>
 </html>

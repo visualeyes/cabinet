@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cabinet.Web.SelfHostTest {
+namespace Cabinet.Web.SelfHostTest.Framework {
     public class UploadKeyProvider : IKeyProvider {
         public string GetKey(string fileName, string contentType) {
             string guid = Guid.NewGuid().ToString();

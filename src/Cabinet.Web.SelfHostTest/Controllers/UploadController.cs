@@ -1,6 +1,7 @@
 ﻿using Cabinet.Core;
 using Cabinet.Core.Providers;
 using Cabinet.FileSystem;
+using Cabinet.Web.SelfHostTest.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;

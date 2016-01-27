@@ -1,4 +1,5 @@
 ﻿using Autofac.Integration.WebApi;
+using Cabinet.Web.SelfHostTest.Framework;
 using Microsoft.Owin;
 using Microsoft.Owin.FileSystems;
 using Microsoft.Owin.StaticFiles;
@@ -18,12 +19,15 @@ namespace Cabinet.Web.SelfHostTest {
             var builder = ConfigureAutoFac(cabinetFactory);
 
             app.UseCommonLogging();
+            //app.UseCommonLogging((log, type) => true, (log, type, message, exception) => {
+            //    Console.WriteLine(message);
+            //});
 
             app.Map("/api", apiApp => {
                 var httpConfig = new HttpConfiguration();
                 httpConfig.MapHttpAttributeRoutes();
-
-                builder.RegisterWebApiFilterProvider(httpConfig);
+                httpConfig.Filters.Add(new UnhandledExceptionFilter());
+                //builder.RegisterWebApiFilterProvider(httpConfig);
 
                 var container = builder.Build();
                 httpConfig.DependencyResolver = new AutofacWebApiDependencyResolver(container);

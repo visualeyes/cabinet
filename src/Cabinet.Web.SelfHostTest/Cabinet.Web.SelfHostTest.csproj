@@ -103,11 +103,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IPathMapper.cs" />
-    <Compile Include="PathMapper.cs" />
-    <Compile Include="Startup.Cabinet.cs" />
-    <Compile Include="Startup.cs" />
-    <Compile Include="UploadKeyProvider.cs" />
+    <Compile Include="Controllers\BrowseController.cs" />
+    <Compile Include="Framework\UnhandledExceptionFilter.cs" />
+    <Compile Include="Framework\IPathMapper.cs" />
+    <Compile Include="Framework\PathMapper.cs" />
+    <Compile Include="App_Start\Startup.Cabinet.cs" />
+    <Compile Include="App_Start\Startup.cs" />
+    <Compile Include="Framework\UploadKeyProvider.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Controllers\UploadController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -115,7 +117,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-    <Compile Include="Startup.IOC.cs" />
+    <Compile Include="App_Start\Startup.IOC.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cabinet.Core\Cabinet.Core.csproj">
@@ -138,6 +140,15 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="www\index.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="www\js\browse.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="www\js\ui.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="www\js\upload.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
