@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace Cabinet.Core {
     public interface IFileCabinet {
+        bool SupportsProviderType(string providerType);
+
         Task<bool> ExistsAsync(string key);
         Task<IEnumerable<string>> ListKeysAsync(string keyPrefix = "", bool recursive = true);
 
