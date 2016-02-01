@@ -23,7 +23,7 @@ using System.Web.Http;
 
 namespace Cabinet.Web.SelfHostTest {
     public partial class Startup {
-        private const string BucketName = "careerhub-info";
+        private const string BucketName = "test-bucket";
 
 		public ContainerBuilder ConfigureAutoFac(FileCabinetFactory cabinetFactory) {
 
