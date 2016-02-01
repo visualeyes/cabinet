@@ -36,17 +36,18 @@ namespace Cabinet.Web.SelfHostTest {
 
             builder.RegisterInstance<IFileCabinetFactory>(cabinetFactory);
 
+            builder.Register((c) => {
+                var mapper = c.Resolve<IPathMapper>();
+                string uploadDir = mapper.MapPath("~/App_Data/Uploads");
+                var fileConfig = new FileSystemCabinetConfig(uploadDir, true);
+                return cabinetFactory.GetCabinet(fileConfig);
+            });
+
             //builder.Register((c) => {
-            //    var mapper = c.Resolve<IPathMapper>();
-            //    string uploadDir = mapper.MapPath("~/App_Data/Uploads");
-            //    var fileConfig = new FileSystemCabinetConfig(uploadDir, true);
-            //    return cabinetFactory.GetCabinet(fileConfig);
+            //    var s3Config = new AmazonS3CabinetConfig(BucketName, RegionEndpoint.APSoutheast2, new StoredProfileAWSCredentials());
+            //    return cabinetFactory.GetCabinet(s3Config);
             //});
 
-            builder.Register((c) => {
-                var s3Config = new AmazonS3CabinetConfig(BucketName, RegionEndpoint.APSoutheast2, new StoredProfileAWSCredentials());
-                return cabinetFactory.GetCabinet(s3Config);
-            });
             return builder;
         }
     }
