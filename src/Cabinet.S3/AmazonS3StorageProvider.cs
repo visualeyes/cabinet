@@ -31,6 +31,9 @@ namespace Cabinet.S3 {
         }
 
         public async Task<bool> ExistsAsync(string key, AmazonS3CabinetConfig config) {
+            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
+            if (config == null) throw new ArgumentNullException(nameof(config));
+
             using (var s3Client = GetS3Client(config)) {
                 return await ExistsInternalAsync(key, config, s3Client);
             }

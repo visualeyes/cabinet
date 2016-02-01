@@ -7,6 +7,7 @@ using Cabinet.S3;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -18,6 +19,8 @@ namespace Cabinet.Tests.S3 {
     public class AmazonS3StorageProviderFacts {
         private readonly Mock<IAmazonS3ClientFactory> mockS3ClientFactory;
         private readonly Mock<IAmazonS3> mockS3Client;
+        private const string ValidBucketName = "bucket-name";
+        private const string ValidFileKey = "key";
 
         public AmazonS3StorageProviderFacts() {
             this.mockS3ClientFactory = new Mock<IAmazonS3ClientFactory>();
@@ -30,6 +33,21 @@ namespace Cabinet.Tests.S3 {
         public void Provider_Type() {
             IStorageProvider<AmazonS3CabinetConfig> provider = GetProvider();
             Assert.Equal(AmazonS3StorageProvider.ProviderType, provider.ProviderType);
+        }
+
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public async Task Exists_Empty_Key_Throws(string key) {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.ExistsAsync(key, config));
+        }
+
+        [Fact]
+        public async Task Exists_Null_Config_Throws() {
+            var provider = GetProvider();
+            AmazonS3CabinetConfig config = null;
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.ExistsAsync(ValidFileKey, config));
         }
 
         [Theory]
@@ -47,6 +65,13 @@ namespace Cabinet.Tests.S3 {
             Assert.Equal(expectedExists, expectedExists);
         }
 
+        [Fact]
+        public async Task List_Keys_Null_Config_Throws() {
+            var provider = GetProvider();
+            AmazonS3CabinetConfig config = null;
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.ListKeysAsync(config));
+        }
+
         [Theory]
         [MemberData("GetTestS3Objects")]
         public async Task List_Keys(string bucketName, string keyPrefix, bool recursive, HttpStatusCode code, List<S3Object> s3Objects, List<S3Object> expectedS3Objects) {
@@ -59,6 +84,21 @@ namespace Cabinet.Tests.S3 {
             var keysList = keys.ToList();
             var expectedKeys = expectedS3Objects.Select(o => o.Key).ToList();
             Assert.Equal(expectedKeys, keysList);
+        }
+
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public async Task Get_File_Empty_Key_Throws(string key) {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.GetFileAsync(key, config));
+        }
+
+        [Fact]
+        public async Task Get_File_Null_Config_Throws() {
+            var provider = GetProvider();
+            AmazonS3CabinetConfig config = null;
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.GetFileAsync(ValidFileKey, config));
         }
 
         [Theory]
@@ -78,9 +118,16 @@ namespace Cabinet.Tests.S3 {
             Assert.Equal(expectedExists, file.Exists);
         }
 
+        [Fact]
+        public async Task Get_Items_Null_Config_Throws() {
+            var provider = GetProvider();
+            AmazonS3CabinetConfig config = null;
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.GetItemsAsync(config));
+        }
+
         [Theory]
         [MemberData("GetTestS3Objects")]
-        public async Task Get_Files(string bucketName, string keyPrefix, bool recursive, HttpStatusCode code, List<S3Object> s3Objects, List<S3Object> expectedS3Objects) {
+        public async Task Get_Items(string bucketName, string keyPrefix, bool recursive, HttpStatusCode code, List<S3Object> s3Objects, List<S3Object> expectedS3Objects) {
             var provider = GetProvider();
             var config = GetConfig(bucketName);
 
@@ -91,6 +138,139 @@ namespace Cabinet.Tests.S3 {
             var fileInfos = await provider.GetItemsAsync(config, keyPrefix: keyPrefix, recursive: recursive);
             
             Assert.Equal(expectedFileInfos, fileInfos, new S3CabinetFileInfoKeyComparer());
+        }
+
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public async Task Open_Read_Stream_Empty_Key_Throws(string key) {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.OpenReadStreamAsync(key, config));
+        }
+
+        [Fact]
+        public async Task Open_Read_Stream_Null_Config_Throws() {
+            var provider = GetProvider();
+            AmazonS3CabinetConfig config = null;
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.OpenReadStreamAsync(ValidFileKey, config));
+        }
+
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public async Task Save_File_Path_Empty_Key_Throws(string key) {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+            string filePath = @"C:\test\test.txt";
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+                await provider.SaveFileAsync(key, filePath, HandleExistingMethod.Overwrite, mockProgress.Object, config)
+            );
+        }
+        
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public async Task Save_File_Path_Empty_FilePath_Throws(string filePath) {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+                await provider.SaveFileAsync(ValidFileKey, filePath, HandleExistingMethod.Overwrite, mockProgress.Object, config)
+            );
+        }
+
+        [Fact]
+        public async Task Save_File_Stream_Path_Config_Throws() {
+            var provider = GetProvider();
+            AmazonS3CabinetConfig config = null;
+            string filePath = @"C:\test\test.txt";
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+                await provider.SaveFileAsync(ValidFileKey, filePath, HandleExistingMethod.Overwrite, mockProgress.Object, config)
+            );
+        }
+
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public async Task Save_File_Stream_Empty_Key_Throws(string key) {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+            var mockStream = new Mock<Stream>();
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => 
+                await provider.SaveFileAsync(key, mockStream.Object, HandleExistingMethod.Overwrite, mockProgress.Object, config)
+            );
+        }
+
+        [Fact]
+        public async Task Save_File_Stream_Null_Config_Throws() {
+            var provider = GetProvider();
+            AmazonS3CabinetConfig config = null;
+            var mockStream = new Mock<Stream>();
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+                await provider.SaveFileAsync(ValidFileKey, mockStream.Object, HandleExistingMethod.Overwrite, mockProgress.Object, config)
+            );
+        }
+
+
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public async Task Move_File_Path_Empty_SourceKey_Throws(string sourceKey) {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+            string destKey = @"test.txt";
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+                await provider.MoveFileAsync(sourceKey, destKey, HandleExistingMethod.Overwrite, config)
+            );
+        }
+
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public async Task Move_File_Path_Empty_DestKey_Throws(string destKey) {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+            string sourceKey = @"test.txt";
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+                await provider.MoveFileAsync(sourceKey, destKey, HandleExistingMethod.Overwrite, config)
+            );
+        }
+
+        [Fact]
+        public async Task Move_File_Path_Empty_Key_Throws() {
+            var provider = GetProvider();
+            AmazonS3CabinetConfig config = null;
+            string sourceKey = @"source.txt";
+            string destKey = @"dest.txt";
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+                await provider.MoveFileAsync(sourceKey, destKey, HandleExistingMethod.Overwrite, config)
+            );
+        }
+
+
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public async Task Delete_File_Empty_Key_Throws(string key) {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.DeleteFileAsync(key, config));
+        }
+
+        [Fact]
+        public async Task Delete_File_Null_Config_Throws() {
+            var provider = GetProvider();
+            AmazonS3CabinetConfig config = null;
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.DeleteFileAsync(ValidFileKey, config));
         }
 
         private void SetupGetObjectRequest(string bucketName, string key, HttpStatusCode code) {
