@@ -1,5 +1,7 @@
-﻿using Amazon.S3;
+﻿using Amazon;
+using Amazon.S3;
 using Amazon.S3.Model;
+using Cabinet.Core;
 using Cabinet.Core.Providers;
 using Cabinet.S3;
 using Moq;
@@ -14,19 +16,19 @@ using Xunit;
 
 namespace Cabinet.Tests.S3 {
     public class AmazonS3StorageProviderFacts {
-        private readonly Mock<IS3ClientFactory> mockS3ClientFactory;
+        private readonly Mock<IAmazonS3ClientFactory> mockS3ClientFactory;
         private readonly Mock<IAmazonS3> mockS3Client;
 
         public AmazonS3StorageProviderFacts() {
-            this.mockS3ClientFactory = new Mock<IS3ClientFactory>();
+            this.mockS3ClientFactory = new Mock<IAmazonS3ClientFactory>();
             this.mockS3Client = new Mock<IAmazonS3>();
 
-            this.mockS3ClientFactory.Setup(f => f.GetS3Client(It.IsAny<S3CabinetConfig>())).Returns(this.mockS3Client.Object);
+            this.mockS3ClientFactory.Setup(f => f.GetS3Client(It.IsAny<AmazonS3CabinetConfig>())).Returns(this.mockS3Client.Object);
         }
 
         [Fact]
         public void Provider_Type() {
-            IStorageProvider<S3CabinetConfig> provider = GetProvider();
+            IStorageProvider<AmazonS3CabinetConfig> provider = GetProvider();
             Assert.Equal(AmazonS3StorageProvider.ProviderType, provider.ProviderType);
         }
 
@@ -84,9 +86,9 @@ namespace Cabinet.Tests.S3 {
 
             SetupGetObjectsRequest(bucketName, keyPrefix, code, s3Objects);
 
-            var expectedFileInfos = expectedS3Objects.Select(o => new S3CabinetFileInfo(o.Key, true));
+            var expectedFileInfos = expectedS3Objects.Select(o => new AmazonS3CabinetItemInfo(o.Key, true, ItemType.File));
 
-            var fileInfos = await provider.GetFilesAsync(config, keyPrefix: keyPrefix, recursive: recursive);
+            var fileInfos = await provider.GetItemsAsync(config, keyPrefix: keyPrefix, recursive: recursive);
             
             Assert.Equal(expectedFileInfos, fileInfos, new S3CabinetFileInfoKeyComparer());
         }
@@ -116,11 +118,8 @@ namespace Cabinet.Tests.S3 {
             return provider;
         }
 
-        private S3CabinetConfig GetConfig(string bucketName) {
-            var config = new S3CabinetConfig() {
-                BucketName = bucketName
-            };
-
+        private AmazonS3CabinetConfig GetConfig(string bucketName) {
+            var config = new AmazonS3CabinetConfig(bucketName, RegionEndpoint.APSoutheast2, null);
             return config;
         }
 

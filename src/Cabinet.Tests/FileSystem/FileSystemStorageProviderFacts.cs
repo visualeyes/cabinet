@@ -16,9 +16,10 @@ using Xunit;
 namespace Cabinet.Tests.FileSystem {
     public class FileSystemStorageProviderFacts {
         private const string ValidBasePath = @"C:\tests";
+        private const string ValidFileKey = "key";
 
         private readonly MockFileSystem mockFileSystem;
-
+        
         public FileSystemStorageProviderFacts() {
             this.mockFileSystem = new MockFileSystem();
         }
@@ -40,7 +41,7 @@ namespace Cabinet.Tests.FileSystem {
         [Fact]
         public async Task Exists_Null_Config_Throws() {
             var provider = GetProvider(ValidBasePath);
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.ExistsAsync("key", null));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.ExistsAsync(ValidFileKey, null));
         }
 
         [Theory]
@@ -67,7 +68,7 @@ namespace Cabinet.Tests.FileSystem {
         [Fact]
         public async Task GetFile_Null_Config_Throws() {
             var provider = GetProvider(ValidBasePath);
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.GetFileAsync("key", null));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.GetFileAsync(ValidFileKey, null));
         }
 
         [Theory]
@@ -111,7 +112,7 @@ namespace Cabinet.Tests.FileSystem {
 
         [Theory]
         [MemberData("GetListTestPaths")]
-        public async Task List_Keys(string basePath, IDictionary<string, string> files, string keyPrefix, bool recursive, IDictionary<string, string> expectedFiles) {
+        public async Task List_Keys(string basePath, IDictionary<string, string> files, string keyPrefix, bool recursive, IDictionary<string, ItemType> expectedFiles) {
             var provider = GetProvider(basePath);
             var config = GetConfig(basePath);
 
@@ -121,21 +122,23 @@ namespace Cabinet.Tests.FileSystem {
             }
 
             var keys = await provider.ListKeysAsync(config, keyPrefix: keyPrefix, recursive: recursive);
+            
+            var expectedFileKeys = expectedFiles.Where(f => f.Value == ItemType.File).Select(f => f.Key).ToList();
 
-            Assert.Equal(expectedFiles.Count, keys.Count());
-            Assert.Equal(expectedFiles.Keys, keys);
+            Assert.Equal(expectedFileKeys.Count, keys.Count());
+            Assert.Equal(expectedFileKeys, keys);
         }
 
         [Fact]
         public async Task Get_Files_Null_Config_Throws() {
             var provider = GetProvider(ValidBasePath);
             FileSystemCabinetConfig config = null;
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.GetFilesAsync(config));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.GetItemsAsync(config));
         }
 
         [Theory]
         [MemberData("GetListTestPaths")]
-        public async Task Get_Files(string basePath, IDictionary<string, string> files, string keyPrefix, bool recursive, IDictionary<string, string> expectedFiles) {
+        public async Task Get_Files(string basePath, IDictionary<string, string> files, string keyPrefix, bool recursive, IDictionary<string, ItemType> expectedFiles) {
             var provider = GetProvider(basePath);
             var config = GetConfig(basePath);
 
@@ -144,9 +147,11 @@ namespace Cabinet.Tests.FileSystem {
                 this.mockFileSystem.AddFile(filePath, file.Value);
             }
 
-            var actualFiles = await provider.GetFilesAsync(config, keyPrefix: keyPrefix, recursive: recursive);
+            var actualFiles = await provider.GetItemsAsync(config, keyPrefix: keyPrefix, recursive: recursive);
 
             Assert.Equal(expectedFiles.Count, actualFiles.Count());
+            Assert.Equal(expectedFiles.Count(f => f.Value == ItemType.File), actualFiles.Count(f => f.Type == ItemType.File));
+            Assert.Equal(expectedFiles.Count(f => f.Value == ItemType.Directory), actualFiles.Count(f => f.Type == ItemType.Directory));
             Assert.Equal(expectedFiles.Keys, actualFiles.Select(a => a.Key));
         }
 
@@ -157,7 +162,7 @@ namespace Cabinet.Tests.FileSystem {
             var provider = GetProvider(basePath);
             var config = GetConfig(basePath);
 
-            var actualFiles = await provider.GetFilesAsync(config, keyPrefix: "missingDir", recursive: true);
+            var actualFiles = await provider.GetItemsAsync(config, keyPrefix: "missingDir", recursive: true);
 
             Assert.Empty(actualFiles);
         }
@@ -175,7 +180,7 @@ namespace Cabinet.Tests.FileSystem {
         public async Task Open_Read_Stream_Null_Config_Throws() {
             var provider = GetProvider(ValidBasePath);
             FileSystemCabinetConfig config = null;
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.OpenReadStreamAsync("key", config));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.OpenReadStreamAsync(ValidFileKey, config));
         }
 
         [Theory]
@@ -223,7 +228,7 @@ namespace Cabinet.Tests.FileSystem {
             var config = GetConfig(ValidBasePath);
             var mockProgress = new Mock<IProgress<WriteProgress>>();
             Stream stream = null;
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.SaveFileAsync("key", stream, HandleExistingMethod.Overwrite, mockProgress.Object, config));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.SaveFileAsync(ValidFileKey, stream, HandleExistingMethod.Overwrite, mockProgress.Object, config));
         }
 
         [Fact]
@@ -232,7 +237,7 @@ namespace Cabinet.Tests.FileSystem {
             var mockProgress = new Mock<IProgress<WriteProgress>>();
 
             using (var stream = new MemoryStream()) {
-                await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.SaveFileAsync("key", stream, HandleExistingMethod.Overwrite, mockProgress.Object, null));
+                await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.SaveFileAsync(ValidFileKey, stream, HandleExistingMethod.Overwrite, mockProgress.Object, null));
             }
         }
 
@@ -241,7 +246,7 @@ namespace Cabinet.Tests.FileSystem {
             var provider = GetProvider(ValidBasePath);
             var mockProgress = new Mock<IProgress<WriteProgress>>();
             
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.SaveFileAsync("key", @"C:\foo", HandleExistingMethod.Overwrite, mockProgress.Object, null));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.SaveFileAsync(ValidFileKey, @"C:\foo", HandleExistingMethod.Overwrite, mockProgress.Object, null));
         }
 
         [Theory]
@@ -449,7 +454,7 @@ namespace Cabinet.Tests.FileSystem {
         [Fact]
         public async Task Delete_Null_Config_Throws() {
             var provider = GetProvider(ValidBasePath);
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.DeleteFileAsync("key", null));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.DeleteFileAsync(ValidFileKey, null));
         }
 
         [Theory]
@@ -513,7 +518,38 @@ namespace Cabinet.Tests.FileSystem {
         [Fact]
         public void GetFileInfo_Null_Config_Throws() {
             var provider = GetProvider(ValidBasePath);
-            Assert.Throws<ArgumentNullException>(() => provider.GetFileInfo("key", null));
+            Assert.Throws<ArgumentNullException>(() => provider.GetFileInfo(ValidFileKey, null));
+        }
+        
+        [Theory]
+        [InlineData(null)]
+        public void GetDirectoryInfo_Null_Key_Throws(string key) {
+            var provider = GetProvider(ValidBasePath);
+            var config = GetConfig(ValidBasePath);
+            Assert.Throws<ArgumentNullException>(() => provider.GetDirectoryInfo(key, config));
+        }
+
+        [Theory]
+        [InlineData(""), InlineData(" ")]
+        public void GetDirectoryInfo_Empty_Key_Does_Not_Throw(string key) {
+            var provider = GetProvider(ValidBasePath);
+            var config = GetConfig(ValidBasePath);
+
+            var result = provider.GetDirectoryInfo(key, config);
+        }
+        [Theory]
+        [InlineData("D:\blah")]
+        public void GetDirectoryInfo_Invalid_Key_Throws(string key) {
+            var provider = GetProvider(ValidBasePath);
+            var config = GetConfig(ValidBasePath);
+
+            Assert.Throws<ArgumentException>(() => provider.GetDirectoryInfo(key, config));
+        }
+
+        [Fact]
+        public void GetDirectoryInfo_Null_Config_Throws() {
+            var provider = GetProvider(ValidBasePath);
+            Assert.Throws<ArgumentNullException>(() => provider.GetDirectoryInfo(ValidFileKey, null));
         }
 
         [Theory]
@@ -579,34 +615,36 @@ namespace Cabinet.Tests.FileSystem {
                 { @"bar\baz\three", "three" },
                 { @"foo\one.txt", "one" },
             };
-
-
+            
             return new object[] {
-                new object[] { baseDir, files, "", true, new Dictionary<string, string> {
-                        { "file.txt", "test-file" },
-                        { @"bar/one.txt", "one" },
-                        { @"bar/two.txt", "two" },
-                        { @"bar/baz/three", "three" },
-                        { @"foo/one.txt", "one" },
+                new object[] { baseDir, files, "", true, new Dictionary<string, ItemType> {
+                        { @"file.txt", ItemType.File },
+                        { @"bar/one.txt", ItemType.File },
+                        { @"bar/two.txt", ItemType.File },
+                        { @"bar/baz/three", ItemType.File },
+                        { @"foo/one.txt", ItemType.File },
                     }
                 },
-                new object[] { baseDir, files, "", false, new Dictionary<string, string> {
-                        { "file.txt", "test-file" },
+                new object[] { baseDir, files, "", false, new Dictionary<string, ItemType> {
+                        { @"bar", ItemType.Directory },
+                        { @"foo", ItemType.Directory },
+                        { @"file.txt", ItemType.File },
                     }
                 },
-                new object[] { baseDir, files, "bar", true, new Dictionary<string, string> {
-                        { @"bar/one.txt", "one" },
-                        { @"bar/two.txt", "two" },
-                        { @"bar/baz/three", "three" },
+                new object[] { baseDir, files, "bar", true, new Dictionary<string, ItemType> {
+                        { @"bar/one.txt", ItemType.File },
+                        { @"bar/two.txt", ItemType.File },
+                        { @"bar/baz/three", ItemType.File },
                     }
                 },
-                new object[] { baseDir, files, "bar", false, new Dictionary<string, string> {
-                        { @"bar/one.txt", "one" },
-                        { @"bar/two.txt", "two" },
+                new object[] { baseDir, files, "bar", false, new Dictionary<string, ItemType> {
+                        { @"bar/baz", ItemType.Directory },
+                        { @"bar/one.txt", ItemType.File },
+                        { @"bar/two.txt", ItemType.File },
                     }
                 },
-                new object[] { baseDir, files, @"bar\baz", false, new Dictionary<string, string> {
-                        { @"bar/baz/three", "three" },
+                new object[] { baseDir, files, @"bar\baz", false, new Dictionary<string, ItemType> {
+                        { @"bar/baz/three", ItemType.File },
                     }
                 },
             };

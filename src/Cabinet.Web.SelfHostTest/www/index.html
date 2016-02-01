@@ -13,8 +13,16 @@
     <h1>Cabinet Test</h1>
     <div id="browse-container">
         <h2>Browse Files</h2>
-        <div id="browse-files-list">
-
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody id="browse-files-list"></tbody>
+            </table>
         </div>
         <div>
             <button id="browse-refresh">Refresh Files</button>
@@ -33,11 +41,5 @@
             <p id="result-message"></p>
         </div>
     </div>
-    <script>
-        (function (window, Cabinet) {
-            var form = document.getElementById('upload-form');
-
-        })(window, window.Cabinet);
-    </script>
 </body>
 </html>

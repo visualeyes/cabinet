@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Xunit;
 namespace Cabinet.Tests.S3 {
     public class S3ClientFactoryFacts {
+        private const string ValidBucketName = "bucket-name";
 
         [Fact]
         public void Sets_Credentails_And_Config() {
@@ -18,12 +19,11 @@ namespace Cabinet.Tests.S3 {
             };
             
             var mockCredentials = new Mock<AWSCredentials>();
-            var factory = new S3ClientFactory();
+            var factory = new AmazonS3ClientFactory();
 
-            var client = factory.GetS3Client(new S3CabinetConfig {
-                AWSCredentials = mockCredentials.Object,
-                AmazonS3Config = s3Config
-            }) as AmazonS3Client;
+            var config = new AmazonS3CabinetConfig(ValidBucketName, s3Config, mockCredentials.Object);
+
+            var client = factory.GetS3Client(config) as AmazonS3Client;
 
             Assert.NotNull(client);
             Assert.Equal(s3Config, client.Config);

@@ -24,15 +24,15 @@ namespace Cabinet.Core {
             return await provider.ExistsAsync(key, config);
         }
 
-        public async Task<ICabinetFileInfo> GetFileAsync(string key) {
+        public async Task<ICabinetItemInfo> GetFileAsync(string key) {
             return await provider.GetFileAsync(key, config);
         }
 
-        public async Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(string keyPrefix = "", bool recursive = true) {
-            return await provider.GetFilesAsync(keyPrefix: keyPrefix, recursive: recursive, config: config);
+        public async Task<IEnumerable<ICabinetItemInfo>> GetFilesAsync(string keyPrefix = "", bool recursive = true) {
+            return await provider.GetItemsAsync(keyPrefix: keyPrefix, recursive: recursive, config: config);
         }
 
-        public async Task<Stream> OpenReadStreamAsync(ICabinetFileInfo file) {
+        public async Task<Stream> OpenReadStreamAsync(ICabinetItemInfo file) {
             if(file.ProviderType != provider.ProviderType) {
                 throw new InvalidOperationException(String.Format("A file with the provider {0} cannot be used with a provider of type {1}", file.ProviderType, provider.ProviderType));
             }

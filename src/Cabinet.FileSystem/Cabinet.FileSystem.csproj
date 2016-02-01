@@ -45,7 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FileSystemCabinetFileInfo.cs" />
+    <Compile Include="FileSystemCabinetItemInfo.cs" />
     <Compile Include="FileSystemCabinetConfig.cs" />
     <Compile Include="FileCabinetFactoryExtensions.cs" />
     <Compile Include="FileSystemStorageProvider.cs" />

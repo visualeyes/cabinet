@@ -51,15 +51,15 @@
   <ItemGroup>
     <Compile Include="AmazonS3StorageProvider.cs" />
     <Compile Include="FileCabinetFactoryExtensions.cs" />
-    <Compile Include="IS3ClientFactory.cs" />
+    <Compile Include="IAmazonS3ClientFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Results\DeleteResult.cs" />
     <Compile Include="Results\MoveResult.cs" />
     <Compile Include="Results\SaveResult.cs" />
-    <Compile Include="S3CabinetConfig.cs" />
-    <Compile Include="S3CabinetFileInfo.cs" />
-    <Compile Include="S3CabinetFileInfoComparer.cs" />
-    <Compile Include="S3ClientFactory.cs" />
+    <Compile Include="AmazonS3CabinetConfig.cs" />
+    <Compile Include="AmazonS3CabinetItemInfo.cs" />
+    <Compile Include="AmazonS3CabinetItemInfoComparer.cs" />
+    <Compile Include="AmazonS3ClientFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cabinet.S3.nuspec" />

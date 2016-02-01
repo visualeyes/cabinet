@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using Amazon.S3;
 
 namespace Cabinet.S3 {
-    internal class S3ClientFactory : IS3ClientFactory {
-        public IAmazonS3 GetS3Client(S3CabinetConfig config) {
+    internal class AmazonS3ClientFactory : IAmazonS3ClientFactory {
+        public IAmazonS3 GetS3Client(AmazonS3CabinetConfig config) {
             return new AmazonS3Client(config.AWSCredentials, config.AmazonS3Config);
         }
     }

@@ -12,10 +12,10 @@ namespace Cabinet.Core {
         Task<bool> ExistsAsync(string key);
         Task<IEnumerable<string>> ListKeysAsync(string keyPrefix = "", bool recursive = true);
 
-        Task<ICabinetFileInfo> GetFileAsync(string key);
-        Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(string keyPrefix = "", bool recursive = true);
+        Task<ICabinetItemInfo> GetFileAsync(string key);
+        Task<IEnumerable<ICabinetItemInfo>> GetFilesAsync(string keyPrefix = "", bool recursive = true);
 
-        Task<Stream> OpenReadStreamAsync(ICabinetFileInfo file);
+        Task<Stream> OpenReadStreamAsync(ICabinetItemInfo file);
 
         Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress = null);
         Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress = null);

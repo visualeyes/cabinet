@@ -17,58 +17,58 @@ using Amazon.S3.Transfer;
 
 namespace Cabinet.S3 {
     // TOCONSIDER: Should GetFile ect get an object or just return info that can be used to get the stream
-    internal class AmazonS3StorageProvider : IStorageProvider<S3CabinetConfig> {
+    internal class AmazonS3StorageProvider : IStorageProvider<AmazonS3CabinetConfig> {
         public const string ProviderType = "AmazonS3";
 
-        private readonly IS3ClientFactory clientFactory;
+        private readonly IAmazonS3ClientFactory clientFactory;
 
-        string IStorageProvider<S3CabinetConfig>.ProviderType {
+        string IStorageProvider<AmazonS3CabinetConfig>.ProviderType {
             get { return ProviderType; }
         }
 
-        internal AmazonS3StorageProvider(IS3ClientFactory clientFactory) {
+        internal AmazonS3StorageProvider(IAmazonS3ClientFactory clientFactory) {
             this.clientFactory = clientFactory;
         }
 
-        public async Task<bool> ExistsAsync(string key, S3CabinetConfig config) {
+        public async Task<bool> ExistsAsync(string key, AmazonS3CabinetConfig config) {
             using (var s3Client = GetS3Client(config)) {
                 return await ExistsInternalAsync(key, config, s3Client);
             }
         }
 
-        public async Task<IEnumerable<string>> ListKeysAsync(S3CabinetConfig config, string keyPrefix = null, bool recursive = true) {
+        public async Task<IEnumerable<string>> ListKeysAsync(AmazonS3CabinetConfig config, string keyPrefix = null, bool recursive = true) {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
             using (var s3Client = GetS3Client(config)) {
-                var s3Objects = await GetS3Objects(keyPrefix, config, s3Client);
+                var s3Objects = await GetS3Objects(keyPrefix, recursive, config, s3Client);
 
                 return s3Objects.Select(o => o.Key);
             }
         }
 
-        public async Task<ICabinetFileInfo> GetFileAsync(string key, S3CabinetConfig config) {
+        public async Task<ICabinetItemInfo> GetFileAsync(string key, AmazonS3CabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
 
             using (var s3Client = GetS3Client(config)) {
                 using (var response = await GetS3Object(key, config, s3Client, CancellationToken.None)) {
                     bool exists = response.HttpStatusCode == HttpStatusCode.OK;
-                    return new S3CabinetFileInfo(response.Key, exists);
+                    return new AmazonS3CabinetItemInfo(response.Key, exists, ItemType.File);
                 }
             }
         }
 
-        public async Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(S3CabinetConfig config, string keyPrefix = null, bool recursive = true) {
+        public async Task<IEnumerable<ICabinetItemInfo>> GetItemsAsync(AmazonS3CabinetConfig config, string keyPrefix = null, bool recursive = true) {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
             using (var s3Client = GetS3Client(config)) {
-                var s3Objects = await GetS3Objects(keyPrefix, config, s3Client);
+                var s3Objects = await GetS3Objects(keyPrefix, recursive, config, s3Client);
 
-                return s3Objects.Select(o => new S3CabinetFileInfo(o.Key, true));
+                return s3Objects.Select(o => new AmazonS3CabinetItemInfo(o.Key, true, ItemType.File));
             }
         }
 
-        public async Task<Stream> OpenReadStreamAsync(string key, S3CabinetConfig config) {
+        public async Task<Stream> OpenReadStreamAsync(string key, AmazonS3CabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
 
@@ -78,7 +78,7 @@ namespace Cabinet.S3 {
             }
         }
 
-        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, S3CabinetConfig config) {
+        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, AmazonS3CabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -105,7 +105,7 @@ namespace Cabinet.S3 {
             }
         }
 
-        public async Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, S3CabinetConfig config) {
+        public async Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, AmazonS3CabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (String.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -132,7 +132,7 @@ namespace Cabinet.S3 {
             }
         }
 
-        public async Task<IMoveResult> MoveFileAsync(string sourceKey, string destKey, HandleExistingMethod handleExisting, S3CabinetConfig config) {
+        public async Task<IMoveResult> MoveFileAsync(string sourceKey, string destKey, HandleExistingMethod handleExisting, AmazonS3CabinetConfig config) {
             if (String.IsNullOrWhiteSpace(sourceKey)) throw new ArgumentNullException(nameof(sourceKey));
             if (String.IsNullOrWhiteSpace(destKey)) throw new ArgumentNullException(nameof(destKey));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -169,7 +169,7 @@ namespace Cabinet.S3 {
             }
         }
 
-        public async Task<IDeleteResult> DeleteFileAsync(string key, S3CabinetConfig config) {
+        public async Task<IDeleteResult> DeleteFileAsync(string key, AmazonS3CabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
 
@@ -178,7 +178,7 @@ namespace Cabinet.S3 {
             }
         }
 
-        private static async Task<bool> ExistsInternalAsync(string key, S3CabinetConfig config, IAmazonS3 s3Client) {
+        private static async Task<bool> ExistsInternalAsync(string key, AmazonS3CabinetConfig config, IAmazonS3 s3Client) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
             if (s3Client == null) throw new ArgumentNullException(nameof(s3Client));
@@ -188,7 +188,7 @@ namespace Cabinet.S3 {
             }
         }
 
-        private static async Task<bool> SkipUploadAsync(string key, HandleExistingMethod handleExisting, S3CabinetConfig config, IAmazonS3 s3Client) {
+        private static async Task<bool> SkipUploadAsync(string key, HandleExistingMethod handleExisting, AmazonS3CabinetConfig config, IAmazonS3 s3Client) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
             if (s3Client == null) throw new ArgumentNullException(nameof(s3Client));
@@ -209,7 +209,7 @@ namespace Cabinet.S3 {
             throw new NotImplementedException();
         }
 
-        private static async Task UploadInternal(string key, S3CabinetConfig config, IAmazonS3 s3Client, IProgress<WriteProgress> progress, TransferUtilityUploadRequest uploadRequest) {
+        private static async Task UploadInternal(string key, AmazonS3CabinetConfig config, IAmazonS3 s3Client, IProgress<WriteProgress> progress, TransferUtilityUploadRequest uploadRequest) {
             var utilty = new TransferUtility(s3Client);
 
             uploadRequest.BucketName = config.BucketName;
@@ -227,28 +227,32 @@ namespace Cabinet.S3 {
             await utilty.UploadAsync(uploadRequest);
         }
 
-        private static async Task<List<S3Object>> GetS3Objects(string keyPrefix, S3CabinetConfig config, IAmazonS3 s3Client) {
+        private static async Task<IEnumerable<AmazonS3CabinetItemInfo>> GetS3Objects(string keyPrefix, bool recursive, AmazonS3CabinetConfig config, IAmazonS3 s3Client) {
             if (config == null) throw new ArgumentNullException(nameof(config));
             if (s3Client == null) throw new ArgumentNullException(nameof(s3Client));
 
-            var s3Objects = new List<S3Object>();
-
-            // See http://stackoverflow.com/questions/8932469/how-can-i-non-recursively-browse-the-contents-of-a-directory-with-the-aws-s3-api
+            var fileInfos = new List<AmazonS3CabinetItemInfo>();
+            
+            // If a delimiter is not specified, the response will include all keys i.e. recursive
+            // If a delimiter is specified, the response will return files under the prefix and the CommonPrefixes
 
             var request = new ListObjectsRequest {
                 BucketName = config.BucketName,
-                Prefix = keyPrefix,    
+                Prefix = keyPrefix
             };
 
-            // recursive ?
-            // request.Delimiter = "/";
-            
+            if (!recursive) {
+                request.Delimiter = config.Delimiter;
+            }
+
             do {
                 var response = await s3Client.ListObjectsAsync(request);
+                
+                var directories = response.CommonPrefixes.Select(prefix => new AmazonS3CabinetItemInfo(prefix, true, ItemType.Directory));
+                var files = response.S3Objects.Select(o => new AmazonS3CabinetItemInfo(o.Key, true, ItemType.File));
 
-                // response.CommonPrefixes ? get items
-
-                s3Objects.AddRange(response.S3Objects);
+                fileInfos.AddRange(directories);
+                fileInfos.AddRange(files);
 
                 if (response.IsTruncated) {
                     request.Marker = response.NextMarker;
@@ -257,10 +261,10 @@ namespace Cabinet.S3 {
                 }
             } while (request != null);
 
-            return s3Objects;
+            return fileInfos;
         }
 
-        private static async Task<GetObjectResponse> GetS3Object(string key, S3CabinetConfig config, IAmazonS3 s3Client, CancellationToken cancellationToken) {
+        private static async Task<GetObjectResponse> GetS3Object(string key, AmazonS3CabinetConfig config, IAmazonS3 s3Client, CancellationToken cancellationToken) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
             if (s3Client == null) throw new ArgumentNullException(nameof(s3Client));
@@ -275,7 +279,7 @@ namespace Cabinet.S3 {
             }
         }
 
-        private static async Task<IDeleteResult> DeleteInternal(string key, S3CabinetConfig config, IAmazonS3 s3Client) {
+        private static async Task<IDeleteResult> DeleteInternal(string key, AmazonS3CabinetConfig config, IAmazonS3 s3Client) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
             if (s3Client == null) throw new ArgumentNullException(nameof(s3Client));
@@ -294,7 +298,7 @@ namespace Cabinet.S3 {
             }
         }
 
-        private IAmazonS3 GetS3Client(S3CabinetConfig config) {
+        private IAmazonS3 GetS3Client(AmazonS3CabinetConfig config) {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
             return clientFactory.GetS3Client(config);

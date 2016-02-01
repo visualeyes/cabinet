@@ -1,4 +1,5 @@
-﻿using Cabinet.S3;
+﻿using Cabinet.Core;
+using Cabinet.S3;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,20 +12,20 @@ namespace Cabinet.Tests.S3 {
 
         [Fact]
         public void Provider_Type() {
-            var fileInfo = new S3CabinetFileInfo("key", true);
+            var fileInfo = new AmazonS3CabinetItemInfo("key", true, ItemType.File);
             Assert.Equal(AmazonS3StorageProvider.ProviderType, fileInfo.ProviderType);
         }
 
         [Theory]
         [InlineData(null), InlineData(""), InlineData(" ")]
         public void Null_Key_Throws(string key) {
-            Assert.Throws<ArgumentNullException>(() => new S3CabinetFileInfo(key, true));
+            Assert.Throws<ArgumentNullException>(() => new AmazonS3CabinetItemInfo(key, true, ItemType.File));
         }
 
         [Fact]
         public void Key_Set() {
             string key = "key";
-            var fileInfo = new S3CabinetFileInfo(key, true);
+            var fileInfo = new AmazonS3CabinetItemInfo(key, true, ItemType.File);
             Assert.Equal(key, fileInfo.Key);
         }
 
@@ -32,7 +33,7 @@ namespace Cabinet.Tests.S3 {
         [InlineData(true), InlineData(false)]
         public void Exists_Set(bool exists) {
             string key = "key";
-            var fileInfo = new S3CabinetFileInfo(key, exists);
+            var fileInfo = new AmazonS3CabinetItemInfo(key, exists, ItemType.File);
             Assert.Equal(exists, fileInfo.Exists);
         }
     }

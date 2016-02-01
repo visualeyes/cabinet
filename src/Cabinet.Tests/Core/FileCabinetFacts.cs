@@ -53,7 +53,7 @@ namespace Cabinet.Tests.Core {
         [Theory]
         [InlineData("key")]
         public async Task Get_File(string key) {
-            var mockFile = new Mock<ICabinetFileInfo>();
+            var mockFile = new Mock<ICabinetItemInfo>();
             this.mockStorageProvider.Setup(s => s.GetFileAsync(key, mockConfig.Object)).ReturnsAsync(mockFile.Object);
 
             var actualFile = await this.fileCabinet.GetFileAsync(key);
@@ -67,20 +67,20 @@ namespace Cabinet.Tests.Core {
         [InlineData("keyPrefix", true)]
         [InlineData("", false)]
         public async Task Get_Files(string keyPrefix, bool recursive) {
-            var mockFile = new Mock<ICabinetFileInfo>();
-            var expectedFiles = new List<ICabinetFileInfo>() { mockFile.Object };
-            this.mockStorageProvider.Setup(s => s.GetFilesAsync(mockConfig.Object, keyPrefix, recursive)).ReturnsAsync(expectedFiles);
+            var mockFile = new Mock<ICabinetItemInfo>();
+            var expectedFiles = new List<ICabinetItemInfo>() { mockFile.Object };
+            this.mockStorageProvider.Setup(s => s.GetItemsAsync(mockConfig.Object, keyPrefix, recursive)).ReturnsAsync(expectedFiles);
 
             var actualFiles = await this.fileCabinet.GetFilesAsync(keyPrefix: keyPrefix, recursive: recursive);
 
-            this.mockStorageProvider.Verify(s => s.GetFilesAsync(mockConfig.Object, keyPrefix, recursive), Times.Once);
+            this.mockStorageProvider.Verify(s => s.GetItemsAsync(mockConfig.Object, keyPrefix, recursive), Times.Once);
 
             Assert.Equal(expectedFiles, actualFiles);
         }
 
         [Fact]
         public async Task OpenRead_Invalid_Provider_Throws() {
-            var file = new TestCabinetFileInfo("key", true) {
+            var file = new TestCabinetFileInfo("key", true, ItemType.File) {
                 ProviderType = "SomeRandomType"
             };
 
@@ -91,7 +91,7 @@ namespace Cabinet.Tests.Core {
 
         [Fact]
         public async Task OpenRead_Missing_File_Throws() {
-            var file = new TestCabinetFileInfo("key", false) {
+            var file = new TestCabinetFileInfo("key", false, ItemType.File) {
                 ProviderType = TestProviderType
             };
 
@@ -107,7 +107,7 @@ namespace Cabinet.Tests.Core {
 
             this.mockStorageProvider.Setup(p => p.OpenReadStreamAsync(key, this.mockConfig.Object)).ReturnsAsync(mockStream.Object);
 
-            var file = new TestCabinetFileInfo(key, true) {
+            var file = new TestCabinetFileInfo(key, true, ItemType.File) {
                 ProviderType = TestProviderType
             };
 

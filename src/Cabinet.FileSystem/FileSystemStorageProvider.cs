@@ -36,30 +36,32 @@ namespace Cabinet.FileSystem {
         public Task<IEnumerable<string>> ListKeysAsync(FileSystemCabinetConfig config, string keyPrefix = "", bool recursive = true) {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
-            var cabinetFiles = GetFilesRecursive(keyPrefix, recursive, config);
-            var keys = cabinetFiles.Select(f => FileSystemCabinetFileInfo.GetFileKey(f, config.Directory));
+            var cabinetFiles = GetItemsRecursive(keyPrefix, recursive, config);
+            var keys = cabinetFiles
+                        .Where(f => f is FileInfoBase) // we only want file keys
+                        .Select(f => FileSystemCabinetItemInfo.GetItemKey(f, config.Directory));
 
             return Task.FromResult(keys);
         }
 
-        public Task<ICabinetFileInfo> GetFileAsync(string key, FileSystemCabinetConfig config) {
+        public Task<ICabinetItemInfo> GetFileAsync(string key, FileSystemCabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
 
             var fileInfo = this.GetFileInfo(key, config);
-            return Task.FromResult<ICabinetFileInfo>(new FileSystemCabinetFileInfo(fileInfo, config.Directory));
+            return Task.FromResult<ICabinetItemInfo>(new FileSystemCabinetItemInfo(fileInfo, config.Directory));
         }
 
-        public Task<IEnumerable<ICabinetFileInfo>> GetFilesAsync(FileSystemCabinetConfig config, string keyPrefix = "", bool recursive = true) {
+        public Task<IEnumerable<ICabinetItemInfo>> GetItemsAsync(FileSystemCabinetConfig config, string keyPrefix = "", bool recursive = true) {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
-            var cabinetFiles = GetFilesRecursive(keyPrefix, recursive, config);
+            var cabinetFiles = GetItemsRecursive(keyPrefix, recursive, config);
 
             var cabinetFileInfos = cabinetFiles.Select(f => {
-                return new FileSystemCabinetFileInfo(f, config.Directory);
+                return new FileSystemCabinetItemInfo(f, config.Directory);
             });
 
-            return Task.FromResult<IEnumerable<ICabinetFileInfo>>(cabinetFileInfos);
+            return Task.FromResult<IEnumerable<ICabinetItemInfo>>(cabinetFileInfos);
         }
 
         public Task<Stream> OpenReadStreamAsync(string key, FileSystemCabinetConfig config) {
@@ -186,9 +188,6 @@ namespace Cabinet.FileSystem {
         public FileInfoBase GetFileInfo(string key, FileSystemCabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
-            if (String.IsNullOrWhiteSpace(config.Directory)) {
-                throw new ApplicationException("The config directory has not been configured.");
-            }
 
             string fullKeyPath = GetKeyFullPath(config.Directory, key);
 
@@ -208,9 +207,6 @@ namespace Cabinet.FileSystem {
         public DirectoryInfoBase GetDirectoryInfo(string key, FileSystemCabinetConfig config) {
             if (key == null) throw new ArgumentNullException(nameof(key)); // Allow empty strings
             if (config == null) throw new ArgumentNullException(nameof(config));
-            if (String.IsNullOrWhiteSpace(config.Directory)) {
-                throw new ApplicationException("The config directory has not been configured.");
-            }
 
             string fullKeyPath = GetKeyFullPath(config.Directory, key);
             var fs = GetFileSystem(config);
@@ -261,19 +257,24 @@ namespace Cabinet.FileSystem {
             }
         }
         
-        private FileInfoBase[] GetFilesRecursive(string keyPrefix, bool recursive, FileSystemCabinetConfig config) {
+        private IEnumerable<FileSystemInfoBase> GetItemsRecursive(string keyPrefix, bool recursive, FileSystemCabinetConfig config) {
             if (keyPrefix == null) keyPrefix = "";
 
             var dirInfo = this.GetDirectoryInfo(keyPrefix, config);
-                        
-            if(!dirInfo.Exists) {
-                return new FileInfoBase[0];
+
+            if (!dirInfo.Exists) {
+                return Enumerable.Empty<FileSystemInfoBase>();
             }
             
             var searchOption = recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
-            var files = dirInfo.GetFiles("*", searchOption);
 
-            return files;
+            var itemInfoEnumeration =  dirInfo.EnumerateFileSystemInfos("*", searchOption);
+
+            if(recursive) {
+                itemInfoEnumeration = itemInfoEnumeration.Where(i => i is FileInfoBase);
+            }
+
+            return itemInfoEnumeration;
         }
 
         private T HandleExistingFile<T>(FileInfoBase fileInfo, string key, HandleExistingMethod handleExisting, Func<T> createExisingResult, Func<IDeleteResult, T> createFailedDeleteResult) where T : class {

@@ -46,6 +46,7 @@
     <Compile Include="ICabinetFileInfo.cs" />
     <Compile Include="IFileCabinet.cs" />
     <Compile Include="IFileCabinetFactory.cs" />
+    <Compile Include="ItemType.cs" />
     <Compile Include="Progress\ProgressStream.cs" />
     <Compile Include="Progress\WriteProgress.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

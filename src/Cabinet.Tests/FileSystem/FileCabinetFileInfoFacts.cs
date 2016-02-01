@@ -13,14 +13,14 @@ namespace Cabinet.Tests.FileSystem {
 
         [Fact]
         public void Null_File_Info_Throws() {
-            Assert.Throws<ArgumentNullException>(() => new FileSystemCabinetFileInfo(null, @"C:\test"));
+            Assert.Throws<ArgumentNullException>(() => new FileSystemCabinetItemInfo(null, @"C:\test"));
         }
 
         [Theory]
         [InlineData(null), InlineData(""), InlineData("  ")]
         public void Null_Base_Dir_Throws(string baseDirectory) {
             var mockFileInfo = new Mock<FileInfoBase>();
-            Assert.Throws<ArgumentNullException>(() => new FileSystemCabinetFileInfo(mockFileInfo.Object, baseDirectory));
+            Assert.Throws<ArgumentNullException>(() => new FileSystemCabinetItemInfo(mockFileInfo.Object, baseDirectory));
         }
     }
 }
