@@ -181,7 +181,7 @@ namespace Cabinet.Tests.S3 {
         }
 
         [Fact]
-        public async Task Save_File_Stream_Path_Config_Throws() {
+        public async Task Save_File_Path_Config_Throws() {
             var provider = GetProvider();
             AmazonS3CabinetConfig config = null;
             string filePath = @"C:\test\test.txt";
@@ -202,6 +202,18 @@ namespace Cabinet.Tests.S3 {
 
             await Assert.ThrowsAsync<ArgumentNullException>(async () => 
                 await provider.SaveFileAsync(key, mockStream.Object, HandleExistingMethod.Overwrite, mockProgress.Object, config)
+            );
+        }
+
+        [Fact]
+        public async Task Save_File_Stream_Null_Content_Throws() {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+            Stream stream = null;
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+                await provider.SaveFileAsync(ValidFileKey, stream, HandleExistingMethod.Overwrite, mockProgress.Object, config)
             );
         }
 
@@ -257,6 +269,33 @@ namespace Cabinet.Tests.S3 {
             );
         }
 
+        [Theory]
+        [InlineData("source.txt", "dest.txt", HttpStatusCode.OK)]
+        [InlineData("source.txt", "dest.txt", HttpStatusCode.NotFound)]
+        public async Task Move_File(string sourceKey, string destKey, HttpStatusCode copyResult) {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            this.mockS3Client.Setup(s3 => s3.CopyObjectAsync(It.IsAny<CopyObjectRequest>(), default(CancellationToken)))
+                .ReturnsAsync(new CopyObjectResponse {
+                    HttpStatusCode = copyResult
+                });
+
+            this.mockS3Client.Setup(s3 => s3.DeleteObjectAsync(It.IsAny<DeleteObjectRequest>(), default(CancellationToken)))
+                .ReturnsAsync(new DeleteObjectResponse {
+                    HttpStatusCode = HttpStatusCode.OK
+                });
+
+            var result = await provider.MoveFileAsync(sourceKey, destKey, HandleExistingMethod.Overwrite, config);
+
+            bool shouldDelete = copyResult == HttpStatusCode.OK;
+            var deleteTimes = shouldDelete ? Times.Once() : Times.Never();
+
+            this.mockS3Client.Verify(s3 => s3.CopyObjectAsync(It.IsAny<CopyObjectRequest>(), default(CancellationToken)), Times.Once);
+            this.mockS3Client.Verify(s3 => s3.DeleteObjectAsync(It.IsAny<DeleteObjectRequest>(), default(CancellationToken)), deleteTimes);
+        }
 
         [Theory]
         [InlineData(null), InlineData(""), InlineData(" ")]
@@ -273,6 +312,24 @@ namespace Cabinet.Tests.S3 {
             await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.DeleteFileAsync(ValidFileKey, config));
         }
 
+        [Theory]
+        [InlineData("file.txt", HttpStatusCode.OK)]
+        [InlineData("file.txt", HttpStatusCode.NotFound)]
+        public async Task Delete_File(string key, HttpStatusCode httpResult) {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            
+            this.mockS3Client.Setup(s3 => s3.DeleteObjectAsync(It.IsAny<DeleteObjectRequest>(), default(CancellationToken)))
+                .ReturnsAsync(new DeleteObjectResponse {
+                    HttpStatusCode = httpResult
+                });
+
+            var result = await provider.DeleteFileAsync(key, config);
+
+            this.mockS3Client.Verify(s3 => s3.DeleteObjectAsync(It.IsAny<DeleteObjectRequest>(), default(CancellationToken)), Times.Once);
+        }
         private void SetupGetObjectRequest(string bucketName, string key, HttpStatusCode code) {
             this.mockS3Client.Setup(
                 s3 => s3.GetObjectAsync(It.Is<GetObjectRequest>((r) => r.BucketName == bucketName && r.Key == key), It.IsAny<CancellationToken>())

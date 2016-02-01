@@ -21,6 +21,8 @@ namespace Cabinet.Core {
         }
 
         public bool SupportsProviderType(string providerType) {
+            if (String.IsNullOrWhiteSpace(providerType)) throw new ArgumentNullException(nameof(providerType));
+
             return providerType == provider.ProviderType;
         }
 
