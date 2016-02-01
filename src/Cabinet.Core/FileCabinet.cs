@@ -20,6 +20,10 @@ namespace Cabinet.Core {
             this.config = config;
         }
 
+        public bool SupportsProviderType(string providerType) {
+            return providerType == provider.ProviderType;
+        }
+
         public async Task<bool> ExistsAsync(string key) {
             return await provider.ExistsAsync(key, config);
         }
