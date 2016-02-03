@@ -1,6 +1,7 @@
 ﻿using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
+using Amazon.S3.Transfer;
 using Cabinet.Core;
 using Cabinet.Core.Providers;
 using Cabinet.S3;
@@ -17,16 +18,20 @@ using Xunit;
 
 namespace Cabinet.Tests.S3 {
     public class AmazonS3StorageProviderFacts {
-        private readonly Mock<IAmazonS3ClientFactory> mockS3ClientFactory;
-        private readonly Mock<IAmazonS3> mockS3Client;
         private const string ValidBucketName = "bucket-name";
         private const string ValidFileKey = "key";
+
+        private readonly Mock<IAmazonS3ClientFactory> mockS3ClientFactory;
+        private readonly Mock<IAmazonS3> mockS3Client;
+        private readonly Mock<ITransferUtility> mockS3TransferUtility;
 
         public AmazonS3StorageProviderFacts() {
             this.mockS3ClientFactory = new Mock<IAmazonS3ClientFactory>();
             this.mockS3Client = new Mock<IAmazonS3>();
+            this.mockS3TransferUtility = new Mock<ITransferUtility>();
 
             this.mockS3ClientFactory.Setup(f => f.GetS3Client(It.IsAny<AmazonS3CabinetConfig>())).Returns(this.mockS3Client.Object);
+            this.mockS3ClientFactory.Setup(f => f.GetTransferUtility(mockS3Client.Object)).Returns(this.mockS3TransferUtility.Object);
         }
 
         [Fact]
@@ -155,6 +160,21 @@ namespace Cabinet.Tests.S3 {
             await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.OpenReadStreamAsync(ValidFileKey, config));
         }
 
+        [Fact]
+        public async Task Open_Read_Stream() {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+            var mockStream = new Mock<Stream>();
+
+            this.mockS3TransferUtility
+                    .Setup(t => t.OpenStreamAsync(config.BucketName, ValidFileKey, default(CancellationToken)))
+                    .ReturnsAsync(mockStream.Object);
+
+            var stream = await provider.OpenReadStreamAsync(ValidFileKey, config);
+
+            Assert.Equal(mockStream.Object, stream);
+        }
+
         [Theory]
         [InlineData(null), InlineData(""), InlineData(" ")]
         public async Task Save_File_Path_Empty_Key_Throws(string key) {
@@ -190,6 +210,24 @@ namespace Cabinet.Tests.S3 {
             await Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await provider.SaveFileAsync(ValidFileKey, filePath, HandleExistingMethod.Overwrite, mockProgress.Object, config)
             );
+        }
+
+        [Fact]
+        public async Task Save_File_Path() {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+
+            string filePath = @"C:\test\test.txt";
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            this.mockS3TransferUtility
+                    .Setup(t => t.UploadAsync(It.IsAny<TransferUtilityUploadRequest>(), default(CancellationToken)))
+                    .Returns(Task.FromResult(0));
+
+            var result = await provider.SaveFileAsync(ValidFileKey, filePath, HandleExistingMethod.Overwrite, mockProgress.Object, config);
+
+            Assert.True(result.Success);
+            Assert.Equal(ValidFileKey, result.Key);
         }
 
         [Theory]
@@ -229,6 +267,23 @@ namespace Cabinet.Tests.S3 {
             );
         }
 
+        [Fact]
+        public async Task Save_File_Stream() {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+
+            var mockStream = new Mock<Stream>();
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            this.mockS3TransferUtility
+                    .Setup(t => t.UploadAsync(It.IsAny<TransferUtilityUploadRequest>(), default(CancellationToken)))
+                    .Returns(Task.FromResult(0));
+
+            var result = await provider.SaveFileAsync(ValidFileKey, mockStream.Object, HandleExistingMethod.Overwrite, mockProgress.Object, config);
+
+            Assert.True(result.Success);
+            Assert.Equal(ValidFileKey, result.Key);
+        }
 
         [Theory]
         [InlineData(null), InlineData(""), InlineData(" ")]

@@ -76,7 +76,7 @@ namespace Cabinet.S3 {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
             using (var s3Client = GetS3Client(config)) {
-                var transferUtility = new TransferUtility(s3Client);
+                var transferUtility = GetTransferUtility(s3Client);
                 return await transferUtility.OpenStreamAsync(config.BucketName, key);
             }
         }
@@ -212,8 +212,8 @@ namespace Cabinet.S3 {
             throw new NotImplementedException();
         }
 
-        private static async Task UploadInternal(string key, AmazonS3CabinetConfig config, IAmazonS3 s3Client, IProgress<WriteProgress> progress, TransferUtilityUploadRequest uploadRequest) {
-            var utilty = new TransferUtility(s3Client);
+        private async Task UploadInternal(string key, AmazonS3CabinetConfig config, IAmazonS3 s3Client, IProgress<WriteProgress> progress, TransferUtilityUploadRequest uploadRequest) {
+            var utilty = GetTransferUtility(s3Client);
 
             uploadRequest.BucketName = config.BucketName;
             uploadRequest.Key = key;
@@ -305,6 +305,12 @@ namespace Cabinet.S3 {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
             return clientFactory.GetS3Client(config);
+        }
+
+        private ITransferUtility GetTransferUtility(IAmazonS3 client) {
+            if (client == null) throw new ArgumentNullException(nameof(client));
+
+            return clientFactory.GetTransferUtility(client);
         }
     }
 }
