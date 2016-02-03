@@ -230,6 +230,63 @@ namespace Cabinet.Tests.S3 {
             Assert.Equal(ValidFileKey, result.Key);
         }
 
+        [Fact]
+        public async Task Save_File_Path_Exists_Overwrite() {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+
+            string filePath = @"C:\test\test.txt";
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            SetupGetObjectRequest(ValidBucketName, ValidFileKey, HttpStatusCode.OK);
+            this.mockS3TransferUtility
+                    .Setup(t => t.UploadAsync(It.IsAny<TransferUtilityUploadRequest>(), default(CancellationToken)))
+                    .Returns(Task.FromResult(0));
+
+            var result = await provider.SaveFileAsync(ValidFileKey, filePath, HandleExistingMethod.Overwrite, mockProgress.Object, config);
+
+            Assert.True(result.Success);
+            Assert.Equal(ValidFileKey, result.Key);
+        }
+
+        [Fact]
+        public async Task Save_File_Path_Exists_Skip() {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+
+            string filePath = @"C:\test\test.txt";
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            SetupGetObjectRequest(ValidBucketName, ValidFileKey, HttpStatusCode.OK);
+            this.mockS3TransferUtility
+                    .Setup(t => t.UploadAsync(It.IsAny<TransferUtilityUploadRequest>(), default(CancellationToken)))
+                    .Returns(Task.FromResult(0));
+
+            var result = await provider.SaveFileAsync(ValidFileKey, filePath, HandleExistingMethod.Skip, mockProgress.Object, config);
+
+            Assert.True(result.Success);
+            Assert.Equal(ValidFileKey, result.Key);
+            Assert.True(result.AlreadyExists);
+        }
+
+        [Fact]
+        public async Task Save_File_Path_Exists_Throw() {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+
+            string filePath = @"C:\test\test.txt";
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            SetupGetObjectRequest(ValidBucketName, ValidFileKey, HttpStatusCode.OK);
+            this.mockS3TransferUtility
+                    .Setup(t => t.UploadAsync(It.IsAny<TransferUtilityUploadRequest>(), default(CancellationToken)))
+                    .Returns(Task.FromResult(0));
+
+            await Assert.ThrowsAsync<ApplicationException>(async () => {
+                await provider.SaveFileAsync(ValidFileKey, filePath, HandleExistingMethod.Throw, mockProgress.Object, config);
+            });
+        }
+
         [Theory]
         [InlineData(null), InlineData(""), InlineData(" ")]
         public async Task Save_File_Stream_Empty_Key_Throws(string key) {
@@ -283,6 +340,63 @@ namespace Cabinet.Tests.S3 {
 
             Assert.True(result.Success);
             Assert.Equal(ValidFileKey, result.Key);
+        }
+
+        [Fact]
+        public async Task Save_File_Stream_Exists_Overwrite() {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+
+            var mockStream = new Mock<Stream>();
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            SetupGetObjectRequest(ValidBucketName, ValidFileKey, HttpStatusCode.OK);
+            this.mockS3TransferUtility
+                    .Setup(t => t.UploadAsync(It.IsAny<TransferUtilityUploadRequest>(), default(CancellationToken)))
+                    .Returns(Task.FromResult(0));
+
+            var result = await provider.SaveFileAsync(ValidFileKey, mockStream.Object, HandleExistingMethod.Overwrite, mockProgress.Object, config);
+
+            Assert.True(result.Success);
+            Assert.Equal(ValidFileKey, result.Key);
+        }
+
+        [Fact]
+        public async Task Save_File_Stream_Exists_Skip() {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+
+            var mockStream = new Mock<Stream>();
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            SetupGetObjectRequest(ValidBucketName, ValidFileKey, HttpStatusCode.OK);
+            this.mockS3TransferUtility
+                    .Setup(t => t.UploadAsync(It.IsAny<TransferUtilityUploadRequest>(), default(CancellationToken)))
+                    .Returns(Task.FromResult(0));
+
+            var result = await provider.SaveFileAsync(ValidFileKey, mockStream.Object, HandleExistingMethod.Skip, mockProgress.Object, config);
+
+            Assert.True(result.Success);
+            Assert.Equal(ValidFileKey, result.Key);
+            Assert.True(result.AlreadyExists);
+        }
+
+        [Fact]
+        public async Task Save_File_Stream_Exists_Throw() {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+
+            var mockStream = new Mock<Stream>();
+            var mockProgress = new Mock<IProgress<WriteProgress>>();
+
+            SetupGetObjectRequest(ValidBucketName, ValidFileKey, HttpStatusCode.OK);
+            this.mockS3TransferUtility
+                    .Setup(t => t.UploadAsync(It.IsAny<TransferUtilityUploadRequest>(), default(CancellationToken)))
+                    .Returns(Task.FromResult(0));
+
+            await Assert.ThrowsAsync<ApplicationException>(async () => {
+                await provider.SaveFileAsync(ValidFileKey, mockStream.Object, HandleExistingMethod.Throw, mockProgress.Object, config);
+            });
         }
 
         [Theory]
