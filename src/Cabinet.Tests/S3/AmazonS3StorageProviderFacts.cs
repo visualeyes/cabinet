@@ -142,7 +142,7 @@ namespace Cabinet.Tests.S3 {
 
             var fileInfos = await provider.GetItemsAsync(config, keyPrefix: keyPrefix, recursive: recursive);
             
-            Assert.Equal(expectedFileInfos, fileInfos, new S3CabinetFileInfoKeyComparer());
+            Assert.Equal(expectedFileInfos, fileInfos, new AmazonS3CabinetItemInfoKeyComparer());
         }
 
         [Theory]

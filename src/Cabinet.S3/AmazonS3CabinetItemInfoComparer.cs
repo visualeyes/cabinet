@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cabinet.S3 {
-    public class S3CabinetFileInfoKeyComparer : IEqualityComparer<AmazonS3CabinetItemInfo>, IEqualityComparer<ICabinetItemInfo> {
+    public class AmazonS3CabinetItemInfoKeyComparer : IEqualityComparer<AmazonS3CabinetItemInfo>, IEqualityComparer<ICabinetItemInfo> {
 
         public bool Equals(ICabinetItemInfo x, ICabinetItemInfo y) {
             return GetProviderKey(x) == GetProviderKey(y);
