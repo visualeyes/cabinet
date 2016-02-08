@@ -60,6 +60,7 @@
     <Compile Include="UploadSaveResult.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Cabinet.Web.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
