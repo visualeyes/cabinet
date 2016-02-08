@@ -11,7 +11,7 @@ namespace Cabinet.FileSystem {
     internal class FileSystemCabinetItemInfo : ICabinetItemInfo {
 
         public string ProviderType {
-            get { return FileSystemStorageProvider.ProviderType; }
+            get { return FileSystemCabinetConfig.ProviderType; }
         }
 
         public FileSystemCabinetItemInfo(FileSystemInfoBase itemInfo, string baseDirectory) {

@@ -35,7 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AWSSDK.Core, Version=3.1.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.Core.3.1.4.3\lib\net45\AWSSDK.Core.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.Core.3.1.4.4\lib\net45\AWSSDK.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="AWSSDK.S3, Version=3.1.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
@@ -44,6 +44,10 @@
     </Reference>
     <Reference Include="Moq, Version=4.2.1510.2205, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -80,11 +84,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\FileCabinetProviderConfigStoreFacts.cs" />
     <Compile Include="Core\FileCabinetFactoryFacts.cs" />
     <Compile Include="Core\FileCabinetFacts.cs" />
-    <Compile Include="Core\ITestProviderConfiguration.cs" />
+    <Compile Include="Core\TestProviderConfiguration.cs" />
     <Compile Include="Core\ProgressStreamFacts.cs" />
     <Compile Include="Core\TestCabinetFileInfo.cs" />
+    <Compile Include="FileSystem\Config\FileSystemConfigConverterFacts.cs" />
     <Compile Include="FileSystem\FileCabinetFactoryExtensionsFacts.cs" />
     <Compile Include="FileSystem\FileCabinetFileInfoFacts.cs" />
     <Compile Include="FileSystem\FileSystemCabinetConfigFacts.cs" />
@@ -96,6 +102,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="S3\AmazonS3CabinetItemInfoComparerFacts.cs" />
     <Compile Include="S3\AmazonS3StorageProviderFacts.cs" />
+    <Compile Include="S3\Config\AmazonS3ConfigConverterFacts.cs" />
     <Compile Include="S3\FileCabinetFactoryExtensionsFacts.cs" />
     <Compile Include="S3\Results\DeleteResultFacts.cs" />
     <Compile Include="S3\Results\MoveResultFacts.cs" />
@@ -106,24 +113,53 @@
     <Compile Include="TestSettings.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Cabinet.Config\Cabinet.Config.csproj">
+      <Project>{5b871962-b15d-4954-9e17-c4dfa8c64e29}</Project>
+      <Name>Cabinet.Config</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cabinet.Core\Cabinet.Core.csproj">
       <Project>{dbdf6ca2-31d3-469e-a9d6-9e3f13b01001}</Project>
       <Name>Cabinet.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cabinet.FileSystem.Config\Cabinet.FileSystem.Config.csproj">
+      <Project>{6ed4b1ad-6604-4bc3-a325-59484eed5d4f}</Project>
+      <Name>Cabinet.FileSystem.Config</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cabinet.FileSystem\Cabinet.FileSystem.csproj">
       <Project>{0896c531-c5c4-4cb3-99ef-73b264e0dde0}</Project>
       <Name>Cabinet.FileSystem</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Cabinet.Migrator.Config\Cabinet.Migrator.Config.csproj">
+      <Project>{c747700e-6fac-4f8b-a384-2658c0e52abf}</Project>
+      <Name>Cabinet.Migrator.Config</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cabinet.Migrator\Cabinet.Migrator.csproj">
+      <Project>{fec7949e-6925-4b44-b2c0-2d695c750c72}</Project>
+      <Name>Cabinet.Migrator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cabinet.S3.Config\Cabinet.S3.Config.csproj">
+      <Project>{79b8edb4-7488-4732-ba2b-27ec3fbffa53}</Project>
+      <Name>Cabinet.S3.Config</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cabinet.S3\Cabinet.S3.csproj">
       <Project>{790f406f-acdc-4cd1-8541-21f42c844ec2}</Project>
       <Name>Cabinet.S3</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Cabinet.Web\Cabinet.Web.csproj">
+      <Project>{c74037b5-9d95-4806-9be7-89bba1b07f4e}</Project>
+      <Name>Cabinet.Web</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Analyzer Include="..\packages\AWSSDK.S3.3.1.3.11\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\AWSSDK.S3.3.1.3.11\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />

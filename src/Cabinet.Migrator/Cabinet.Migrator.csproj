@@ -42,7 +42,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CabinetMigrator.cs" />
-    <Compile Include="MigratorCabinet.cs" />
+    <Compile Include="FileCabinetFactoryExtensions.cs" />
+    <Compile Include="MigratorStorageProvider.cs" />
+    <Compile Include="MigratorProviderConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Results\MoveResult.cs" />
   </ItemGroup>

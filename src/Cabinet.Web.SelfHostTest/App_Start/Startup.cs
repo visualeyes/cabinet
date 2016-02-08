@@ -15,14 +15,10 @@ using System.Web.Http;
 namespace Cabinet.Web.SelfHostTest {
     public partial class Startup {
         public void Configuration(IAppBuilder app) {
-            var cabinetFactory = ConfigureCabinet();
-            var builder = ConfigureAutoFac(cabinetFactory);
+            var builder = ConfigureAutoFac();
 
             app.UseCommonLogging();
-            //app.UseCommonLogging((log, type) => true, (log, type, message, exception) => {
-            //    Console.WriteLine(message);
-            //});
-
+            
             app.Map("/api", apiApp => {
                 var httpConfig = new HttpConfiguration();
                 httpConfig.MapHttpAttributeRoutes();

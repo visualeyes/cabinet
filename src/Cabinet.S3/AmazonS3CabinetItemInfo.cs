@@ -12,7 +12,7 @@ namespace Cabinet.S3 {
     public class AmazonS3CabinetItemInfo : ICabinetItemInfo {
 
         public string ProviderType {
-            get { return AmazonS3StorageProvider.ProviderType; }
+            get { return AmazonS3CabinetConfig.ProviderType; }
         }
 
         public AmazonS3CabinetItemInfo(string key, bool exists, ItemType type) {

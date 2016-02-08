@@ -21,60 +21,61 @@ namespace Cabinet.Tests.Core {
 
         [Fact]
         public void Get_Provider_Throws_Null_Config() {
-            Assert.Throws<ArgumentNullException>(() => cabinetFactory.GetCabinet<ITestProviderConfiguration>(null));
+            TestProviderConfiguration config = null;
+            Assert.Throws<ArgumentNullException>(() => cabinetFactory.GetCabinet(config));
         }
 
         [Fact]
         public void Get_Provider_Throws_If_Not_Registered() {
-            var mockProviderConfig = new Mock<ITestProviderConfiguration>();
+            var mockProviderConfig = new Mock<TestProviderConfiguration>();
 
             Assert.Throws<ApplicationException>(() => cabinetFactory.GetCabinet(mockProviderConfig.Object));
         }
 
         [Fact]
         public void Get_Provider_Throws_If_Null_Provider_Returned() {
-            Func<IStorageProvider<ITestProviderConfiguration>> providerFactory = () => null;
+            Func<IStorageProvider<TestProviderConfiguration>> providerFactory = () => null;
             cabinetFactory.RegisterProvider(providerFactory);
 
-            var mockProviderConfig = new Mock<ITestProviderConfiguration>();
+            var mockProviderConfig = new Mock<TestProviderConfiguration>();
 
             Assert.Throws<ApplicationException>(() => cabinetFactory.GetCabinet(mockProviderConfig.Object));
         }
 
         [Fact]
         public void Register_And_Get_Provider() {
-            var mockProvider = new Mock<IStorageProvider<ITestProviderConfiguration>>();
+            var mockProvider = new Mock<IStorageProvider<TestProviderConfiguration>>();
 
             cabinetFactory.RegisterProvider(mockProvider.Object);
-            
-            var mockProviderConfig = new Mock<ITestProviderConfiguration>();
-            var cabinet = cabinetFactory.GetCabinet(mockProviderConfig.Object);
+
+            var providerConfig = new TestProviderConfiguration();
+            var cabinet = cabinetFactory.GetCabinet(providerConfig);
 
             Assert.NotNull(cabinet);
         }
 
         [Fact]
         public void Register_Func_And_Get_Provider() {
-            var mockProvider = new Mock<IStorageProvider<ITestProviderConfiguration>>();
-            Func<IStorageProvider<ITestProviderConfiguration>> mockProviderFunc = () => mockProvider.Object;
+            var mockProvider = new Mock<IStorageProvider<TestProviderConfiguration>>();
+            Func<IStorageProvider<TestProviderConfiguration>> mockProviderFunc = () => mockProvider.Object;
 
             cabinetFactory.RegisterProvider(mockProviderFunc);
 
-            var mockProviderConfig = new Mock<ITestProviderConfiguration>();
-            var cabinet = cabinetFactory.GetCabinet(mockProviderConfig.Object);
+            var providerConfig = new TestProviderConfiguration();
+            var cabinet = cabinetFactory.GetCabinet(providerConfig);
 
             Assert.NotNull(cabinet);
         }
 
         [Fact]
         public void Register_Provider_Throws_Null() {
-            IStorageProvider<ITestProviderConfiguration> provider = null;
+            IStorageProvider<TestProviderConfiguration> provider = null;
             Assert.Throws<ArgumentNullException>(() => cabinetFactory.RegisterProvider(provider));
         }
 
         [Fact]
         public void Register_Provider_Factory_Throws_Null() {
-            Func<IStorageProvider<ITestProviderConfiguration>> providerFactory = null;
+            Func<IStorageProvider<TestProviderConfiguration>> providerFactory = null;
             Assert.Throws<ArgumentNullException>(() => cabinetFactory.RegisterProvider(providerFactory));
         }
     }

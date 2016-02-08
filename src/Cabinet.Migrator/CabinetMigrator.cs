@@ -29,7 +29,7 @@ namespace Cabinet.Migrator {
             }
 
             ISaveResult saveResult;
-            using (var stream = await sourceCabinet.OpenReadStreamAsync(file)) {
+            using (var stream = await sourceCabinet.OpenReadStreamAsync(file.Key)) {
                 saveResult = await destCabinet.SaveFileAsync(file.Key, stream, handleExisting);
             }
 

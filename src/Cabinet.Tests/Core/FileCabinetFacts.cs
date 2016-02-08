@@ -14,27 +14,27 @@ namespace Cabinet.Tests.Core {
     public class FileCabinetFacts {
         private const string TestProviderType = "Test";
 
-        private readonly Mock<ITestProviderConfiguration> mockConfig;
-        private readonly Mock<IStorageProvider<ITestProviderConfiguration>> mockStorageProvider;
+        private readonly Mock<TestProviderConfiguration> mockConfig;
+        private readonly Mock<IStorageProvider<TestProviderConfiguration>> mockStorageProvider;
 
-        private readonly FileCabinet<ITestProviderConfiguration> fileCabinet;
+        private readonly FileCabinet<TestProviderConfiguration> fileCabinet;
 
         public FileCabinetFacts() {
-            this.mockConfig = new Mock<ITestProviderConfiguration>();
-            this.mockStorageProvider = new Mock<IStorageProvider<ITestProviderConfiguration>>();
+            this.mockConfig = new Mock<TestProviderConfiguration>();
+            this.mockStorageProvider = new Mock<IStorageProvider<TestProviderConfiguration>>();
             this.mockStorageProvider.SetupGet(p => p.ProviderType).Returns(TestProviderType);
 
-            this.fileCabinet = new FileCabinet<ITestProviderConfiguration>(mockStorageProvider.Object, mockConfig.Object);
+            this.fileCabinet = new FileCabinet<TestProviderConfiguration>(mockStorageProvider.Object, mockConfig.Object);
         }
         
         [Fact]
         public void Null_Provider_Throws() {
-            Assert.Throws<ArgumentNullException>(() => new FileCabinet<ITestProviderConfiguration>(null, this.mockConfig.Object));
+            Assert.Throws<ArgumentNullException>(() => new FileCabinet<TestProviderConfiguration>(null, this.mockConfig.Object));
         }
 
         [Fact]
         public void Null_Config_Throws() {
-            Assert.Throws<ArgumentNullException>(() => new FileCabinet<ITestProviderConfiguration>(mockStorageProvider.Object, null));
+            Assert.Throws<ArgumentNullException>(() => new FileCabinet<TestProviderConfiguration>(mockStorageProvider.Object, null));
         }
 
         [Theory]
@@ -90,29 +90,7 @@ namespace Cabinet.Tests.Core {
 
             Assert.Equal(expectedFiles, actualFiles);
         }
-
-        [Fact]
-        public async Task OpenRead_Invalid_Provider_Throws() {
-            var file = new TestCabinetFileInfo("key", true, ItemType.File) {
-                ProviderType = "SomeRandomType"
-            };
-
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => {
-                await this.fileCabinet.OpenReadStreamAsync(file);
-            });
-        }
-
-        [Fact]
-        public async Task OpenRead_Missing_File_Throws() {
-            var file = new TestCabinetFileInfo("key", false, ItemType.File) {
-                ProviderType = TestProviderType
-            };
-
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => {
-                await this.fileCabinet.OpenReadStreamAsync(file);
-            });
-        }
-
+        
         [Fact]
         public async Task OpenRead() {
             string key = "key";
@@ -124,7 +102,7 @@ namespace Cabinet.Tests.Core {
                 ProviderType = TestProviderType
             };
 
-            var stream = await this.fileCabinet.OpenReadStreamAsync(file);
+            var stream = await this.fileCabinet.OpenReadStreamAsync(file.Key);
 
             this.mockStorageProvider.Verify(p => p.OpenReadStreamAsync(key, this.mockConfig.Object), Times.Once);
 
