@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Cabinet.Migrator.Config</id>
+    <version>$version$-alpha</version>
+    <authors>CareerHub</authors>
+    <owners>CareerHub</owners>
+    <projectUrl>https://github.com/visualeyes/cabinet</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Configuration for Cabinet.Migrator</description>
+    <releaseNotes>This is the initial release.</releaseNotes>
+    <copyright>Copyright 2016</copyright>
+    <tags>Files IO S3</tags>
+    <dependencies>
+      <dependency id="Cabinet.Config" version="1.0.24" />
+      <dependency id="Newtonsoft.Json" version="8.0.2" />
+    </dependencies>
+    <frameworkAssemblies>
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <file src="bin\Release\Cabinet.Migrator.Config.dll" target="lib" />
+    <file src="bin\Release\Cabinet.Migrator.Config.pdb" target="lib" />
+  </files>
+</package>
