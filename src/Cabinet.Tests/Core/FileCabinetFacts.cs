@@ -90,29 +90,7 @@ namespace Cabinet.Tests.Core {
 
             Assert.Equal(expectedFiles, actualFiles);
         }
-
-        [Fact]
-        public async Task OpenRead_Invalid_Provider_Throws() {
-            var file = new TestCabinetFileInfo("key", true, ItemType.File) {
-                ProviderType = "SomeRandomType"
-            };
-
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => {
-                await this.fileCabinet.OpenReadStreamAsync(file);
-            });
-        }
-
-        [Fact]
-        public async Task OpenRead_Missing_File_Throws() {
-            var file = new TestCabinetFileInfo("key", false, ItemType.File) {
-                ProviderType = TestProviderType
-            };
-
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => {
-                await this.fileCabinet.OpenReadStreamAsync(file);
-            });
-        }
-
+        
         [Fact]
         public async Task OpenRead() {
             string key = "key";
@@ -124,7 +102,7 @@ namespace Cabinet.Tests.Core {
                 ProviderType = TestProviderType
             };
 
-            var stream = await this.fileCabinet.OpenReadStreamAsync(file);
+            var stream = await this.fileCabinet.OpenReadStreamAsync(file.Key);
 
             this.mockStorageProvider.Verify(p => p.OpenReadStreamAsync(key, this.mockConfig.Object), Times.Once);
 

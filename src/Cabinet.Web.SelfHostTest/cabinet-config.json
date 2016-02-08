@@ -15,5 +15,12 @@
             "region": "ap-southeast-2",
             "bucket": "careerhub-info"
         }
+    },
+    "lazy": {
+        "type": "Migrator",
+        "config": {
+            "from": "ondisk",
+            "to": "amazon"
+        }
     }
 }

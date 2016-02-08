@@ -18,6 +18,10 @@ namespace Cabinet.Config {
         private readonly IFileCabinetConfigConvertFactory converterFactory;
         private readonly IFileSystem fs;
 
+        public FileCabinetProviderConfigStore(string configFilePath, IFileCabinetConfigConvertFactory converterFactory)
+            : this(configFilePath, converterFactory, new FileSystem()) {
+        }
+
         public FileCabinetProviderConfigStore(string configFilePath, IFileCabinetConfigConvertFactory converterFactory, IFileSystem fs) {
             this.configFilePath = configFilePath;
             this.converterFactory = converterFactory;

@@ -7,6 +7,8 @@ using Cabinet.Config;
 using Cabinet.Core;
 using Cabinet.FileSystem;
 using Cabinet.FileSystem.Config;
+using Cabinet.Migrator;
+using Cabinet.Migrator.Config;
 using Cabinet.S3;
 using Cabinet.S3.Config;
 using Cabinet.Web.SelfHostTest.Framework;
@@ -39,29 +41,26 @@ namespace Cabinet.Web.SelfHostTest {
             // Cabinet Stuff
             var pathMapper = new PathMapper(AppDomain.CurrentDomain.SetupInformation.ApplicationBase);
 
+            string configPath = pathMapper.MapPath(ConfigFilePath);
+
             var cabinetFactory = new FileCabinetFactory();
             var cabinetConfigFactory = new FileCabinetConfigConvertFactory();
+            var cabinetConfigStore = new FileCabinetProviderConfigStore(configPath, cabinetConfigFactory);
 
             cabinetFactory
                 .RegisterFileSystemProvider()
-                .RegisterS3Provider();
+                .RegisterS3Provider()
+                .RegisterMigratorProvider();
 
             cabinetConfigFactory
                 .RegisterFileSystemConfigConverter(pathMapper)
-                .RegisterAmazonS3ConfigConverter();
+                .RegisterAmazonS3ConfigConverter()
+                .RegisterMigratorConfigConverter(cabinetConfigStore);
 
             builder.RegisterInstance<IPathMapper>(pathMapper);
             builder.RegisterInstance<IFileCabinetFactory>(cabinetFactory);
             builder.RegisterInstance<IFileCabinetConfigConvertFactory>(cabinetConfigFactory);
-
-            builder.Register<ICabinetProviderConfigStore>((c) => {
-                var mapper = c.Resolve<IPathMapper>();
-                string configPath = mapper.MapPath(ConfigFilePath);
-                var converterFactory = c.Resolve<IFileCabinetConfigConvertFactory>();
-                var fs = c.Resolve<System.IO.Abstractions.IFileSystem>();
-
-                return new FileCabinetProviderConfigStore(configPath, converterFactory, fs);
-            });
+            builder.RegisterInstance<ICabinetProviderConfigStore>(cabinetConfigStore);
 
             // Register one cabinet for the whole app
             builder.Register<IFileCabinet>((c) => {

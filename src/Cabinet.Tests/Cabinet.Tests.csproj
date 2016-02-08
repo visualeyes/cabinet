@@ -135,6 +135,10 @@
       <Project>{0896c531-c5c4-4cb3-99ef-73b264e0dde0}</Project>
       <Name>Cabinet.FileSystem</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Cabinet.Migrator.Config\Cabinet.Migrator.Config.csproj">
+      <Project>{c747700e-6fac-4f8b-a384-2658c0e52abf}</Project>
+      <Name>Cabinet.Migrator.Config</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cabinet.Migrator\Cabinet.Migrator.csproj">
       <Project>{fec7949e-6925-4b44-b2c0-2d695c750c72}</Project>
       <Name>Cabinet.Migrator</Name>

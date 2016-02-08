@@ -17,7 +17,7 @@ namespace Cabinet.Core {
         Task<ICabinetItemInfo> GetFileAsync(string key);
         Task<IEnumerable<ICabinetItemInfo>> GetFilesAsync(string keyPrefix = "", bool recursive = true);
 
-        Task<Stream> OpenReadStreamAsync(ICabinetItemInfo file);
+        Task<Stream> OpenReadStreamAsync(string key);
 
         Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress = null);
         Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress = null);
