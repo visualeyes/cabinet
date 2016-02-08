@@ -13,7 +13,7 @@
                 "type": "stored-profile"
             },
             "region": "ap-southeast-2",
-            "bucket": "careerhub-info"
+            "bucket": "test-bucket"
         }
     },
     "lazy": {
