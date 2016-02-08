@@ -10,25 +10,12 @@ namespace Cabinet.Core {
     public class FileCabinetFactory : IFileCabinetFactory {
         private static ConcurrentDictionary<Type, Func<object>> providerCache = new ConcurrentDictionary<Type, Func<object>>();
 
-        public IFileCabinet GetCabinet<T>(T config) where T : class, IStorageProviderConfig {
-            if (config == null) throw new ArgumentNullException(nameof(config));
+        public IFileCabinet GetCabinet(IStorageProviderConfig config) {
+            Contract.NotNull(config, nameof(config));
 
-            var configType = typeof(T); // this is what it was registered with - config.GetType() would get the implementation
+            Type configType = config.GetType();
 
-            Func<object> providerFactory;
-
-            if (!providerCache.TryGetValue(configType, out providerFactory)) {
-                throw new ApplicationException("No provider is registered for a config of type: " + configType.FullName);
-            }
-
-            var provider = providerFactory() as IStorageProvider<T>;
-
-            if(provider == null) {
-                throw new ApplicationException("An item in the cache could not be cast to it's correct type: " + configType.FullName);
-            }
-            
-            var cabinet = new FileCabinet<T>(provider, config);
-            return cabinet;
+            return CreateFileCabinet(config, configType);
         }
 
         public void RegisterProvider<T>(Func<IStorageProvider<T>> providerFactory) where T : class, IStorageProviderConfig {
@@ -42,6 +29,27 @@ namespace Cabinet.Core {
 
             Func<IStorageProvider<T>> providerFactory = () => provider;
             this.RegisterProvider(providerFactory);
+        }
+
+        private static IFileCabinet CreateFileCabinet(IStorageProviderConfig config, Type configType) {
+            Func<object> providerFactory;
+
+            if (!providerCache.TryGetValue(configType, out providerFactory)) {
+                throw new ApplicationException("No provider is registered for a config of type: " + configType.FullName);
+            }
+
+            var provider = providerFactory();
+
+            if(provider == null) {
+                throw new ApplicationException("The providerFactory returned null. Factory registered  for type: " + configType.FullName);
+            }
+
+            var cabinetType = typeof(FileCabinet<>);
+            var cabinetGenericType = cabinetType.MakeGenericType(configType);
+
+            var cabinet = Activator.CreateInstance(cabinetGenericType, provider, config);
+
+            return cabinet as IFileCabinet;
         }
 
         internal void ClearCache() {

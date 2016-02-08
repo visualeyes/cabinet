@@ -14,27 +14,27 @@ namespace Cabinet.Tests.Core {
     public class FileCabinetFacts {
         private const string TestProviderType = "Test";
 
-        private readonly Mock<ITestProviderConfiguration> mockConfig;
-        private readonly Mock<IStorageProvider<ITestProviderConfiguration>> mockStorageProvider;
+        private readonly Mock<TestProviderConfiguration> mockConfig;
+        private readonly Mock<IStorageProvider<TestProviderConfiguration>> mockStorageProvider;
 
-        private readonly FileCabinet<ITestProviderConfiguration> fileCabinet;
+        private readonly FileCabinet<TestProviderConfiguration> fileCabinet;
 
         public FileCabinetFacts() {
-            this.mockConfig = new Mock<ITestProviderConfiguration>();
-            this.mockStorageProvider = new Mock<IStorageProvider<ITestProviderConfiguration>>();
+            this.mockConfig = new Mock<TestProviderConfiguration>();
+            this.mockStorageProvider = new Mock<IStorageProvider<TestProviderConfiguration>>();
             this.mockStorageProvider.SetupGet(p => p.ProviderType).Returns(TestProviderType);
 
-            this.fileCabinet = new FileCabinet<ITestProviderConfiguration>(mockStorageProvider.Object, mockConfig.Object);
+            this.fileCabinet = new FileCabinet<TestProviderConfiguration>(mockStorageProvider.Object, mockConfig.Object);
         }
         
         [Fact]
         public void Null_Provider_Throws() {
-            Assert.Throws<ArgumentNullException>(() => new FileCabinet<ITestProviderConfiguration>(null, this.mockConfig.Object));
+            Assert.Throws<ArgumentNullException>(() => new FileCabinet<TestProviderConfiguration>(null, this.mockConfig.Object));
         }
 
         [Fact]
         public void Null_Config_Throws() {
-            Assert.Throws<ArgumentNullException>(() => new FileCabinet<ITestProviderConfiguration>(mockStorageProvider.Object, null));
+            Assert.Throws<ArgumentNullException>(() => new FileCabinet<TestProviderConfiguration>(mockStorageProvider.Object, null));
         }
 
         [Theory]

@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Cabinet.Web.SelfHostTest</RootNamespace>
     <AssemblyName>Cabinet.Web.SelfHostTest</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,7 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Autofac, Version=3.5.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <HintPath>..\packages\Autofac.3.5.0\lib\net40\Autofac.dll</HintPath>
+      <HintPath>..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Autofac.Integration.WebApi, Version=3.4.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
@@ -42,11 +43,11 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="AWSSDK.Core, Version=3.1.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.Core.3.1.4.3\lib\net45\AWSSDK.Core.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.Core.3.1.4.4\lib\net45\AWSSDK.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="AWSSDK.S3, Version=3.1.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.S3.3.1.3.10\lib\net45\AWSSDK.S3.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.S3.3.1.3.11\lib\net45\AWSSDK.S3.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Common.Logging, Version=3.0.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
@@ -77,8 +78,8 @@
       <HintPath>..\packages\Microsoft.Owin.StaticFiles.3.0.1\lib\net45\Microsoft.Owin.StaticFiles.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
@@ -91,6 +92,10 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Abstractions, Version=2.0.0.123, Culture=neutral, PublicKeyToken=d480b5b72fb413da, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Abstractions.2.0.0.123\lib\net40\System.IO.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
@@ -113,9 +118,7 @@
   <ItemGroup>
     <Compile Include="Controllers\BrowseController.cs" />
     <Compile Include="Framework\UnhandledExceptionFilter.cs" />
-    <Compile Include="Framework\IPathMapper.cs" />
     <Compile Include="Framework\PathMapper.cs" />
-    <Compile Include="App_Start\Startup.Cabinet.cs" />
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="Framework\UploadKeyProvider.cs" />
     <Compile Include="Program.cs" />
@@ -124,17 +127,36 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <Content Include="cabinet-config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
     <Compile Include="App_Start\Startup.IOC.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Cabinet.Config\Cabinet.Config.csproj">
+      <Project>{5b871962-b15d-4954-9e17-c4dfa8c64e29}</Project>
+      <Name>Cabinet.Config</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cabinet.Core\Cabinet.Core.csproj">
       <Project>{dbdf6ca2-31d3-469e-a9d6-9e3f13b01001}</Project>
       <Name>Cabinet.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Cabinet.FileSystem.Config\Cabinet.FileSystem.Config.csproj">
+      <Project>{6ed4b1ad-6604-4bc3-a325-59484eed5d4f}</Project>
+      <Name>Cabinet.FileSystem.Config</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cabinet.FileSystem\Cabinet.FileSystem.csproj">
       <Project>{0896c531-c5c4-4cb3-99ef-73b264e0dde0}</Project>
       <Name>Cabinet.FileSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cabinet.Migrator\Cabinet.Migrator.csproj">
+      <Project>{fec7949e-6925-4b44-b2c0-2d695c750c72}</Project>
+      <Name>Cabinet.Migrator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cabinet.S3.Config\Cabinet.S3.Config.csproj">
+      <Project>{79b8edb4-7488-4732-ba2b-27ec3fbffa53}</Project>
+      <Name>Cabinet.S3.Config</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cabinet.S3\Cabinet.S3.csproj">
       <Project>{790f406f-acdc-4cd1-8541-21f42c844ec2}</Project>
@@ -144,9 +166,6 @@
       <Project>{c74037b5-9d95-4806-9be7-89bba1b07f4e}</Project>
       <Name>Cabinet.Web</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\packages\AWSSDK.S3.3.1.3.10\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="www\index.html">
@@ -161,6 +180,9 @@
     <Content Include="www\js\upload.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\AWSSDK.S3.3.1.3.11\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cabinet.Web.SelfHostTest.Framework {
+namespace Cabinet.FileSystem {
     public interface IPathMapper {
         string MapPath(string path);
     }

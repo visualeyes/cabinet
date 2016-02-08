@@ -19,7 +19,7 @@ namespace Cabinet.Tests.FileSystem.Results {
         [Fact]
         public void Null_Exception_Throws() {
             Exception e = null;
-            Assert.Throws<ArgumentNullException>(() => new MoveResult("sourceKey", "destKey", null));
+            Assert.Throws<ArgumentNullException>(() => new MoveResult("sourceKey", "destKey", e));
         }
 
         [Fact]

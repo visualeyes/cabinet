@@ -17,12 +17,10 @@ namespace Cabinet.Web.SelfHostTest.Controllers {
     public class BrowseController : ApiController {
         private readonly IFileCabinet fileCabinet;
         private readonly IKeyProvider keyProvider;
-        private readonly IPathMapper pathMapper;
 
-        public BrowseController(IFileCabinet fileCabinet, IKeyProvider keyProvider, IPathMapper pathMapper) {
+        public BrowseController(IFileCabinet fileCabinet, IKeyProvider keyProvider) {
             this.fileCabinet = fileCabinet;
             this.keyProvider = keyProvider;
-            this.pathMapper = pathMapper;
         }
 
         [Route(""), HttpGet]

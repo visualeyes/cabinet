@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Cabinet.Core {
     public interface IFileCabinetFactory {
-        IFileCabinet GetCabinet<T>(T config) where T : class, IStorageProviderConfig;
+        IFileCabinet GetCabinet(IStorageProviderConfig config);
 
         void RegisterProvider<T>(IStorageProvider<T> provider) where T : class, IStorageProviderConfig;
         void RegisterProvider<T>(Func<IStorageProvider<T>> providerFactory) where T : class, IStorageProviderConfig;

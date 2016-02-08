@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Contract.cs" />
     <Compile Include="FileCabinet.cs" />
     <Compile Include="FileCabinetFactory.cs" />
     <Compile Include="ICabinetFileInfo.cs" />

@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 
 namespace Cabinet.S3 {
     public class AmazonS3CabinetConfig : IStorageProviderConfig {
+        public const string ProviderType = "AmazonS3";
+
         public const string DefaultDelimiter = "/"; 
 
         public AmazonS3CabinetConfig(string bucketName, RegionEndpoint region, AWSCredentials credentials)
