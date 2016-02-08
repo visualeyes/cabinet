@@ -13,7 +13,7 @@ namespace Cabinet.Tests.S3 {
         [Fact]
         public void Provider_Type() {
             var fileInfo = new AmazonS3CabinetItemInfo("key", true, ItemType.File);
-            Assert.Equal(AmazonS3StorageProvider.ProviderType, fileInfo.ProviderType);
+            Assert.Equal(AmazonS3CabinetConfig.ProviderType, fileInfo.ProviderType);
         }
 
         [Theory]

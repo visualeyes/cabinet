@@ -37,7 +37,7 @@ namespace Cabinet.Tests.S3 {
         [Fact]
         public void Provider_Type() {
             IStorageProvider<AmazonS3CabinetConfig> provider = GetProvider();
-            Assert.Equal(AmazonS3StorageProvider.ProviderType, provider.ProviderType);
+            Assert.Equal(AmazonS3CabinetConfig.ProviderType, provider.ProviderType);
         }
 
         [Theory]

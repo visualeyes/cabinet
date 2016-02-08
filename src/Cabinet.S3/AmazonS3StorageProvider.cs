@@ -18,12 +18,10 @@ using Amazon.S3.Transfer;
 namespace Cabinet.S3 {
     // TOCONSIDER: Should GetFile ect get an object or just return info that can be used to get the stream
     internal class AmazonS3StorageProvider : IStorageProvider<AmazonS3CabinetConfig> {
-        public const string ProviderType = "AmazonS3";
-
         private readonly IAmazonS3ClientFactory clientFactory;
 
         string IStorageProvider<AmazonS3CabinetConfig>.ProviderType {
-            get { return ProviderType; }
+            get { return AmazonS3CabinetConfig.ProviderType; }
         }
 
         internal AmazonS3StorageProvider(IAmazonS3ClientFactory clientFactory) {

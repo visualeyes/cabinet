@@ -13,12 +13,11 @@ using System.Threading.Tasks;
 
 namespace Cabinet.FileSystem {
     internal class FileSystemStorageProvider : IStorageProvider<FileSystemCabinetConfig> {
-        public const string ProviderType = "FileSystem";
         
         private readonly Func<IFileSystem> fileSystemFactory;
 
         string IStorageProvider<FileSystemCabinetConfig>.ProviderType {
-            get { return ProviderType; }
+            get { return FileSystemCabinetConfig.ProviderType; }
         }
 
         public FileSystemStorageProvider(Func<IFileSystem> fileSystemFactory) {

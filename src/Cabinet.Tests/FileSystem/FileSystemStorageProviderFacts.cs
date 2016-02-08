@@ -27,7 +27,7 @@ namespace Cabinet.Tests.FileSystem {
         [Fact]
         public void Provider_Type() {
             IStorageProvider<FileSystemCabinetConfig> provider = GetProvider(ValidBasePath);
-            Assert.Equal(FileSystemStorageProvider.ProviderType, provider.ProviderType);
+            Assert.Equal(FileSystemCabinetConfig.ProviderType, provider.ProviderType);
         }
 
         [Theory]
@@ -83,7 +83,7 @@ namespace Cabinet.Tests.FileSystem {
 
             var fileInfo = await provider.GetFileAsync(key, config);
 
-            Assert.Equal(FileSystemStorageProvider.ProviderType, fileInfo.ProviderType);
+            Assert.Equal(FileSystemCabinetConfig.ProviderType, fileInfo.ProviderType);
             Assert.Equal(expectedFileKey, fileInfo.Key);
             Assert.True(fileInfo.Exists);
         }
@@ -98,7 +98,7 @@ namespace Cabinet.Tests.FileSystem {
 
             var fileInfo = await provider.GetFileAsync(key, config);
 
-            Assert.Equal(FileSystemStorageProvider.ProviderType, fileInfo.ProviderType);
+            Assert.Equal(FileSystemCabinetConfig.ProviderType, fileInfo.ProviderType);
             Assert.Equal(expectedFileKey, fileInfo.Key);
             Assert.False(fileInfo.Exists);
         }

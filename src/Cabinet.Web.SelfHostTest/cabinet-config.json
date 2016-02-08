@@ -1,0 +1,26 @@
+﻿{
+    "ondisk": {
+        "type": "FileSystem",
+        "config": {
+            "dir": "~/App_Data/Uploads",
+            "createIfNotExists": true
+        }
+    },
+    "amazon": {
+        "type": "AmazonS3",
+        "config": {
+            "credentials": {
+                "type": "stored-profile"
+            },
+            "region": "ap-southeast-2",
+            "bucket": "test-bucket"
+        }
+    },
+    "lazy": {
+        "type": "Migrator",
+        "config": {
+            "from": "ondisk",
+            "to": "amazon"
+        }
+    }
+}
