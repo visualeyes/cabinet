@@ -61,7 +61,8 @@
     <Compile Include="Files\FileTypeProviderExtensions.cs" />
     <Compile Include="Files\IFileType.cs" />
     <Compile Include="Files\IFileTypeProvider.cs" />
-    <Compile Include="IFileScanner.cs" />
+    <Compile Include="AntiVirus\IFileScanner.cs" />
+    <Compile Include="UploadKeyProvider.cs" />
     <Compile Include="Validation\IUploadValidator.cs" />
     <Compile Include="IKeyProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

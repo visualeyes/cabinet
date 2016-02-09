@@ -124,7 +124,6 @@
     <Compile Include="Framework\UnhandledExceptionFilter.cs" />
     <Compile Include="Framework\PathMapper.cs" />
     <Compile Include="App_Start\Startup.cs" />
-    <Compile Include="Framework\UploadKeyProvider.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Controllers\UploadController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

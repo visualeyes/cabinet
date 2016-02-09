@@ -1,6 +1,7 @@
 ﻿using Cabinet.Core;
 using Cabinet.Core.Providers;
 using Cabinet.Core.Results;
+using Cabinet.Web.AntiVirus;
 using Cabinet.Web.Files;
 using Cabinet.Web.Results;
 using Cabinet.Web.Validation;

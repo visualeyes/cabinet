@@ -1,8 +1,12 @@
-﻿
-# OSWAP Notes
+﻿# Usage
+
+# Security Considerations
+Before using this project please consider the security implications of allowing file uploads.
+This is not an exclusive list of all the aspects you may need to consider.
 
 ## Unrestricted File Upload
-https://www.owasp.org/index.php/Unrestricted_File_Upload
+Files must be restricted to types you can trust. It is difficult to acheive this.
+The following is based of the [OSWAP Guidelines](https://www.owasp.org/index.php/Unrestricted_File_Upload)
 
 ### File Names
 
@@ -16,7 +20,6 @@ https://www.owasp.org/index.php/Unrestricted_File_Upload
 
 `IKeyProvider` provides a method to get a key based off the filename and content type `string GetKey(string fileName, string contentType);`
 
-
 ##### Control Characters
 *All the control characters and Unicode ones should be removed from the filenames and their extensions without any exception. 
  Also, the special characters such as “;”, “:”, “>”, “<”, “/” ,”\”, additional “.”, “*”, “%”, “$”, and so on should be discarded as well. 
@@ -25,7 +28,6 @@ https://www.owasp.org/index.php/Unrestricted_File_Upload
 
 ##### Filename Length
 Limit the filename length. For instance, the maximum length of the name of a file plus its extension should be less than 255 characters (without any directory) in an NTFS partition.
-
 
 ### File Sizes
 *Limit the file size to a maximum value in order to prevent denial of service attacks (on file space or other web application’s functions such as the image resizer).*
