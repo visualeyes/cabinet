@@ -54,10 +54,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileCabinetStreamProvider.cs" />
+    <Compile Include="Files\FileType.cs" />
+    <Compile Include="Files\FileTypeCategory.cs" />
+    <Compile Include="Files\FileTypeProvider.cs" />
+    <Compile Include="Files\FileTypeExtensions.cs" />
+    <Compile Include="Files\FileTypeProviderExtensions.cs" />
+    <Compile Include="Files\IFileType.cs" />
+    <Compile Include="Files\IFileTypeProvider.cs" />
     <Compile Include="IFileScanner.cs" />
+    <Compile Include="Validation\IUploadValidator.cs" />
     <Compile Include="IKeyProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UploadSaveResult.cs" />
+    <Compile Include="Results\UploadSaveResult.cs" />
+    <Compile Include="Validation\UploadValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cabinet.Web.nuspec" />
@@ -68,6 +77,9 @@
       <Project>{dbdf6ca2-31d3-469e-a9d6-9e3f13b01001}</Project>
       <Name>Cabinet.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

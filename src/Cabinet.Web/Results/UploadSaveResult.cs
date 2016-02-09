@@ -5,11 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cabinet.Web {
+namespace Cabinet.Web.Results {
     public class UploadSaveResult : ISaveResult {
         private readonly string errorMessage;
 
-        public UploadSaveResult(string key, string errorMessage) {
+        public UploadSaveResult(string uploadFileName, string errorMessage)
+            : this(null, uploadFileName, errorMessage) {
+        }
+
+        public UploadSaveResult(string key, string uploadFileName, string errorMessage) {
             this.Key = key;
             this.Success = false;
             this.errorMessage = errorMessage;
@@ -20,6 +24,8 @@ namespace Cabinet.Web {
         public bool AlreadyExists { get; private set; }
 
         public Exception Exception { get; private set; }
+
+        public string UploadFileName { get; set; }
 
         public string GetErrorMessage() {
             return this.errorMessage;

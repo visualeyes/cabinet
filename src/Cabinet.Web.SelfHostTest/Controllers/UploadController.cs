@@ -1,7 +1,9 @@
 ﻿using Cabinet.Core;
 using Cabinet.Core.Providers;
 using Cabinet.FileSystem;
+using Cabinet.Web.Files;
 using Cabinet.Web.SelfHostTest.Framework;
+using Cabinet.Web.Validation;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,11 +20,13 @@ namespace Cabinet.Web.SelfHostTest.Controllers {
         private const string TempFolder = "~/App_Data/Temp";
 
         private readonly IFileCabinet fileCabinet;
+        private readonly IUploadValidator uploadValidator;
         private readonly IKeyProvider keyProvider;
         private readonly IPathMapper pathMapper;
 
-        public UploadController(IFileCabinet fileCabinet, IKeyProvider keyProvider, IPathMapper pathMapper) {
+        public UploadController(IFileCabinet fileCabinet, IUploadValidator uploadValidator, IKeyProvider keyProvider, IPathMapper pathMapper) {
             this.fileCabinet = fileCabinet;
+            this.uploadValidator = uploadValidator;
             this.keyProvider = keyProvider;
             this.pathMapper = pathMapper;
         }
@@ -52,7 +56,8 @@ namespace Cabinet.Web.SelfHostTest.Controllers {
                 Console.WriteLine("Uploaded {0} bytes to cabinet", e.BytesWritten);
             };
 
-            var provider = new FileCabinetStreamProvider(fileCabinet, keyProvider, tempPath) {
+            var provider = new FileCabinetStreamProvider(fileCabinet, uploadValidator, keyProvider, tempPath) {
+                AllowedFileCategories = new FileTypeCategory[] { FileTypeCategory.Document, FileTypeCategory.Image },
                 LocalFileUploadProgress = localFileProgress,
                 CabinetFileSaveProgress = cabinetFileProgress
             };
@@ -61,7 +66,7 @@ namespace Cabinet.Web.SelfHostTest.Controllers {
             await Request.Content.ReadAsMultipartAsync(provider);
 
             // Save in cabinet
-            var result = await provider.SaveInCabinet(HandleExistingMethod.Overwrite);
+            var result = await provider.SaveInCabinet();
 
             foreach(var r in result) {
                 if (r.Success) {

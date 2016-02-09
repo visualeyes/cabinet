@@ -9,11 +9,10 @@ namespace Cabinet.Web.SelfHostTest.Framework {
     public class UploadKeyProvider : IKeyProvider {
         public string GetKey(string fileName, string contentType) {
             string guid = Guid.NewGuid().ToString();
-            string uploadedFileName = fileName.Trim('"').Trim('\\');
 
             // Please consider security implication of selecting a key - https://www.owasp.org/index.php/Unrestricted_File_Upload
 
-            string extensionLessFilename = Path.GetFileName(uploadedFileName);
+            string extensionLessFilename = Path.GetFileName(fileName);
 
             return Path.Combine(guid, extensionLessFilename);
         }
