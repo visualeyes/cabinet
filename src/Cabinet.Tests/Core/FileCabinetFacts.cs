@@ -38,19 +38,6 @@ namespace Cabinet.Tests.Core {
         }
 
         [Theory]
-        [InlineData(null), InlineData(""), InlineData(" ")]
-        public void Supports_ProviderType_Empty_Throws(string providerType) {
-            Assert.Throws<ArgumentNullException>(() => this.fileCabinet.SupportsProviderType(providerType));
-        }
-
-        [Theory]
-        [InlineData(TestProviderType, true), InlineData("blah", false)]
-        public void Supports_ProviderType(string providerType, bool expectedSupports) {
-            var supportsType = this.fileCabinet.SupportsProviderType(providerType);
-            Assert.Equal(expectedSupports, supportsType);
-        }
-
-        [Theory]
         [InlineData("key", true)]
         [InlineData("key", false)]
         public async Task Exists(string key, bool expectedExists) {
@@ -69,7 +56,7 @@ namespace Cabinet.Tests.Core {
             var mockFile = new Mock<ICabinetItemInfo>();
             this.mockStorageProvider.Setup(s => s.GetFileAsync(key, mockConfig.Object)).ReturnsAsync(mockFile.Object);
 
-            var actualFile = await this.fileCabinet.GetFileAsync(key);
+            var actualFile = await this.fileCabinet.GetItemAsync(key);
 
             this.mockStorageProvider.Verify(s => s.GetFileAsync(key, mockConfig.Object), Times.Once);
 
@@ -84,7 +71,7 @@ namespace Cabinet.Tests.Core {
             var expectedFiles = new List<ICabinetItemInfo>() { mockFile.Object };
             this.mockStorageProvider.Setup(s => s.GetItemsAsync(mockConfig.Object, keyPrefix, recursive)).ReturnsAsync(expectedFiles);
 
-            var actualFiles = await this.fileCabinet.GetFilesAsync(keyPrefix: keyPrefix, recursive: recursive);
+            var actualFiles = await this.fileCabinet.GetItemAsync(keyPrefix: keyPrefix, recursive: recursive);
 
             this.mockStorageProvider.Verify(s => s.GetItemsAsync(mockConfig.Object, keyPrefix, recursive), Times.Once);
 

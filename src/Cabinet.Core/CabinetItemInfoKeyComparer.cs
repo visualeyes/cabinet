@@ -5,22 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cabinet.S3 {
-    public class AmazonS3CabinetItemInfoKeyComparer : IEqualityComparer<AmazonS3CabinetItemInfo>, IEqualityComparer<ICabinetItemInfo> {
+namespace Cabinet.Core {
+    public class CabinetItemInfoKeyComparer : IEqualityComparer<ICabinetItemInfo> {
 
         public bool Equals(ICabinetItemInfo x, ICabinetItemInfo y) {
             return GetProviderKey(x) == GetProviderKey(y);
         }
 
-        public bool Equals(AmazonS3CabinetItemInfo x, AmazonS3CabinetItemInfo y) {
-            return GetProviderKey(x) == GetProviderKey(y);
-        }
-
         public int GetHashCode(ICabinetItemInfo obj) {
-            return GetProviderHashCode(obj);
-        }
-
-        public int GetHashCode(AmazonS3CabinetItemInfo obj) {
             return GetProviderHashCode(obj);
         }
 

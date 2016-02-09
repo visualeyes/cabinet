@@ -13,6 +13,7 @@
     <tags>Files IO S3</tags>
     <dependencies>
       <dependency id="Cabinet.Core" version="1.0.5" />
+      <dependency id="Microsoft.Tpl.Dataflow" version="4.5.24" />
     </dependencies>
     <frameworkAssemblies>
     </frameworkAssemblies>

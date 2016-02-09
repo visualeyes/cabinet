@@ -11,5 +11,7 @@ namespace Cabinet.Core {
         ItemType Type { get; }
         string Key { get; }
         bool Exists { get; }
+
+        DateTime? LastModifiedUtc { get; }
     }
 }

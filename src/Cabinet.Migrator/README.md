@@ -1,0 +1,6 @@
+﻿
+# TO Consider
+
+- Race conditions
+
+

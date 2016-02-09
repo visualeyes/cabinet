@@ -1,4 +1,5 @@
 ﻿using Cabinet.Config;
+using Cabinet.Migrator.Migration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace Cabinet.Migrator.Config {
         public static IFileCabinetConfigConvertFactory RegisterMigratorConfigConverter(this IFileCabinetConfigConvertFactory factory, ICabinetProviderConfigStore store) {
             var migratorConverter = new MigratorProviderConfigConverter(store);
             
-            factory.RegisterProvider(MigratorProviderConfig.ProviderType, migratorConverter);
+            factory.RegisterProvider(MigrationProviderConfig.ProviderType, migratorConverter);
             return factory;
         }
     }

@@ -16,7 +16,7 @@ namespace Cabinet.FileSystem {
         
         private readonly Func<IFileSystem> fileSystemFactory;
 
-        string IStorageProvider<FileSystemCabinetConfig>.ProviderType {
+        public string ProviderType {
             get { return FileSystemCabinetConfig.ProviderType; }
         }
 

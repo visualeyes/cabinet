@@ -19,5 +19,7 @@ namespace Cabinet.Tests.Core {
         public string Key { get; set; }
         public bool Exists { get; set; }
         public ItemType Type { get; set; }
+
+        public DateTime? LastModifiedUtc { get; set; }
     }
 }

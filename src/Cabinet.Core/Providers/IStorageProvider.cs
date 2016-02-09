@@ -13,16 +13,7 @@ namespace Cabinet.Core.Providers {
     /// Ideally it should be implemented in a thread safe maner so it can be used as a singleton
     /// </summary>
     /// <typeparam name="T">Provider Configuration</typeparam>
-    public interface IStorageProvider<T> where T : IStorageProviderConfig {
-        string ProviderType { get; }
-        
-        Task<bool> ExistsAsync(string key, T config);
-        Task<IEnumerable<string>> ListKeysAsync(T config, string keyPrefix = "", bool recursive = true);
-
-        Task<ICabinetItemInfo> GetFileAsync(string key, T config);
-        Task<IEnumerable<ICabinetItemInfo>> GetItemsAsync(T config, string keyPrefix = "", bool recursive = true);
-
-        Task<Stream> OpenReadStreamAsync(string key, T config);
+    public interface IStorageProvider<T> : IReadonlyStorageProvider<T> where T : IStorageProviderConfig {
 
         Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, T config);
         Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, T config);

@@ -144,7 +144,11 @@ namespace Cabinet.Tests.FileSystem {
 
             foreach (var file in files) {
                 var filePath = Path.Combine(basePath, file.Key);
-                this.mockFileSystem.AddFile(filePath, file.Value);
+                var fileData = new MockFileData(file.Value) {
+                    LastWriteTime = DateTime.UtcNow
+                };
+
+                this.mockFileSystem.AddFile(filePath, fileData);
             }
 
             var actualFiles = await provider.GetItemsAsync(config, keyPrefix: keyPrefix, recursive: recursive);
