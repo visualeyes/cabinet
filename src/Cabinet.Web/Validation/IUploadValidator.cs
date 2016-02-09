@@ -12,6 +12,8 @@ namespace Cabinet.Web.Validation {
     ///  -- "Never accept a filename and its extension directly without having a white-list filter."
     /// </summary>
     public interface IUploadValidator {
-        bool IsFileTypeWhitelisted(string extension, string contentType, IEnumerable<FileTypeCategory> categories);
+        bool IsFileTypeWhitelisted(string extension, string contentType);
+        bool IsFileTooLarge(long fileSize);
+        bool IsFileTooSmall(long fileSize);
     }
 }

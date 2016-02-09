@@ -57,7 +57,6 @@ namespace Cabinet.Web.SelfHostTest.Controllers {
             };
 
             var provider = new FileCabinetStreamProvider(fileCabinet, uploadValidator, keyProvider, tempPath) {
-                AllowedFileCategories = new FileTypeCategory[] { FileTypeCategory.Document, FileTypeCategory.Image },
                 LocalFileUploadProgress = localFileProgress,
                 CabinetFileSaveProgress = cabinetFileProgress
             };

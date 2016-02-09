@@ -19,14 +19,12 @@ namespace Cabinet.Web {
         private readonly IUploadValidator fileValidator;
         private readonly IKeyProvider keyProvider;
 
-        public FileCabinetStreamProvider(IFileCabinet fileCabinet, IUploadValidator fileValidator, IKeyProvider keyProvider, string tempFileFolder) 
+        public FileCabinetStreamProvider(IFileCabinet fileCabinet, IUploadValidator fileValidator, IKeyProvider keyProvider, string tempFileFolder)
             : base(tempFileFolder) {
             this.fileCabinet = fileCabinet;
             this.fileValidator = fileValidator;
             this.keyProvider = keyProvider;
         }
-
-        public IEnumerable<FileTypeCategory> AllowedFileCategories { get; set; }
 
         public IProgress<WriteProgress> LocalFileUploadProgress { get; set; }
         public IProgress<WriteProgress> CabinetFileSaveProgress { get; set; }
@@ -38,18 +36,27 @@ namespace Cabinet.Web {
                 string uploadExtension = Path.GetExtension(uploadFileName)?.TrimStart('.');
                 string uploadMediaType = fd.Headers.ContentType?.MediaType;
 
-                if(!this.fileValidator.IsFileTypeWhitelisted(uploadExtension, uploadMediaType, this.AllowedFileCategories)) {
+                if (!this.fileValidator.IsFileTypeWhitelisted(uploadExtension, uploadMediaType)) {
                     return new UploadSaveResult(uploadFileName, "The file type is not allowed");
                 }
 
+                string fileName = fd.LocalFileName;
+                var uploadedFileInfo = new FileInfo(fileName);
+
+                if (this.fileValidator.IsFileTooLarge(uploadedFileInfo.Length)) {
+                    return new UploadSaveResult(uploadFileName, "The file is too large");
+                }
+
+                if (this.fileValidator.IsFileTooSmall(uploadedFileInfo.Length)) {
+                    return new UploadSaveResult(uploadFileName, "The file is too small");
+                }
 
                 string key = this.keyProvider.GetKey(uploadFileName, uploadMediaType);
 
-                if(String.IsNullOrWhiteSpace(key)) {
+                if (String.IsNullOrWhiteSpace(key)) {
                     return new UploadSaveResult(key, "No key was provided");
                 }
 
-                string fileName = fd.LocalFileName;
 
                 if (!File.Exists(fileName)) {
                     return new UploadSaveResult(key, "Could not find uploaded file.");
@@ -64,14 +71,14 @@ namespace Cabinet.Web {
                 if (!File.Exists(fileName)) {
                     return new UploadSaveResult(key, "File has been removed as it is unsafe.");
                 }
-                
+
                 return await this.fileCabinet.SaveFileAsync(key, fileName, handleExisting, this.CabinetFileSaveProgress);
             });
 
             var saveResults = await Task.WhenAll(saveTasks);
 
             // cleanup temp files
-            foreach(var file in this.FileData) {
+            foreach (var file in this.FileData) {
                 File.Delete(file.LocalFileName);
             }
 
