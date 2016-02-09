@@ -9,9 +9,11 @@ namespace Cabinet.Web {
     public class UploadKeyProvider : IKeyProvider {
         private const string UploadExt = ".upload";
         private const int MaxFileNameLength = 255;
-        
-        // Please consider security implication of selecting a key - https://www.owasp.org/index.php/Unrestricted_File_Upload
 
+        /// <summary>
+        /// Gets a key based on a filename
+        /// Please consider security implication of selecting a key - https://www.owasp.org/index.php/Unrestricted_File_Upload
+        /// </summary>
         public string GetKey(string fileName, string contentType) {
             string guid = Guid.NewGuid().ToString();
 
