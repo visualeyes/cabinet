@@ -3,6 +3,7 @@ using Amazon.Runtime;
 using Amazon.S3;
 using Autofac;
 using Autofac.Integration.WebApi;
+using ByteSizeLib;
 using Cabinet.Config;
 using Cabinet.Core;
 using Cabinet.FileSystem;
@@ -11,7 +12,9 @@ using Cabinet.Migrator;
 using Cabinet.Migrator.Config;
 using Cabinet.S3;
 using Cabinet.S3.Config;
+using Cabinet.Web.Files;
 using Cabinet.Web.SelfHostTest.Framework;
+using Cabinet.Web.Validation;
 using Microsoft.Owin;
 using Microsoft.Owin.FileSystems;
 using Microsoft.Owin.Hosting;
@@ -33,12 +36,22 @@ namespace Cabinet.Web.SelfHostTest {
 		public ContainerBuilder ConfigureAutoFac() {
             var builder = new ContainerBuilder();
 
-            // Web Stuff
+            // Web Registrations
             builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
             builder.RegisterType<System.IO.Abstractions.FileSystem>().As<System.IO.Abstractions.IFileSystem>();
-            builder.RegisterType<UploadKeyProvider>().As<IKeyProvider>();
 
-            // Cabinet Stuff
+            // Cabinet.Web Registrations
+
+            builder.RegisterType<FileTypeProvider>().As<IFileTypeProvider>();
+            builder.RegisterType<UploadValidator>().As<IUploadValidator>();
+            builder.RegisterType<UploadKeyProvider>().As<IKeyProvider>();
+            builder.RegisterInstance<IValidationSettings>(new ValidationSettings {
+                AllowedFileCategories = new FileTypeCategory[] { FileTypeCategory.Document, FileTypeCategory.Image },
+                MaxSize = (long)ByteSize.FromMegaBytes(30).Bytes,
+                MinSize = 1
+            });
+
+            // Cabinet Registrations
             var pathMapper = new PathMapper(AppDomain.CurrentDomain.SetupInformation.ApplicationBase);
 
             string configPath = pathMapper.MapPath(ConfigFilePath);
@@ -65,7 +78,7 @@ namespace Cabinet.Web.SelfHostTest {
             // Register one cabinet for the whole app
             builder.Register<IFileCabinet>((c) => {
                 var configStore = c.Resolve<ICabinetProviderConfigStore>();
-                var config = configStore.GetConfig("amazon");
+                var config = configStore.GetConfig("ondisk");
                 return cabinetFactory.GetCabinet(config);
             });
 
