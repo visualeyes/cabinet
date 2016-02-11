@@ -36,6 +36,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cabinet.S3.Config", "Cabine
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cabinet.Migrator.Config", "Cabinet.Migrator.Config\Cabinet.Migrator.Config.csproj", "{C747700E-6FAC-4F8B-A384-2658C0E52ABF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cabinet.ConsoleTest", "Cabinet.ConsoleTest\Cabinet.ConsoleTest.csproj", "{80824195-32CF-4500-AF72-3EA904C9F3F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +88,10 @@ Global
 		{C747700E-6FAC-4F8B-A384-2658C0E52ABF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C747700E-6FAC-4F8B-A384-2658C0E52ABF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C747700E-6FAC-4F8B-A384-2658C0E52ABF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80824195-32CF-4500-AF72-3EA904C9F3F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80824195-32CF-4500-AF72-3EA904C9F3F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80824195-32CF-4500-AF72-3EA904C9F3F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80824195-32CF-4500-AF72-3EA904C9F3F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

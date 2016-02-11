@@ -1,0 +1,19 @@
+﻿{
+    "ondisk": {
+        "type": "FileSystem",
+        "config": {
+            "dir": "~/files",
+            "createIfNotExists": true
+        }
+    },
+    "amazon": {
+        "type": "AmazonS3",
+        "config": {
+            "credentials": {
+                "type": "stored-profile"
+            },
+            "region": "ap-southeast-2",
+            "bucket": "testbucket"
+        }
+    }
+}
