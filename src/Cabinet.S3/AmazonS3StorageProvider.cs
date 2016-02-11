@@ -16,11 +16,10 @@ using System.Threading;
 using Amazon.S3.Transfer;
 
 namespace Cabinet.S3 {
-    // TOCONSIDER: Should GetFile ect get an object or just return info that can be used to get the stream
     internal class AmazonS3StorageProvider : IStorageProvider<AmazonS3CabinetConfig> {
         private readonly IAmazonS3ClientFactory clientFactory;
 
-        string IStorageProvider<AmazonS3CabinetConfig>.ProviderType {
+        public string ProviderType {
             get { return AmazonS3CabinetConfig.ProviderType; }
         }
 
@@ -54,7 +53,8 @@ namespace Cabinet.S3 {
             using (var s3Client = GetS3Client(config)) {
                 using (var response = await GetS3Object(key, config, s3Client, CancellationToken.None)) {
                     bool exists = response.HttpStatusCode == HttpStatusCode.OK;
-                    return new AmazonS3CabinetItemInfo(response.Key, exists, ItemType.File);
+                    
+                    return new AmazonS3CabinetItemInfo(response.Key, exists, ItemType.File, response.LastModified.ToUniversalTime());
                 }
             }
         }
@@ -65,7 +65,7 @@ namespace Cabinet.S3 {
             using (var s3Client = GetS3Client(config)) {
                 var s3Objects = await GetS3Objects(keyPrefix, recursive, config, s3Client);
 
-                return s3Objects.Select(o => new AmazonS3CabinetItemInfo(o.Key, true, ItemType.File));
+                return s3Objects;
             }
         }
 
@@ -221,9 +221,9 @@ namespace Cabinet.S3 {
 
             do {
                 var response = await s3Client.ListObjectsAsync(request);
-                
-                var directories = response.CommonPrefixes.Select(prefix => new AmazonS3CabinetItemInfo(prefix, true, ItemType.Directory));
-                var files = response.S3Objects.Select(o => new AmazonS3CabinetItemInfo(o.Key, true, ItemType.File));
+
+                var directories = response.CommonPrefixes.Select(prefix => new AmazonS3CabinetItemInfo(prefix, true, ItemType.Directory, null));
+                var files = response.S3Objects.Select(o => new AmazonS3CabinetItemInfo(o.Key, true, ItemType.File, o.LastModified.ToUniversalTime()));
 
                 fileInfos.AddRange(directories);
                 fileInfos.AddRange(files);

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Cabinet.Migrator</id>
+    <version>$version$-alpha</version>
+    <authors>CareerHub</authors>
+    <owners>CareerHub</owners>
+    <projectUrl>https://github.com/visualeyes/cabinet</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A Migration provider for Cabinet. Allows files to be migrated from one Cabinet to another i.e. FileSystem to S3.</description>
+    <releaseNotes>This is the initial release.</releaseNotes>
+    <copyright>Copyright 2016</copyright>
+    <tags>Files IO S3</tags>
+    <dependencies>
+      <dependency id="Cabinet.Core" version="1.0.5" />
+      <dependency id="Microsoft.Tpl.Dataflow" version="4.5.24" />
+    </dependencies>
+    <frameworkAssemblies>
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <file src="bin\Release\Cabinet.Migrator.dll" target="lib" />
+    <file src="bin\Release\Cabinet.Migrator.pdb" target="lib" />
+  </files>
+</package>
