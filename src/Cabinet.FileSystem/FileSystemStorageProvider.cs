@@ -67,6 +67,9 @@ namespace Cabinet.FileSystem {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
 
+
+            var fs = GetFileSystem(config);
+
             var fileInfo = this.GetFileInfo(key, config);
             var stream = fileInfo.OpenRead();
             return Task.FromResult(stream);
@@ -77,37 +80,41 @@ namespace Cabinet.FileSystem {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (config == null) throw new ArgumentNullException(nameof(config));
 
-            var fileInfo = this.GetFileInfo(key, config);
-
-            var handleExisingResult = HandleExistingFile<ISaveResult>(fileInfo, key, handleExisting,
-                () => new SaveResult(key, success: true) { AlreadyExists = true },
-                (deleteResult) => new SaveResult(key, deleteResult.Exception, deleteResult.GetErrorMessage())
-            );
-
-            if(handleExisingResult != null) {
-                return handleExisingResult;
-            }
+            // If for some reason, a file with the same key is created,
+            // only allow it to overwrite if overwriting is allowed
+            var openMode = handleExisting == HandleExistingMethod.Overwrite ? FileMode.Create : FileMode.CreateNew;
 
             try {
+                var fileInfo = this.GetFileInfo(key, config);
+
                 var fs = GetFileSystem(config);
-                
-                if(!fileInfo.Directory.Exists) {
+
+                if (!fileInfo.Directory.Exists) {
                     fileInfo.Directory.Create();
                 }
-
-                // If for some reason, a file with the same key is created,
-                // only allow it to overwrite if overwriting is allowed
-                var openMode = handleExisting == HandleExistingMethod.Overwrite ? FileMode.Create : FileMode.CreateNew;
-
+                
                 using (var writeStream = fs.File.Open(fileInfo.FullName, openMode, FileAccess.Write)) {
                     // no using block as this is simply a wrapper
-                    
                     var progressWriteStream = new ProgressStream(writeStream, content.Length, progress);
 
                     await content.CopyToAsync(progressWriteStream);
 
                     return new SaveResult(key, success: true);
                 }
+            } catch(IOException e) {
+                // We tried to create a new file but it already exists
+                if(openMode == FileMode.CreateNew) {
+                    if (handleExisting == HandleExistingMethod.Throw) {
+                        throw new ApplicationException(String.Format("File exists at {0} and handleExisting is set to throw", key));
+                    }
+
+                    if (handleExisting == HandleExistingMethod.Skip) {
+                        return new SaveResult(key, success: true) { AlreadyExists = true };
+                    }
+                }
+                
+                // Failed for some other reason so return an error
+                return new SaveResult(key, e);
             } catch (Exception e) {
                 return new SaveResult(key, e);
             }
@@ -120,75 +127,55 @@ namespace Cabinet.FileSystem {
 
             try {
                 var fs = GetFileSystem(config);
-                var fileInfo = fs.FileInfo.FromFileName(filePath);
 
-                if(!fileInfo.Exists) {
-                    return new SaveResult(key, success: false, errorMsg: String.Format("File does not exist at path {0}", filePath));
-                }
-
-                using(var readStream = fileInfo.OpenRead()) {
+                using (var readStream = fs.File.OpenRead(filePath)) {
                     return await this.SaveFileAsync(key, readStream, handleExisting, progress, config);
                 }
+            } catch (FileNotFoundException e) {
+                return new SaveResult(key, success: false, errorMsg: String.Format("File does not exist at path {0}", filePath));
             } catch (Exception e) {
                 return new SaveResult(key, e);
             }
         }
 
-        public Task<IMoveResult> MoveFileAsync(string sourceKey, string destKey, HandleExistingMethod handleExisting, FileSystemCabinetConfig config) {
+        public async Task<IMoveResult> MoveFileAsync(string sourceKey, string destKey, HandleExistingMethod handleExisting, FileSystemCabinetConfig config) {
             if (String.IsNullOrWhiteSpace(sourceKey)) throw new ArgumentNullException(nameof(sourceKey));
             if (String.IsNullOrWhiteSpace(destKey)) throw new ArgumentNullException(nameof(destKey));
             if (config == null) throw new ArgumentNullException(nameof(config));
 
-            var destFileInfo = this.GetFileInfo(destKey, config);
+            if (handleExisting == HandleExistingMethod.Overwrite) {
+                return await MoveAndOverwrite(sourceKey, destKey, config);
+            }
             
-            var handleExisingResult = HandleExistingFile<IMoveResult>(destFileInfo, destKey, handleExisting,
-                () => new MoveResult(sourceKey, destKey, success: true) { AlreadyExists = true },
-                (deleteResult) => new MoveResult(sourceKey, destKey, deleteResult.Exception, deleteResult.GetErrorMessage())
-            );
-
-            if (handleExisingResult != null) {
-                return Task.FromResult(handleExisingResult);
-            }
-
-            try {
-                var fs = GetFileSystem(config);
-
-                var fileInfo = this.GetFileInfo(sourceKey, config);
-
-                if (!destFileInfo.Directory.Exists) {
-                    destFileInfo.Directory.Create();
-                }
-
-                // Do file system move
-                fs.File.Move(fileInfo.FullName, destFileInfo.FullName);
-                
-                return Task.FromResult<IMoveResult>(new MoveResult(sourceKey, destKey, success: true));
-            } catch (Exception e) {
-                return Task.FromResult<IMoveResult>(new MoveResult(sourceKey, destKey, e));
-            }
+            return await MoveInternal(sourceKey, destKey, handleExisting, config);
         }
 
         public Task<IDeleteResult> DeleteFileAsync(string key, FileSystemCabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
 
-            var fileInfo = this.GetFileInfo(key, config);
+            try {
+                string fullKeyPath = GetKeyFullPath(config, key);
 
-            if (!fileInfo.Exists) {
-                return Task.FromResult<IDeleteResult>(new DeleteResult(true) {
+                var fs = GetFileSystem(config);
+
+                fs.File.Delete(fullKeyPath);
+
+                return Task.FromResult<IDeleteResult>(new DeleteResult());
+            } catch (DirectoryNotFoundException) {
+                return Task.FromResult<IDeleteResult>(new DeleteResult() {
                     AlreadyDeleted = true
                 });
+            } catch (Exception e) {
+                return Task.FromResult<IDeleteResult>(new DeleteResult(e));
             }
-
-            var result = DeleteFile(fileInfo);
-            return Task.FromResult(result);
         }
 
         public FileInfoBase GetFileInfo(string key, FileSystemCabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
 
-            string fullKeyPath = GetKeyFullPath(config.Directory, key);
+            string fullKeyPath = GetKeyFullPath(config, key);
 
             var fs = GetFileSystem(config);
 
@@ -207,7 +194,7 @@ namespace Cabinet.FileSystem {
             if (key == null) throw new ArgumentNullException(nameof(key)); // Allow empty strings
             if (config == null) throw new ArgumentNullException(nameof(config));
 
-            string fullKeyPath = GetKeyFullPath(config.Directory, key);
+            string fullKeyPath = GetKeyFullPath(config, key);
             var fs = GetFileSystem(config);
 
             var keyFile = fs.DirectoryInfo.FromDirectoryName(fullKeyPath);
@@ -237,25 +224,16 @@ namespace Cabinet.FileSystem {
             return fs;
         }
 
-        private string GetKeyFullPath(string directory, string key) {
-            if (String.IsNullOrWhiteSpace(directory)) throw new ArgumentNullException(nameof(directory));
+        private string GetKeyFullPath(FileSystemCabinetConfig config, string key) {
+            Contract.NotNull(config, nameof(config));
             if (key == null) throw new ArgumentNullException(nameof(key)); // Allow empty strings
 
-            string keyPath = Path.Combine(directory, key);
+            string keyPath = Path.Combine(config.Directory, key);
             string fullKeyPath = Path.GetFullPath(keyPath);
 
             return fullKeyPath;
         }
-
-        private static IDeleteResult DeleteFile(FileInfoBase fileInfo) {
-            try {
-                fileInfo.Delete();
-                return new DeleteResult(true);
-            } catch (Exception e) {
-                return new DeleteResult(e);
-            }
-        }
-        
+                
         private IEnumerable<FileSystemInfoBase> GetItemsRecursive(string keyPrefix, bool recursive, FileSystemCabinetConfig config) {
             if (keyPrefix == null) keyPrefix = "";
 
@@ -276,29 +254,62 @@ namespace Cabinet.FileSystem {
             return itemInfoEnumeration;
         }
 
-        private T HandleExistingFile<T>(FileInfoBase fileInfo, string key, HandleExistingMethod handleExisting, Func<T> createExisingResult, Func<IDeleteResult, T> createFailedDeleteResult) where T : class {
-            if (!fileInfo.Exists) {
-                return null;
-            }
+        private async Task<IMoveResult> MoveAndOverwrite(string sourceKey, string destKey, FileSystemCabinetConfig config) {
+            try {
+                ISaveResult saveResult = null;
 
-            if (handleExisting == HandleExistingMethod.Throw) {
-                throw new ApplicationException(String.Format("File exists at {0} and handleExisting is set to throw", key));
-            }
-
-            if (handleExisting == HandleExistingMethod.Skip) {
-                return createExisingResult();
-            }
-
-            if (handleExisting == HandleExistingMethod.Overwrite) {
-                var deleteResult = DeleteFile(fileInfo);
-                if (!deleteResult.Success) {
-                    return createFailedDeleteResult(deleteResult);
+                // Close stream as soon as we have a result
+                using (var stream = await this.OpenReadStreamAsync(sourceKey, config)) {
+                    saveResult = await this.SaveFileAsync(destKey, stream, HandleExistingMethod.Overwrite, null, config);
                 }
 
-                return null;
-            }
+                if (!saveResult.Success) {
+                    return new MoveResult(sourceKey, destKey, success: false, errorMsg: saveResult.GetErrorMessage());
+                }
+                
+                var deleteResult = await this.DeleteFileAsync(sourceKey, config);
 
-            throw new NotImplementedException();
+                if (!deleteResult.Success) {
+                    return new MoveResult(sourceKey, destKey, success: false, errorMsg: deleteResult.GetErrorMessage());
+                }
+
+                return new MoveResult(sourceKey, destKey);
+            } catch (Exception e) {
+                return new MoveResult(sourceKey, destKey, e);
+            }
+        }
+
+        private Task<IMoveResult> MoveInternal(string sourceKey, string destKey, HandleExistingMethod handleExisting, FileSystemCabinetConfig config) {
+            var destFileInfo = this.GetFileInfo(destKey, config);
+
+            try {
+                var fs = GetFileSystem(config);
+
+                var fileInfo = this.GetFileInfo(sourceKey, config);
+
+                if (!destFileInfo.Directory.Exists) {
+                    destFileInfo.Directory.Create();
+                }
+
+                // Do file system move
+                fs.File.Move(fileInfo.FullName, destFileInfo.FullName);
+
+                return Task.FromResult<IMoveResult>(new MoveResult(sourceKey, destKey, success: true));
+            } catch (IOException e) {
+                if (handleExisting == HandleExistingMethod.Throw) {
+                    throw new ApplicationException(String.Format("File exists at {0} and handleExisting is set to throw", destKey));
+                }
+
+                if (handleExisting == HandleExistingMethod.Skip) {
+                    return Task.FromResult<IMoveResult>(new MoveResult(sourceKey, destKey, success: true) {
+                        AlreadyExists = true
+                    });
+                }
+
+                return Task.FromResult<IMoveResult>(new MoveResult(sourceKey, destKey, e));
+            } catch (Exception e) {
+                return Task.FromResult<IMoveResult>(new MoveResult(sourceKey, destKey, e));
+            }
         }
     }
 }

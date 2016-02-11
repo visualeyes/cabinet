@@ -419,7 +419,7 @@ namespace Cabinet.Tests.FileSystem {
             var result = await provider.MoveFileAsync(fromKey, toKey, HandleExistingMethod.Overwrite, config);
 
             Assert.Null(result.Exception);
-            Assert.True(result.Success);
+            Assert.True(result.Success, result.GetErrorMessage());
 
             Assert.False(this.mockFileSystem.FileExists(fromPath));
             Assert.True(this.mockFileSystem.FileExists(toPath));
