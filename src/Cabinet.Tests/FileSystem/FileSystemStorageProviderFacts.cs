@@ -471,7 +471,6 @@ namespace Cabinet.Tests.FileSystem {
 
             Assert.Null(result.Exception);
             Assert.True(result.Success);
-            Assert.False(result.AlreadyDeleted);
             Assert.False(this.mockFileSystem.FileExists(expectedFilePath));
         }
 
@@ -487,7 +486,6 @@ namespace Cabinet.Tests.FileSystem {
 
             Assert.Null(result.Exception);
             Assert.True(result.Success);
-            Assert.True(result.AlreadyDeleted);
             Assert.False(this.mockFileSystem.FileExists(expectedFilePath));
         }
 

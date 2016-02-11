@@ -92,7 +92,7 @@ namespace Cabinet.FileSystem {
                 if (!fileInfo.Directory.Exists) {
                     fileInfo.Directory.Create();
                 }
-                
+
                 using (var writeStream = fs.File.Open(fileInfo.FullName, openMode, FileAccess.Write)) {
                     // no using block as this is simply a wrapper
                     var progressWriteStream = new ProgressStream(writeStream, content.Length, progress);
@@ -101,6 +101,8 @@ namespace Cabinet.FileSystem {
 
                     return new SaveResult(key, success: true);
                 }
+            } catch(DirectoryNotFoundException e) {
+                return new SaveResult(key, e);
             } catch(IOException e) {
                 // We tried to create a new file but it already exists
                 if(openMode == FileMode.CreateNew) {
@@ -163,9 +165,7 @@ namespace Cabinet.FileSystem {
 
                 return Task.FromResult<IDeleteResult>(new DeleteResult());
             } catch (DirectoryNotFoundException) {
-                return Task.FromResult<IDeleteResult>(new DeleteResult() {
-                    AlreadyDeleted = true
-                });
+                return Task.FromResult<IDeleteResult>(new DeleteResult());
             } catch (Exception e) {
                 return Task.FromResult<IDeleteResult>(new DeleteResult(e));
             }
@@ -295,6 +295,8 @@ namespace Cabinet.FileSystem {
                 fs.File.Move(fileInfo.FullName, destFileInfo.FullName);
 
                 return Task.FromResult<IMoveResult>(new MoveResult(sourceKey, destKey, success: true));
+            } catch(DirectoryNotFoundException e) {
+                return Task.FromResult<IMoveResult>(new MoveResult(sourceKey, destKey, e));
             } catch (IOException e) {
                 if (handleExisting == HandleExistingMethod.Throw) {
                     throw new ApplicationException(String.Format("File exists at {0} and handleExisting is set to throw", destKey));

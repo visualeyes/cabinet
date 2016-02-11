@@ -18,25 +18,23 @@ namespace Cabinet.S3.Results {
             if (exception == null) throw new ArgumentNullException(nameof(exception));
             this.Exception = exception;
         }
-
-        public bool AlreadyDeleted { get; set; }
-
+        
         public Exception Exception { get; private set; }
 
         public bool Success {
-            get { return this.Exception == null && this.httpStatusCode == HttpStatusCode.OK; }
+            get { return this.Exception == null && this.httpStatusCode == HttpStatusCode.NoContent; }
         }
 
         public string GetErrorMessage() {
             if (this.Exception != null) {
-
+                return this.Exception.ToString();
             }
 
             switch (this.httpStatusCode) {
                 case HttpStatusCode.NotFound:
                 case HttpStatusCode.Unauthorized:
                 default:
-                    return null;
+                    return String.Format("Delete request failed with status: {0}", this.httpStatusCode);
             }
         }
     }

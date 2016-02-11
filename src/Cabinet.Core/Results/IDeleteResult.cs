@@ -6,6 +6,5 @@ using System.Threading.Tasks;
 
 namespace Cabinet.Core.Results {
     public interface IDeleteResult : IFileOperationResult {
-        bool AlreadyDeleted { get; }
     }
 }
