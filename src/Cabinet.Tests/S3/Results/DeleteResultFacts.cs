@@ -12,7 +12,7 @@ namespace Cabinet.Tests.S3.Results {
     public class DeleteResultFacts {
 
         [Theory]
-        [InlineData(HttpStatusCode.OK, true)]
+        [InlineData(HttpStatusCode.NoContent, true)]
         [InlineData(HttpStatusCode.NotFound, false)]
         [InlineData(HttpStatusCode.Forbidden, false)]
         [InlineData(HttpStatusCode.InternalServerError, false)]
@@ -44,7 +44,7 @@ namespace Cabinet.Tests.S3.Results {
 
         public static object[] GetExceptionMessages() {
             return new object[] {
-                new object[] { new Exception(), null },
+                new object[] { new Exception(), "System.Exception: Exception of type 'System.Exception' was thrown." },
             };
         }
     }
