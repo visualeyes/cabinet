@@ -84,13 +84,11 @@ namespace Cabinet.S3 {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (config == null) throw new ArgumentNullException(nameof(config));
 
+            if(handleExisting != HandleExistingMethod.Overwrite) {
+                throw new NotImplementedException();
+            }
+
             using (var s3Client = GetS3Client(config)) {
-                bool skip = await SkipUploadAsync(key, handleExisting, config, s3Client);
-
-                if (skip) {
-                    return new SaveResult(key) { AlreadyExists = true };
-                }
-
                 try {
                     // Use the transfer utility as it handle large files in a better way
                     var uploadRequest = new TransferUtilityUploadRequest {
@@ -111,19 +109,17 @@ namespace Cabinet.S3 {
             if (String.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
             if (config == null) throw new ArgumentNullException(nameof(config));
 
+            if (handleExisting != HandleExistingMethod.Overwrite) {
+                throw new NotImplementedException();
+            }
+
             using (var s3Client = GetS3Client(config)) {
-                bool skip = await SkipUploadAsync(key, handleExisting, config, s3Client);
-
-                if (skip) {
-                    return new SaveResult(key) { AlreadyExists = true };
-                }
-
                 try {
                     // Use the transfer utility as it handle large files in a better way
                     var uploadRequest = new TransferUtilityUploadRequest {
                         FilePath = filePath,
                     };
-
+                    
                     await UploadInternal(key, config, s3Client, progress, uploadRequest);
 
                     return new SaveResult(key);
@@ -138,13 +134,11 @@ namespace Cabinet.S3 {
             if (String.IsNullOrWhiteSpace(destKey)) throw new ArgumentNullException(nameof(destKey));
             if (config == null) throw new ArgumentNullException(nameof(config));
 
+            if (handleExisting != HandleExistingMethod.Overwrite) {
+                throw new NotImplementedException();
+            }
+
             using (var s3Client = GetS3Client(config)) {
-                bool skip = await SkipUploadAsync(destKey, handleExisting, config, s3Client);
-
-                if (skip) {
-                    return new MoveResult(sourceKey, destKey) { AlreadyExists = true };
-                }
-
                 try {
                     var copyRequest = new CopyObjectRequest {
                         SourceBucket = config.BucketName,
@@ -188,28 +182,7 @@ namespace Cabinet.S3 {
                 return response.HttpStatusCode == HttpStatusCode.OK;
             }
         }
-
-        private static async Task<bool> SkipUploadAsync(string key, HandleExistingMethod handleExisting, AmazonS3CabinetConfig config, IAmazonS3 s3Client) {
-            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
-            if (config == null) throw new ArgumentNullException(nameof(config));
-            if (s3Client == null) throw new ArgumentNullException(nameof(s3Client));
-
-            if (handleExisting == HandleExistingMethod.Overwrite) {
-                return false;
-            }
-
-            bool exists = await ExistsInternalAsync(key, config, s3Client);
-            if (!exists) return false; // nothing to do
-
-            if (handleExisting == HandleExistingMethod.Skip) {
-                return true;
-            } else if (handleExisting == HandleExistingMethod.Throw) {
-                throw new ApplicationException(String.Format("File exists at {0} and handleExisting is set to throw", key));
-            }
-
-            throw new NotImplementedException();
-        }
-
+        
         private async Task UploadInternal(string key, AmazonS3CabinetConfig config, IAmazonS3 s3Client, IProgress<WriteProgress> progress, TransferUtilityUploadRequest uploadRequest) {
             var utilty = GetTransferUtility(s3Client);
 
@@ -224,7 +197,7 @@ namespace Cabinet.S3 {
                     BytesWritten = e.TransferredBytes
                 });
             };
-
+            
             await utilty.UploadAsync(uploadRequest);
         }
 

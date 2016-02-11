@@ -22,9 +22,7 @@ namespace Cabinet.FileSystem.Results {
         public bool Success { get; private set; }
 
         public Exception Exception { get; private set; }
-
-        public bool AlreadyDeleted { get; set; }
-
+        
         public string GetErrorMessage() {
             string errorMsg = null;
 

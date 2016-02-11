@@ -419,7 +419,7 @@ namespace Cabinet.Tests.FileSystem {
             var result = await provider.MoveFileAsync(fromKey, toKey, HandleExistingMethod.Overwrite, config);
 
             Assert.Null(result.Exception);
-            Assert.True(result.Success);
+            Assert.True(result.Success, result.GetErrorMessage());
 
             Assert.False(this.mockFileSystem.FileExists(fromPath));
             Assert.True(this.mockFileSystem.FileExists(toPath));
@@ -471,7 +471,6 @@ namespace Cabinet.Tests.FileSystem {
 
             Assert.Null(result.Exception);
             Assert.True(result.Success);
-            Assert.False(result.AlreadyDeleted);
             Assert.False(this.mockFileSystem.FileExists(expectedFilePath));
         }
 
@@ -487,7 +486,6 @@ namespace Cabinet.Tests.FileSystem {
 
             Assert.Null(result.Exception);
             Assert.True(result.Success);
-            Assert.True(result.AlreadyDeleted);
             Assert.False(this.mockFileSystem.FileExists(expectedFilePath));
         }
 
