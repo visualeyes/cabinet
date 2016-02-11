@@ -1,4 +1,5 @@
 ﻿using Cabinet.Core;
+using Cabinet.Migrator.Migration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Cabinet.Migrator {
     public static class FileCabinetFactoryExtensions {
 
         public static IFileCabinetFactory RegisterMigratorProvider(this IFileCabinetFactory factory) {
-            var provider = new MigratorStorageProvider(factory);
+            var provider = new MigrationStorageProvider(factory);
             factory.RegisterProvider(provider);
             return factory;
         }

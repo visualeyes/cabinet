@@ -1,11 +1,12 @@
 ﻿using Cabinet.Config;
+using Cabinet.Core.Providers;
+using Cabinet.Migrator.Migration;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Cabinet.Core.Providers;
-using Newtonsoft.Json.Linq;
 
 namespace Cabinet.Migrator.Config {
     public class MigratorProviderConfigConverter : ICabinetProviderConfigConverter {
@@ -20,13 +21,10 @@ namespace Cabinet.Migrator.Config {
             string fromConfigName = config.Value<string>("from");
             string toConfigName = config.Value<string>("to");
 
-            var fromConfig = configStore.GetConfig(fromConfigName);
-            var toConfig = configStore.GetConfig(toConfigName);
+            var from = configStore.GetConfig(fromConfigName);
+            var to = configStore.GetConfig(toConfigName);
 
-            return new MigratorProviderConfig {
-                FromConfig = fromConfig,
-                ToConfig = toConfig
-            };
+            return new MigrationProviderConfig(from, to);
         }
     }
 }

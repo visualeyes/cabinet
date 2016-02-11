@@ -21,12 +21,15 @@ namespace Cabinet.FileSystem {
             this.Type = GetItemType(itemInfo);
             this.Key = GetItemKey(itemInfo, baseDirectory);
             this.Exists = itemInfo.Exists;
+            this.LastModifiedUtc = itemInfo.Exists && this.Type == ItemType.File ? (DateTime?)itemInfo.LastWriteTimeUtc : null;
         }
 
         public ItemType Type { get; private set; }
         public string Key { get; private set; }
         public bool Exists { get; private set; }
-        
+
+        public DateTime? LastModifiedUtc { get; private set; }
+
         public static string GetItemKey(FileSystemInfoBase itemInfo, string baseDirectory) {
             return itemInfo.FullName.MakeRelativeTo(baseDirectory);
         }

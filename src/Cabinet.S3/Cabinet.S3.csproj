@@ -58,7 +58,6 @@
     <Compile Include="Results\SaveResult.cs" />
     <Compile Include="AmazonS3CabinetConfig.cs" />
     <Compile Include="AmazonS3CabinetItemInfo.cs" />
-    <Compile Include="AmazonS3CabinetItemInfoComparer.cs" />
     <Compile Include="AmazonS3ClientFactory.cs" />
   </ItemGroup>
   <ItemGroup>

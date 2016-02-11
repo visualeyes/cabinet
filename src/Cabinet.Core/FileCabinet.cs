@@ -20,21 +20,15 @@ namespace Cabinet.Core {
             this.config = config;
         }
 
-        public bool SupportsProviderType(string providerType) {
-            if (String.IsNullOrWhiteSpace(providerType)) throw new ArgumentNullException(nameof(providerType));
-
-            return providerType == provider.ProviderType;
-        }
-
         public async Task<bool> ExistsAsync(string key) {
             return await provider.ExistsAsync(key, config);
         }
 
-        public async Task<ICabinetItemInfo> GetFileAsync(string key) {
+        public async Task<ICabinetItemInfo> GetItemAsync(string key) {
             return await provider.GetFileAsync(key, config);
         }
 
-        public async Task<IEnumerable<ICabinetItemInfo>> GetFilesAsync(string keyPrefix = "", bool recursive = true) {
+        public async Task<IEnumerable<ICabinetItemInfo>> GetItemAsync(string keyPrefix = "", bool recursive = true) {
             return await provider.GetItemsAsync(keyPrefix: keyPrefix, recursive: recursive, config: config);
         }
 
