@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Cabinet.Core.Providers;
+﻿using Cabinet.Core.Providers;
+using System;
 using System.Collections.Concurrent;
 
 namespace Cabinet.Core {
@@ -35,13 +31,13 @@ namespace Cabinet.Core {
             Func<object> providerFactory;
 
             if (!providerCache.TryGetValue(configType, out providerFactory)) {
-                throw new ApplicationException("No provider is registered for a config of type: " + configType.FullName);
+                throw new Exception("No provider is registered for a config of type: " + configType.FullName);
             }
 
             var provider = providerFactory();
 
             if(provider == null) {
-                throw new ApplicationException("The providerFactory returned null. Factory registered  for type: " + configType.FullName);
+                throw new Exception("The providerFactory returned null. Factory registered  for type: " + configType.FullName);
             }
 
             var cabinetType = typeof(FileCabinet<>);
