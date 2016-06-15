@@ -29,7 +29,7 @@ namespace Cabinet.Tests.Core {
         public void Get_Provider_Throws_If_Not_Registered() {
             var mockProviderConfig = new Mock<TestProviderConfiguration>();
 
-            Assert.Throws<ApplicationException>(() => cabinetFactory.GetCabinet(mockProviderConfig.Object));
+            Assert.Throws<Exception>(() => cabinetFactory.GetCabinet(mockProviderConfig.Object));
         }
 
         [Fact]
@@ -39,7 +39,7 @@ namespace Cabinet.Tests.Core {
 
             var mockProviderConfig = new Mock<TestProviderConfiguration>();
 
-            Assert.Throws<ApplicationException>(() => cabinetFactory.GetCabinet(mockProviderConfig.Object));
+            Assert.Throws<Exception>(() => cabinetFactory.GetCabinet(mockProviderConfig.Object));
         }
 
         [Fact]
