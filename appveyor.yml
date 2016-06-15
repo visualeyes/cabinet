@@ -34,7 +34,7 @@ test_script:
   - cmd: dotnet test .\test\Cabinet.Tests\
 
 build_script:
-- ps: Get-ChildItem src\Cabinet* | Foreach { dotnet pack $_ --output (Join-Path "artifacts\bin" $_.Name) }
+  - ps: Get-ChildItem src\Cabinet* | Foreach { dotnet pack $_ --output (Join-Path "artifacts\bin" $_.Name) }
 
 # "coveralls.io": "1.3.4",
 # "OpenCover": "4.6.519", -- https://github.com/OpenCover/opencover/wiki/DNX-Support
@@ -43,9 +43,7 @@ build_script:
 #    - src\packages\coveralls.io.1.3.4\tools\coveralls.net.exe --opencover --repo-token %COVERALLS_REPO_TOKEN% --full-sources coverage.xml
 
 artifacts:
-    - path: artifacts\bin\Cabinet\Release\*.nupkg
-    - path: artifacts\bin\Cabinet.Mvc\Release\*.nupkg
-    - path: artifacts\bin\Cabinet.WebApi\Release\*.nupkg
+  - path: artifacts\bin\Cabinet*\Release\*.nupkg
 
 deploy:
   provider: NuGet
