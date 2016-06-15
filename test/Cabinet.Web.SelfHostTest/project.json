@@ -1,0 +1,44 @@
+﻿{
+    "version": "1.0.0-*",
+
+    "dependencies": {
+        "Autofac": "3.5.2",
+        "Autofac.WebApi2": "3.4.0",
+        "AWSSDK.Core": "3.1.4.4",
+        "AWSSDK.S3": "3.1.3.11",
+        "ByteSize": "1.1.1",
+        "Cabinet.Config": "1.1.0-*",
+        "Cabinet.Core": "1.1.0-*",
+        "Cabinet.FileSystem": "1.1.0-*",
+        "Cabinet.FileSystem.Config": "1.1.0-*",
+        "Cabinet.S3": "1.1.0-*",
+        "Cabinet.S3.Config": "1.1.0-*",
+        "Cabinet.Migrator": "1.1.0-*",
+        "Cabinet.Migrator.Config": "1.1.0-*",
+        "Cabinet.Web": "1.1.0-*",
+        "Common.Logging": "3.0.0",
+        "Common.Logging.Core": "3.0.0",
+        "Microsoft.AspNet.WebApi.Client": "5.2.3",
+        "Microsoft.AspNet.WebApi.Core": "5.2.3",
+        "Microsoft.AspNet.WebApi.Owin": "5.2.3",
+        "Microsoft.AspNet.WebApi.OwinSelfHost": "5.2.3",
+        "Microsoft.Owin": "3.0.1",
+        "Microsoft.Owin.FileSystems": "3.0.1",
+        "Microsoft.Owin.Host.HttpListener": "2.0.2",
+        "Microsoft.Owin.Hosting": "2.0.2",
+        "Microsoft.Owin.StaticFiles": "3.0.1",
+        "Newtonsoft.Json": "8.0.2",
+        "Owin": "1.0",
+        "Owin.Logging.Common": "1.0.5506.19675",
+        "System.Globalization": "4.0.0",
+        "System.IO.Abstractions": "2.0.0.123",
+        "System.Resources.ResourceManager": "4.0.0",
+        "System.Runtime": "4.0.0",
+        "System.Runtime.Extensions": "4.0.0"
+    },
+
+    "frameworks": {
+        "net45": { },
+        "net46": { }
+    }
+}
