@@ -17,16 +17,20 @@ assembly_info:
   assembly_informational_version: "{version}"
 
 install:
-  - dnvm update-self
-  - dnvm upgrade
-  - dnvm upgrade -r clr
+  - ps: .\scripts\show-dotnet-info.ps1
+  # Download install script to install .NET cli in .dotnet dir
+  - ps: mkdir -Force ".\scripts\obtain\" | Out-Null
+  - ps: Invoke-WebRequest "https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/install.ps1" -OutFile ".\scripts\obtain\install.ps1"
+  - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetcli"
+  - ps: '& .\scripts\obtain\install.ps1 -Channel "preview" -version "$env:CLI_VERSION" -InstallDir "$env:DOTNET_INSTALL_DIR" -NoPath'
+  # add dotnet to PATH
+  - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
   - nuget sources add -Name https://api.nuget.org/v3/index.json -Source https://api.nuget.org/v3/index.json
   - nuget sources disable -Name nuget.org -Source https://www.nuget.org/api/v2
   - nuget sources list   # log what feeds we're using - in case of timeout
-  - dnu feeds list       # log what feeds we're using - in case of timeout
 
 before_build:
-  - ps: .\version-bump.ps1
+  - ps: .\scripts\version-bump.ps1
   - appveyor-retry dnu restore
 
 build:
