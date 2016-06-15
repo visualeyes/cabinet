@@ -44,6 +44,11 @@ EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cabinet.Web.SelfHostTest", "test\Cabinet.Web.SelfHostTest\Cabinet.Web.SelfHostTest.xproj", "{AC2A8304-DBC8-452D-AA16-02423EDBB571}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{9489D3FA-35AA-46B5-9931-23C4417F9C21}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\dotnet-latest.ps1 = scripts\dotnet-latest.ps1
+		scripts\show-dotnet-info.ps1 = scripts\show-dotnet-info.ps1
+		scripts\version-bump.ps1 = scripts\version-bump.ps1
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "example", "example", "{62320D0E-EC56-4D76-A7C0-CB6E14CB77C9}"
 EndProject

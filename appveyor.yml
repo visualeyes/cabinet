@@ -17,30 +17,24 @@ assembly_info:
   assembly_informational_version: "{version}"
 
 install:
-  - ps: .\scripts\show-dotnet-info.ps1
-  # Download install script to install .NET cli in .dotnet dir
-  - ps: mkdir -Force ".\scripts\obtain\" | Out-Null
-  - ps: Invoke-WebRequest "https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0-preview2/scripts/obtain/dotnet-install.ps1" -OutFile ".\scripts\obtain\install.ps1"
-  - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetcli"
-  - ps: '& .\scripts\obtain\install.ps1 -Channel "preview" -version "$env:CLI_VERSION" -InstallDir "$env:DOTNET_INSTALL_DIR" -NoPath'
-  # add dotnet to PATH
-  - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+  - ps: iex .\scripts\dotnet-latest.ps1
+  # Prepend newly installed dotnet cli to the PATH of this build (this cannot be
+  # done from inside the powershell script as it would require to restart
+  # the parent CMD process).
+  - "SET PATH=C:\\Program Files\\dotnet\\bin;%PATH%"
   - nuget sources add -Name https://api.nuget.org/v3/index.json -Source https://api.nuget.org/v3/index.json
   - nuget sources disable -Name nuget.org -Source https://www.nuget.org/api/v2
   - nuget sources list   # log what feeds we're using - in case of timeout
 
 before_build:
   - ps: .\scripts\version-bump.ps1
-  - appveyor-retry dnu restore
-
-build:
-  verbosity: minimal
-  project: Cabinet.sln
-  publish_nuget: false             # package projects with .nuspec files and push to artifacts
-  publish_nuget_symbols: false     # generate and publish NuGet symbol packages
-
+  - appveyor-retry dotnet restore
+  
 test_script:
-  - cmd: dnx -p test\Cabinet.Tests\project.json test
+  - cmd: dotnet test .\test\Cabinet.Tests\
+
+build_script:
+- ps: Get-ChildItem src\Cabinet* | Foreach { dotnet pack $_ --output (Join-Path "artifacts\bin" $_.Name) }
 
 # "coveralls.io": "1.3.4",
 # "OpenCover": "4.6.519", -- https://github.com/OpenCover/opencover/wiki/DNX-Support
@@ -49,9 +43,9 @@ test_script:
 #    - src\packages\coveralls.io.1.3.4\tools\coveralls.net.exe --opencover --repo-token %COVERALLS_REPO_TOKEN% --full-sources coverage.xml
 
 artifacts:
-    - path: src\artifacts\bin\Cabinet\Release\*.nupkg
-    - path: src\artifacts\bin\Cabinet.Mvc\Release\*.nupkg
-    - path: src\artifacts\bin\Cabinet.WebApi\Release\*.nupkg
+    - path: artifacts\bin\Cabinet\Release\*.nupkg
+    - path: artifacts\bin\Cabinet.Mvc\Release\*.nupkg
+    - path: artifacts\bin\Cabinet.WebApi\Release\*.nupkg
 
 deploy:
   provider: NuGet
