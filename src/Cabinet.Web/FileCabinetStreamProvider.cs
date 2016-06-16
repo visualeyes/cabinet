@@ -87,10 +87,11 @@ namespace Cabinet.Web {
         }
 
         public override Stream GetStream(HttpContent parent, HttpContentHeaders headers) {
+            var fileName = headers.ContentDisposition.FileName;
             var fileSize = headers.ContentDisposition.Size;
             var fileStream = base.GetStream(parent, headers);
-
-            return new ProgressStream(fileStream, fileSize, this.LocalFileUploadProgress, disposeStream: true);
+            
+            return new ProgressStream(fileName, fileStream, fileSize, this.LocalFileUploadProgress, disposeStream: true);
         }
     }
 }

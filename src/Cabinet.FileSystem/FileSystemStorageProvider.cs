@@ -95,7 +95,7 @@ namespace Cabinet.FileSystem {
 
                 using (var writeStream = fs.File.Open(fileInfo.FullName, openMode, FileAccess.Write)) {
                     // no using block as this is simply a wrapper
-                    var progressWriteStream = new ProgressStream(writeStream, content.Length, progress);
+                    var progressWriteStream = new ProgressStream(key, writeStream, content.Length, progress);
 
                     await content.CopyToAsync(progressWriteStream);
 

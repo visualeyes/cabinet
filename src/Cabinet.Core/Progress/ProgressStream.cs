@@ -7,16 +7,20 @@ using System.Threading.Tasks;
 
 namespace Cabinet.Core {
     public class ProgressStream : Stream {
-        private readonly long? size;
+        private readonly string key;
         private readonly Stream stream;
-
-        private long bytesWrittenCount;
+        private readonly long? size;
 
         private readonly IProgress<IWriteProgress> writeProgress;
         private readonly bool disposeStream;
 
-        public ProgressStream(Stream stream, long? size, IProgress<IWriteProgress> writeProgress, bool disposeStream = false) {
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
+        private long bytesWrittenCount;
+
+        public ProgressStream(string key, Stream stream, long? size, IProgress<IWriteProgress> writeProgress, bool disposeStream = false) {
+            Contract.NotNullOrEmpty(key, nameof(key));
+            Contract.NotNull(stream, nameof(stream));
+
+            this.key = key;
             this.stream = stream;
             this.size = size;
             this.bytesWrittenCount = 0;
@@ -65,11 +69,7 @@ namespace Cabinet.Core {
         public override void Write(byte[] buffer, int offset, int count) {
             bytesWrittenCount += count;
 
-            writeProgress?.Report(new WriteProgress {
-                BytesWritten = bytesWrittenCount,
-                TotalBytes = size
-            });
-
+            writeProgress?.Report(new WriteProgress(key, bytesWrittenCount, size));
             stream.Write(buffer, offset, count);
         }
 

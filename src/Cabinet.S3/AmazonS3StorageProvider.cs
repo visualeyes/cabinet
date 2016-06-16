@@ -193,9 +193,7 @@ namespace Cabinet.S3 {
                 // TODO: more helpful progress
                 // e.PercentDone;
                 // e.TotalBytes;
-                progress?.Report(new WriteProgress {
-                    BytesWritten = e.TransferredBytes
-                });
+                progress?.Report(new WriteProgress(key, e.TransferredBytes, e.TotalBytes));
             };
             
             await utilty.UploadAsync(uploadRequest);
