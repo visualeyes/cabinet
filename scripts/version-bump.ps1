@@ -3,9 +3,7 @@ $ErrorActionPreference = "Stop"
 $version = $env:APPVEYOR_BUILD_VERSION
 
 if ($env:APPVEYOR_REPO_BRANCH -eq 'develop') {
-	$version = "$version-beta"
-} elseif ($env:APPVEYOR_REPO_BRANCH -ne 'master') {
-	$version = "$version-pr"
+	$version = $version -replace "develop","beta"
 }
 
 if ($env:APPVEYOR_REPO_TAG_NAME) {
