@@ -79,7 +79,7 @@ namespace Cabinet.S3 {
             }
         }
 
-        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, AmazonS3CabinetConfig config) {
+        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, AmazonS3CabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -94,7 +94,7 @@ namespace Cabinet.S3 {
                     var uploadRequest = new TransferUtilityUploadRequest {
                         InputStream = content,
                     };
-
+                    
                     await UploadInternal(key, config, s3Client, progress, uploadRequest);
 
                     return new SaveResult(key);
@@ -104,7 +104,7 @@ namespace Cabinet.S3 {
             }
         }
 
-        public async Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, AmazonS3CabinetConfig config) {
+        public async Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, AmazonS3CabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (String.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -183,7 +183,7 @@ namespace Cabinet.S3 {
             }
         }
         
-        private async Task UploadInternal(string key, AmazonS3CabinetConfig config, IAmazonS3 s3Client, IProgress<WriteProgress> progress, TransferUtilityUploadRequest uploadRequest) {
+        private async Task UploadInternal(string key, AmazonS3CabinetConfig config, IAmazonS3 s3Client, IProgress<IWriteProgress> progress, TransferUtilityUploadRequest uploadRequest) {
             var utilty = GetTransferUtility(s3Client);
 
             uploadRequest.BucketName = config.BucketName;

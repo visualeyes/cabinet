@@ -12,10 +12,10 @@ namespace Cabinet.Core {
 
         private long bytesWrittenCount;
 
-        private readonly IProgress<WriteProgress> writeProgress;
+        private readonly IProgress<IWriteProgress> writeProgress;
         private readonly bool disposeStream;
 
-        public ProgressStream(Stream stream, long? size, IProgress<WriteProgress> writeProgress, bool disposeStream = false) {
+        public ProgressStream(Stream stream, long? size, IProgress<IWriteProgress> writeProgress, bool disposeStream = false) {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
             this.stream = stream;
             this.size = size;
@@ -66,7 +66,8 @@ namespace Cabinet.Core {
             bytesWrittenCount += count;
 
             writeProgress?.Report(new WriteProgress {
-                BytesWritten = bytesWrittenCount
+                BytesWritten = bytesWrittenCount,
+                TotalBytes = size
             });
 
             stream.Write(buffer, offset, count);

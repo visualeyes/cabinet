@@ -27,8 +27,8 @@ namespace Cabinet.Web {
             this.keyProvider = keyProvider;
         }
 
-        public IProgress<WriteProgress> LocalFileUploadProgress { get; set; }
-        public IProgress<WriteProgress> CabinetFileSaveProgress { get; set; }
+        public IProgress<IWriteProgress> LocalFileUploadProgress { get; set; }
+        public IProgress<IWriteProgress> CabinetFileSaveProgress { get; set; }
 
         public async Task<ISaveResult[]> SaveInCabinet(HandleExistingMethod handleExisting = HandleExistingMethod.Throw, IFileScanner fileScanner = null) {
 

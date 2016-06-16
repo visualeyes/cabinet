@@ -13,7 +13,7 @@ namespace Cabinet.Tests.Core {
 
         [Fact]
         public void Null_Inner_Stream_Throws() {
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
             Assert.Throws<ArgumentNullException>(() => new ProgressStream(null, 1, mockProgress.Object));
         }
 
@@ -144,18 +144,18 @@ namespace Cabinet.Tests.Core {
         [Fact]
         public void Inner_Stream_Calls_Write() {
             var mockStream = new Mock<Stream>();
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
             var progressStream = new ProgressStream(mockStream.Object, null, mockProgress.Object);
 
             byte[] buffer = new byte[0];
             int offset = 0;
             int count = 0;
 
-            mockProgress.Setup(p => p.Report(It.IsAny<WriteProgress>()));
+            mockProgress.Setup(p => p.Report(It.IsAny<IWriteProgress>()));
 
             progressStream.Write(buffer, offset, count);
 
-            mockProgress.Verify(p => p.Report(It.IsAny<WriteProgress>()), Times.Once);
+            mockProgress.Verify(p => p.Report(It.IsAny<IWriteProgress>()), Times.Once);
             mockStream.Verify(s => s.Write(buffer, offset, count), Times.Once);
         }
 
@@ -163,7 +163,7 @@ namespace Cabinet.Tests.Core {
         [InlineData(true), InlineData(false)]
         public void Inner_Stream_Calls_Dispose(bool disposeStream) {
             var mockStream = new Mock<Stream>();
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
             var progressStream = new ProgressStream(mockStream.Object, null, mockProgress.Object, disposeStream);
 
             progressStream.Dispose();
