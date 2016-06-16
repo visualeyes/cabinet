@@ -1,0 +1,34 @@
+﻿{
+    "version": "1.1.0-*",
+    "description": "File Storage Services for .NET",
+    "authors": [ "CareerHub" ],
+    "packOptions": {
+        "repository": {
+            "url": "https://github.com/visualeyes/cabinet"
+        },
+        "owners": [ "CareerHub" ],
+        "tags": [ "Files", "IO", "S3" ],
+        "requireLicenseAcceptance": false,
+        "licenseUrl": ""
+    },
+    "copyright": "Copyright 2016",
+
+    "dependencies": { },
+
+    "frameworks": {
+        "net45": { },
+        "net46": { },
+        "netstandard1.5": {
+            "dependencies": {
+                "NETStandard.Library": "1.5.0-rc2-*"
+            }
+        },
+        "netcoreapp1.0": {
+            "dependencies": {
+                "Microsoft.NETCore.App": "1.0.0-rc2-*",
+                "System.Runtime": "4.1.0-rc2-*",
+                "System.Collections": "4.0.11-rc2-*"
+            }
+        }
+    }
+}

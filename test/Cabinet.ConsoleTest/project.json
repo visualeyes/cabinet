@@ -1,0 +1,23 @@
+﻿{
+    "version": "1.1.0-*",
+
+    "dependencies": {
+        "Cabinet.Config": "1.1.0-*",
+        "Cabinet.Core": "1.1.0-*",
+        "Cabinet.FileSystem": "1.1.0-*",
+        "Cabinet.FileSystem.Config": "1.1.0-*",
+        "Cabinet.S3": "1.1.0-*",
+        "Cabinet.S3.Config": "1.1.0-*",
+        "Cabinet.Migrator": "1.1.0-*",
+        "Cabinet.Migrator.Config": "1.1.0-*",
+        "Cabinet.Web": "1.1.0-*",
+        "ManyConsole": "0.4.2.18",
+        "NDesk.Options": "0.2.1",
+        "Nito.AsyncEx": "3.0.1"
+    },
+
+    "frameworks": {
+        "net45": { },
+        "net46": { }
+    }
+}

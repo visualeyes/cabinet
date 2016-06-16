@@ -1,0 +1,26 @@
+﻿{
+    "version": "1.1.0-*",
+    "description": "Configuration for Cabinet",
+    "authors": [ "CareerHub" ],
+    "packOptions": {
+        "repository": {
+            "url": "https://github.com/visualeyes/cabinet"
+        },
+        "owners": [ "CareerHub" ],
+        "tags": [ "Files", "IO", "S3" ],
+        "requireLicenseAcceptance": false,
+        "licenseUrl": ""
+    },
+    "copyright": "Copyright 2016",
+
+    "dependencies": {
+        "Cabinet.Core": "1.1.0-*",
+        "Newtonsoft.Json": "8.0.2",
+        "System.IO.Abstractions": "2.0.0.123"
+    },
+
+    "frameworks": {
+        "net45": { },
+        "net46": { }
+    }
+}

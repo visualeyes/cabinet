@@ -1,0 +1,25 @@
+﻿{
+    "version": "1.1.0-*",
+    "description": "Upload support for Cabinet.",
+    "authors": [ "CareerHub" ],
+    "packOptions": {
+        "repository": {
+            "url": "https://github.com/visualeyes/cabinet"
+        },
+        "owners": [ "CareerHub" ],
+        "tags": [ "Files", "IO", "S3" ],
+        "requireLicenseAcceptance": false,
+        "licenseUrl": ""
+    },
+    "copyright": "Copyright 2016",
+
+    "dependencies": {
+        "Cabinet.Config": "1.1.0-*",
+        "Microsoft.AspNet.WebApi.Core": "5.2.3"
+    },
+
+    "frameworks": {
+        "net45": { },
+        "net46": { }
+    }
+}
