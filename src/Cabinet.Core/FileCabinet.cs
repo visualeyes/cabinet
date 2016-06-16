@@ -44,11 +44,11 @@ namespace Cabinet.Core {
             return await provider.MoveFileAsync(sourceKey, destKey, handleExisting, config);
         }
 
-        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress = null) {
+        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress = null) {
             return await provider.SaveFileAsync(key, content, handleExisting, progress, config);
         }
 
-        public async Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress = null) {
+        public async Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress = null) {
             return await provider.SaveFileAsync(key, filePath, handleExisting, progress, config);
         }
 

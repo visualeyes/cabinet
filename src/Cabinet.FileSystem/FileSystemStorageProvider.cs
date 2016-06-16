@@ -75,7 +75,7 @@ namespace Cabinet.FileSystem {
             return Task.FromResult(stream);
         }
 
-        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, FileSystemCabinetConfig config) {
+        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, FileSystemCabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -95,7 +95,7 @@ namespace Cabinet.FileSystem {
 
                 using (var writeStream = fs.File.Open(fileInfo.FullName, openMode, FileAccess.Write)) {
                     // no using block as this is simply a wrapper
-                    var progressWriteStream = new ProgressStream(writeStream, content.Length, progress);
+                    var progressWriteStream = new ProgressStream(key, writeStream, content.Length, progress);
 
                     await content.CopyToAsync(progressWriteStream);
 
@@ -122,7 +122,7 @@ namespace Cabinet.FileSystem {
             }
         }
 
-        public async Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, FileSystemCabinetConfig config) {
+        public async Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, FileSystemCabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (String.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
             if (config == null) throw new ArgumentNullException(nameof(config));
