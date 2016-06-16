@@ -101,7 +101,7 @@ namespace Cabinet.Migrator.Migration {
             return stream;
         }
 
-        public async Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, MigrationProviderConfig config) {
+        public async Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, MigrationProviderConfig config) {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNullOrEmpty(filePath, nameof(filePath));
             Contract.NotNull(config, nameof(config));
@@ -112,7 +112,7 @@ namespace Cabinet.Migrator.Migration {
             return await to.SaveFileAsync(key, filePath, handleExisting, progress);
         }
 
-        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, MigrationProviderConfig config) {
+        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, MigrationProviderConfig config) {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(content, nameof(content));
             Contract.NotNull(config, nameof(config));

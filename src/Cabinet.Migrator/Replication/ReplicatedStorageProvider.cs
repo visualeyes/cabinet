@@ -73,7 +73,7 @@ namespace Cabinet.Migrator.Replication {
             return stream;
         }
 
-        public async Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, ReaplicatedProviderConfig config) {
+        public async Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, ReaplicatedProviderConfig config) {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNullOrEmpty(filePath, nameof(filePath));
             Contract.NotNull(config, nameof(config));
@@ -83,7 +83,7 @@ namespace Cabinet.Migrator.Replication {
             }, config);
         }
 
-        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, ReaplicatedProviderConfig config) {
+        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, ReaplicatedProviderConfig config) {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(content, nameof(content));
             Contract.NotNull(config, nameof(config));
