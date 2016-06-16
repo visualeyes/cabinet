@@ -18,12 +18,14 @@ $COVERAGE_COMMAND=$OPEN_COVER_PATH +
 $TARGET_ARGS="test $PROJECT_ROOT\test\Cabinet.Tests\"
 
 if($env:APPVEYOR -eq $true) {
-	$TARGET_ARGS+=''
+	Write-Host "Running on appveyor"
+	$TARGET_ARGS+=' -appveyor'
 }
 
 $COVERAGE_COMMAND+=" -targetargs:`"$TARGET_ARGS`""
 
 if($env:CI -eq $true) {
+	Write-Host "Outputting ci format"
 	$COVERAGE_COMMAND+=' -output:coverage.xml'
 }
 
@@ -31,5 +33,6 @@ Write-Host "Executing $COVERAGE_COMMAND"
 iex $COVERAGE_COMMAND
 
 if($env:CI -eq $true) {
+	Write-Host "Uploading to coveralls.io"
 	& $COVERALLS_PATH --opencover --repo-token $env:COVERALLS_REPO_TOKEN --full-sources coverage.xml
 }
