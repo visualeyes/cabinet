@@ -133,7 +133,7 @@ namespace Cabinet.Tests.Core {
         public async Task Save_File_Stream(string key, HandleExistingMethod handleExisting) {
             var mockStream = new Mock<Stream>();
             var mockResult = new Mock<ISaveResult>();
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             this.mockStorageProvider.Setup(s => s.SaveFileAsync(key, mockStream.Object, handleExisting, mockProgress.Object, mockConfig.Object)).ReturnsAsync(mockResult.Object);
 
@@ -151,7 +151,7 @@ namespace Cabinet.Tests.Core {
         public async Task Save_File_Path(string key, HandleExistingMethod handleExisting) {
             string filePath = "C:\test";
             var mockResult = new Mock<ISaveResult>();
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             this.mockStorageProvider.Setup(s => s.SaveFileAsync(key, filePath, handleExisting, mockProgress.Object, mockConfig.Object)).ReturnsAsync(mockResult.Object);
 

@@ -27,8 +27,8 @@ namespace Cabinet.Web {
             this.keyProvider = keyProvider;
         }
 
-        public IProgress<WriteProgress> LocalFileUploadProgress { get; set; }
-        public IProgress<WriteProgress> CabinetFileSaveProgress { get; set; }
+        public IProgress<IWriteProgress> LocalFileUploadProgress { get; set; }
+        public IProgress<IWriteProgress> CabinetFileSaveProgress { get; set; }
 
         public async Task<ISaveResult[]> SaveInCabinet(HandleExistingMethod handleExisting = HandleExistingMethod.Throw, IFileScanner fileScanner = null) {
 
@@ -87,10 +87,11 @@ namespace Cabinet.Web {
         }
 
         public override Stream GetStream(HttpContent parent, HttpContentHeaders headers) {
+            var fileName = headers.ContentDisposition.FileName;
             var fileSize = headers.ContentDisposition.Size;
             var fileStream = base.GetStream(parent, headers);
-
-            return new ProgressStream(fileStream, fileSize, this.LocalFileUploadProgress, disposeStream: true);
+            
+            return new ProgressStream(fileName, fileStream, fileSize, this.LocalFileUploadProgress, disposeStream: true);
         }
     }
 }

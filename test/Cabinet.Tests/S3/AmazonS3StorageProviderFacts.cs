@@ -181,7 +181,7 @@ namespace Cabinet.Tests.S3 {
             var provider = GetProvider();
             var config = GetConfig(ValidBucketName);
             string filePath = @"C:\test\test.txt";
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             await Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await provider.SaveFileAsync(key, filePath, HandleExistingMethod.Overwrite, mockProgress.Object, config)
@@ -193,7 +193,7 @@ namespace Cabinet.Tests.S3 {
         public async Task Save_File_Path_Empty_FilePath_Throws(string filePath) {
             var provider = GetProvider();
             var config = GetConfig(ValidBucketName);
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             await Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await provider.SaveFileAsync(ValidFileKey, filePath, HandleExistingMethod.Overwrite, mockProgress.Object, config)
@@ -205,7 +205,7 @@ namespace Cabinet.Tests.S3 {
             var provider = GetProvider();
             AmazonS3CabinetConfig config = null;
             string filePath = @"C:\test\test.txt";
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             await Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await provider.SaveFileAsync(ValidFileKey, filePath, HandleExistingMethod.Overwrite, mockProgress.Object, config)
@@ -218,7 +218,7 @@ namespace Cabinet.Tests.S3 {
             var config = GetConfig(ValidBucketName);
 
             string filePath = @"C:\test\test.txt";
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             this.mockS3TransferUtility
                     .Setup(t => t.UploadAsync(It.IsAny<TransferUtilityUploadRequest>(), default(CancellationToken)))
@@ -236,7 +236,7 @@ namespace Cabinet.Tests.S3 {
             var config = GetConfig(ValidBucketName);
 
             string filePath = @"C:\test\test.txt";
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             SetupGetObjectRequest(ValidBucketName, ValidFileKey, HttpStatusCode.OK);
             this.mockS3TransferUtility
@@ -255,7 +255,7 @@ namespace Cabinet.Tests.S3 {
             var config = GetConfig(ValidBucketName);
 
             string filePath = @"C:\test\test.txt";
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             await Assert.ThrowsAsync<NotImplementedException>(async () => {
                 await provider.SaveFileAsync(ValidFileKey, filePath, HandleExistingMethod.Skip, mockProgress.Object, config);
@@ -268,7 +268,7 @@ namespace Cabinet.Tests.S3 {
             var config = GetConfig(ValidBucketName);
 
             string filePath = @"C:\test\test.txt";
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             await Assert.ThrowsAsync<NotImplementedException>(async () => {
                 await provider.SaveFileAsync(ValidFileKey, filePath, HandleExistingMethod.Throw, mockProgress.Object, config);
@@ -281,7 +281,7 @@ namespace Cabinet.Tests.S3 {
             var provider = GetProvider();
             var config = GetConfig(ValidBucketName);
             var mockStream = new Mock<Stream>();
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             await Assert.ThrowsAsync<ArgumentNullException>(async () => 
                 await provider.SaveFileAsync(key, mockStream.Object, HandleExistingMethod.Overwrite, mockProgress.Object, config)
@@ -293,7 +293,7 @@ namespace Cabinet.Tests.S3 {
             var provider = GetProvider();
             var config = GetConfig(ValidBucketName);
             Stream stream = null;
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             await Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await provider.SaveFileAsync(ValidFileKey, stream, HandleExistingMethod.Overwrite, mockProgress.Object, config)
@@ -305,7 +305,7 @@ namespace Cabinet.Tests.S3 {
             var provider = GetProvider();
             AmazonS3CabinetConfig config = null;
             var mockStream = new Mock<Stream>();
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             await Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await provider.SaveFileAsync(ValidFileKey, mockStream.Object, HandleExistingMethod.Overwrite, mockProgress.Object, config)
@@ -318,7 +318,7 @@ namespace Cabinet.Tests.S3 {
             var config = GetConfig(ValidBucketName);
 
             var mockStream = new Mock<Stream>();
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             this.mockS3TransferUtility
                     .Setup(t => t.UploadAsync(It.IsAny<TransferUtilityUploadRequest>(), default(CancellationToken)))
@@ -336,7 +336,7 @@ namespace Cabinet.Tests.S3 {
             var config = GetConfig(ValidBucketName);
 
             var mockStream = new Mock<Stream>();
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             SetupGetObjectRequest(ValidBucketName, ValidFileKey, HttpStatusCode.OK);
             this.mockS3TransferUtility
@@ -355,7 +355,7 @@ namespace Cabinet.Tests.S3 {
             var config = GetConfig(ValidBucketName);
 
             var mockStream = new Mock<Stream>();
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
             
             await Assert.ThrowsAsync<NotImplementedException>(async () => {
                 await provider.SaveFileAsync(ValidFileKey, mockStream.Object, HandleExistingMethod.Skip, mockProgress.Object, config);
@@ -368,7 +368,7 @@ namespace Cabinet.Tests.S3 {
             var config = GetConfig(ValidBucketName);
 
             var mockStream = new Mock<Stream>();
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
             
             await Assert.ThrowsAsync<NotImplementedException>(async () => {
                 await provider.SaveFileAsync(ValidFileKey, mockStream.Object, HandleExistingMethod.Throw, mockProgress.Object, config);
@@ -381,7 +381,7 @@ namespace Cabinet.Tests.S3 {
             var provider = GetProvider();
             var config = GetConfig(ValidBucketName);
             string destKey = @"test.txt";
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             await Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await provider.MoveFileAsync(sourceKey, destKey, HandleExistingMethod.Overwrite, config)
@@ -394,7 +394,7 @@ namespace Cabinet.Tests.S3 {
             var provider = GetProvider();
             var config = GetConfig(ValidBucketName);
             string sourceKey = @"test.txt";
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             await Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await provider.MoveFileAsync(sourceKey, destKey, HandleExistingMethod.Overwrite, config)
@@ -407,7 +407,7 @@ namespace Cabinet.Tests.S3 {
             AmazonS3CabinetConfig config = null;
             string sourceKey = @"source.txt";
             string destKey = @"dest.txt";
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             await Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await provider.MoveFileAsync(sourceKey, destKey, HandleExistingMethod.Overwrite, config)
@@ -421,7 +421,7 @@ namespace Cabinet.Tests.S3 {
             var provider = GetProvider();
             var config = GetConfig(ValidBucketName);
 
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             this.mockS3Client.Setup(s3 => s3.CopyObjectAsync(It.IsAny<CopyObjectRequest>(), default(CancellationToken)))
                 .ReturnsAsync(new CopyObjectResponse {
@@ -464,7 +464,7 @@ namespace Cabinet.Tests.S3 {
             var provider = GetProvider();
             var config = GetConfig(ValidBucketName);
 
-            var mockProgress = new Mock<IProgress<WriteProgress>>();
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
             
             this.mockS3Client.Setup(s3 => s3.DeleteObjectAsync(It.IsAny<DeleteObjectRequest>(), default(CancellationToken)))
                 .ReturnsAsync(new DeleteObjectResponse {
