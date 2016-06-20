@@ -11,8 +11,8 @@ namespace Cabinet.Core.Providers {
     /// <typeparam name="T">Provider Configuration</typeparam>
     public interface IStorageProvider<T> : IReadonlyStorageProvider<T> where T : IStorageProviderConfig {
 
-        Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, T config);
-        Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, T config);
+        Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, T config);
+        Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, T config);
 
         Task<IMoveResult> MoveFileAsync(string sourceKey, string destKey, HandleExistingMethod handleExisting, T config);
         Task<IDeleteResult> DeleteFileAsync(string key, T config);

@@ -19,6 +19,7 @@ namespace Cabinet.Migrator.Results {
         public MoveResult(string sourceKey, string destKey, bool success = true, string errorMsg = null)
             : this(sourceKey, destKey) {
             this.Success = success;
+            this.errorMsg = errorMsg;
         }
 
         public MoveResult(string sourceKey, string destKey, Exception e, string errorMsg = null)

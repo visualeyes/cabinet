@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cabinet.ConsoleTest {
-    public class ConsoleProgress : IProgress<WriteProgress> {
+    public class ConsoleProgress : IProgress<IWriteProgress> {
 
-        public void Report(WriteProgress value) {
+        public void Report(IWriteProgress value) {
             DrawUnknownLengthProgress(value.BytesWritten, "bytes");
         }
 
