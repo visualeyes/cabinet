@@ -50,11 +50,11 @@ namespace Cabinet.Azure {
             return stream;
         }
 
-        public Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, AzureCabinetConfig config) {
+        public Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, AzureCabinetConfig config) {
             throw new NotImplementedException();
         }
 
-        public Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<WriteProgress> progress, AzureCabinetConfig config) {
+        public Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, AzureCabinetConfig config) {
             throw new NotImplementedException();
         }
 
