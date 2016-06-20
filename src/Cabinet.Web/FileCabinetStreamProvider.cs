@@ -30,8 +30,7 @@ namespace Cabinet.Web {
         public IProgress<IWriteProgress> LocalFileUploadProgress { get; set; }
         public IProgress<IWriteProgress> CabinetFileSaveProgress { get; set; }
 
-        public async Task<ISaveResult[]> SaveInCabinet(HandleExistingMethod handleExisting = HandleExistingMethod.Throw, IFileScanner fileScanner = null) {
-
+        public async Task<UploadSaveResult[]> SaveInCabinet(HandleExistingMethod handleExisting = HandleExistingMethod.Throw, IFileScanner fileScanner = null) {
             var saveTasks = this.FileData.Select(async (fd) => {
                 string uploadFileName = fd.Headers.ContentDisposition.FileName?.Trim('"')?.Trim('\\');
                 string uploadExtension = Path.GetExtension(uploadFileName)?.TrimStart('.');
