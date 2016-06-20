@@ -43,15 +43,15 @@ namespace Cabinet.Web.SelfHostTest.Controllers {
                 Directory.CreateDirectory(tempPath);
             }
 
-            var localFileProgress = new Progress<WriteProgress>();
-            var cabinetFileProgress = new Progress<WriteProgress>();
+            var localFileProgress = new Progress<IWriteProgress>();
+            var cabinetFileProgress = new Progress<IWriteProgress>();
 
-            localFileProgress.ProgressChanged += (object sender, WriteProgress e) => {
+            localFileProgress.ProgressChanged += (object sender, IWriteProgress e) => {
                 // Notify Message Bus to return progress to client (i.e. SignalR)
                 Console.WriteLine("Uploaded {0} bytes to temp", e.BytesWritten);
             };
 
-            cabinetFileProgress.ProgressChanged += (object sender, WriteProgress e) => {
+            cabinetFileProgress.ProgressChanged += (object sender, IWriteProgress e) => {
                 // Notify Message Bus to return progress to client (i.e. SignalR)
                 Console.WriteLine("Uploaded {0} bytes to cabinet", e.BytesWritten);
             };

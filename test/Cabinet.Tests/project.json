@@ -16,7 +16,7 @@
         "coveralls.io": "1.3.4",
         "Moq": "4.2.1510.2205",
         "Newtonsoft.Json": "8.0.2",
-        "OpenCover": "4.6.166",
+        "OpenCover": "4.6.519",
         "System.IO.Abstractions": "2.0.0.123",
         "System.IO.Abstractions.TestingHelpers": "2.0.0.123",
         "xunit": "2.1.0",

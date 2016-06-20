@@ -45,6 +45,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cabinet.Web.SelfHostTest", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{9489D3FA-35AA-46B5-9931-23C4417F9C21}"
 	ProjectSection(SolutionItems) = preProject
+		scripts\coverage.ps1 = scripts\coverage.ps1
 		scripts\dotnet-latest.ps1 = scripts\dotnet-latest.ps1
 		scripts\show-dotnet-info.ps1 = scripts\show-dotnet-info.ps1
 		scripts\version-bump.ps1 = scripts\version-bump.ps1
