@@ -16,9 +16,7 @@ namespace Cabinet.FileSystem {
         
         private readonly Func<IFileSystem> fileSystemFactory;
 
-        public string ProviderType {
-            get { return FileSystemCabinetConfig.ProviderType; }
-        }
+        public string ProviderType => FileSystemCabinetConfig.ProviderType;
 
         public FileSystemStorageProvider(Func<IFileSystem> fileSystemFactory) {
             this.fileSystemFactory = fileSystemFactory;
@@ -107,7 +105,7 @@ namespace Cabinet.FileSystem {
                 // We tried to create a new file but it already exists
                 if(openMode == FileMode.CreateNew) {
                     if (handleExisting == HandleExistingMethod.Throw) {
-                        throw new ApplicationException(String.Format("File exists at {0} and handleExisting is set to throw", key));
+                        throw new ApplicationException($"File exists at {key} and handleExisting is set to throw");
                     }
 
                     if (handleExisting == HandleExistingMethod.Skip) {
@@ -134,7 +132,7 @@ namespace Cabinet.FileSystem {
                     return await this.SaveFileAsync(key, readStream, handleExisting, progress, config);
                 }
             } catch (FileNotFoundException e) {
-                return new SaveResult(key, success: false, errorMsg: String.Format("File does not exist at path {0}", filePath));
+                return new SaveResult(key, success: false, errorMsg: $"File does not exist at path {filePath}");
             } catch (Exception e) {
                 return new SaveResult(key, e);
             }
@@ -184,7 +182,7 @@ namespace Cabinet.FileSystem {
 
             // Prevent backpaths
             if (!keyFile.Directory.IsSameDirectory(baseDir) && !keyFile.Directory.IsChildOf(baseDir)) {
-                throw new ArgumentException(String.Format("{0} results in a path outside of {1}", key, baseDir.FullName), nameof(key));
+                throw new ArgumentException($"{key} results in a path outside of {baseDir.FullName}", nameof(key));
             }
 
             return keyFile;
@@ -202,7 +200,7 @@ namespace Cabinet.FileSystem {
 
             // Prevent backpaths
             if (!keyFile.IsSameDirectory(baseDir) && !keyFile.IsChildOf(baseDir)) {
-                throw new ArgumentException(String.Format("{0} results in a path outside of {1}", key, baseDir.FullName), nameof(key));
+                throw new ArgumentException($"{key} results in a path outside of {baseDir.FullName}", nameof(key));
             }
 
             return keyFile;
@@ -215,7 +213,7 @@ namespace Cabinet.FileSystem {
 
             if (!directoryExists) {
                 if(!config.CreateIfNotExists) {
-                    throw new ApplicationException(String.Format("{0} does not exist and CreateIfNotExists is set to false.", config.Directory));
+                    throw new ApplicationException($"{config.Directory} does not exist and CreateIfNotExists is set to false.");
                 }
 
                 fs.Directory.CreateDirectory(config.Directory);
@@ -299,7 +297,7 @@ namespace Cabinet.FileSystem {
                 return Task.FromResult<IMoveResult>(new MoveResult(sourceKey, destKey, e));
             } catch (IOException e) {
                 if (handleExisting == HandleExistingMethod.Throw) {
-                    throw new ApplicationException(String.Format("File exists at {0} and handleExisting is set to throw", destKey));
+                    throw new ApplicationException($"File exists at {destKey} and handleExisting is set to throw");
                 }
 
                 if (handleExisting == HandleExistingMethod.Skip) {
