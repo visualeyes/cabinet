@@ -19,9 +19,7 @@ namespace Cabinet.S3 {
     internal class AmazonS3StorageProvider : IStorageProvider<AmazonS3CabinetConfig> {
         private readonly IAmazonS3ClientFactory clientFactory;
 
-        public string ProviderType {
-            get { return AmazonS3CabinetConfig.ProviderType; }
-        }
+        public string ProviderType => AmazonS3CabinetConfig.ProviderType;
 
         internal AmazonS3StorageProvider(IAmazonS3ClientFactory clientFactory) {
             this.clientFactory = clientFactory;
@@ -189,10 +187,7 @@ namespace Cabinet.S3 {
             uploadRequest.BucketName = config.BucketName;
             uploadRequest.Key = key;
 
-            uploadRequest.UploadProgressEvent += (object sender, UploadProgressArgs e) => {
-                // TODO: more helpful progress
-                // e.PercentDone;
-                // e.TotalBytes;
+            uploadRequest.UploadProgressEvent += (sender, e) => {
                 progress?.Report(new WriteProgress(key, e.TransferredBytes, e.TotalBytes));
             };
             
