@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cabinet.Core;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cabinet.Web {
-    public class UploadKeyProvider : IKeyProvider {
+    public class UploadKeyProvider : IUploadKeyProvider {
         private const string UploadExt = ".upload";
         private const int MaxFileNameLength = 255;
 
@@ -15,6 +16,9 @@ namespace Cabinet.Web {
         /// Please consider security implication of selecting a key - https://www.owasp.org/index.php/Unrestricted_File_Upload
         /// </summary>
         public string GetKey(string fileName, string contentType) {
+            Contract.NotNullOrEmpty(fileName, nameof(fileName));
+            Contract.NotNullOrEmpty(contentType, nameof(contentType));
+
             string guid = Guid.NewGuid().ToString();
 
             var invalid = Path.GetInvalidFileNameChars().Union(Path.GetInvalidPathChars());
@@ -33,6 +37,14 @@ namespace Cabinet.Web {
             fileName += UploadExt;
 
             return Path.Combine(guid, fileName);
+        }
+
+        public string NormalizeKey(string key) {
+            Contract.NotNullOrEmpty(key, nameof(key));
+
+            if(!key.EndsWith(UploadExt)) return key;
+
+            return key.Substring(0, key.Length - UploadExt.Length);
         }
     }
 }
