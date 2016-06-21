@@ -52,7 +52,10 @@ namespace Cabinet.S3 {
                 using (var response = await GetS3Object(key, config, s3Client, CancellationToken.None)) {
                     bool exists = response.HttpStatusCode == HttpStatusCode.OK;
                     
-                    return new AmazonS3CabinetItemInfo(response.Key, exists, ItemType.File, response.LastModified.ToUniversalTime());
+                    return new AmazonS3CabinetItemInfo(response.Key, exists, ItemType.File) {
+                        Size = response.ContentLength,
+                        LastModifiedUtc = response.LastModified.ToUniversalTime()
+                    };
                 }
             }
         }
@@ -215,9 +218,13 @@ namespace Cabinet.S3 {
             do {
                 var response = await s3Client.ListObjectsAsync(request);
 
-                var directories = response.CommonPrefixes.Select(prefix => new AmazonS3CabinetItemInfo(prefix, true, ItemType.Directory, null));
-                var files = response.S3Objects.Select(o => new AmazonS3CabinetItemInfo(o.Key, true, ItemType.File, o.LastModified.ToUniversalTime()));
+                var directories = response.CommonPrefixes.Select(prefix => new AmazonS3CabinetItemInfo(prefix, true, ItemType.Directory));
 
+                var files = response.S3Objects.Select(o => new AmazonS3CabinetItemInfo(o.Key, true, ItemType.File) {
+                    Size = o.Size,
+                    LastModifiedUtc = o.LastModified.ToUniversalTime()
+                });
+                
                 fileInfos.AddRange(directories);
                 fileInfos.AddRange(files);
 

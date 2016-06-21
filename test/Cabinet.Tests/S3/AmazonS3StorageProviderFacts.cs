@@ -138,7 +138,9 @@ namespace Cabinet.Tests.S3 {
 
             SetupGetObjectsRequest(bucketName, keyPrefix, code, s3Objects);
 
-            var expectedFileInfos = expectedS3Objects.Select(o => new AmazonS3CabinetItemInfo(o.Key, true, ItemType.File, o.LastModified));
+            var expectedFileInfos = expectedS3Objects.Select(o => new AmazonS3CabinetItemInfo(o.Key, true, ItemType.File) {
+                LastModifiedUtc = o.LastModified
+            });
 
             var fileInfos = await provider.GetItemsAsync(config, keyPrefix: keyPrefix, recursive: recursive);
             
