@@ -35,5 +35,34 @@ namespace Cabinet.Tests.S3.Config {
         public void Basic_Credentials_Null_Throws(string accessKey, string secretKey) {
             Assert.Throws<ArgumentNullException>(() => factory.GetBasicCredentials(accessKey, secretKey));
         }
+
+        [Fact]
+        public void Environment_Credentials() {
+            var credentials = factory.GetEnvironmentCredentials();
+            var envAwsCredentials = credentials as EnvironmentAWSCredentials;
+
+            Assert.NotNull(envAwsCredentials);
+        }
+
+        //[Fact] -- would require environment variables to be set
+        //public void Environment_Variable_Credentials() {
+        //    var credentials = factory.GetEnvironmentVariableCredentials();
+            
+        //    var envVarCrednetials = credentials as EnvironmentVariablesAWSCredentials;
+
+        //    Assert.NotNull(envVarCrednetials);
+        //}
+
+        [Theory]
+        [InlineData(""), InlineData("  "), InlineData(null)]
+        public void Instance_Role_Credentials_Null_Throws(string role) {
+            Assert.Throws<ArgumentNullException>(() => factory.GetInstanceProfileCredentials(role));
+        }
+
+        [Theory]
+        [InlineData(""), InlineData("  "), InlineData(null)]
+        public void Stored_Profile_Credentials_Null_Throws(string profile) {
+            Assert.Throws<ArgumentNullException>(() => factory.GetStoredProfileCredentials(profile));
+        }
     }
 }

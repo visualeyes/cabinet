@@ -19,7 +19,11 @@ namespace Cabinet.Core.Progress {
                 return null;
             }
 
-            return progress.BytesWritten / progress.TotalBytes.Value;
+            if(progress.TotalBytes.Value == 0) {
+                return null;
+            }
+
+            return (double)progress.BytesWritten / (double)progress.TotalBytes.Value;
         }
     }
 }
