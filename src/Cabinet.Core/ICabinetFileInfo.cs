@@ -9,9 +9,12 @@ namespace Cabinet.Core {
     public interface ICabinetItemInfo {
         string ProviderType { get; }
         ItemType Type { get; }
-        string Key { get; }
+
         bool Exists { get; }
 
+        string Key { get; }
+
+        long? Size { get; }
         DateTime? LastModifiedUtc { get; }
     }
 }

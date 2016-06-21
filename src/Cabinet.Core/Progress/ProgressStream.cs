@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cabinet.Core {
+namespace Cabinet.Core.Progress {
     public class ProgressStream : Stream {
         private readonly string key;
         private readonly Stream stream;

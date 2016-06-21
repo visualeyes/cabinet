@@ -1,4 +1,5 @@
 ﻿using Cabinet.Core;
+using Cabinet.Core.Progress;
 using Cabinet.Core.Providers;
 using Cabinet.Core.Results;
 using Cabinet.FileSystem.Results;

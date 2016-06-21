@@ -1,4 +1,5 @@
 ﻿using Cabinet.Core;
+using Cabinet.Core.Progress;
 using Moq;
 using System;
 using System.Collections.Generic;
