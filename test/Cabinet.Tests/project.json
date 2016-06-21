@@ -25,7 +25,8 @@
         "xunit.core": "2.1.0",
         "xunit.extensibility.core": "2.1.0",
         "xunit.extensibility.execution": "2.1.0",
-        "dotnet-test-xunit": "1.0.0-rc2-*"
+        "dotnet-test-xunit": "1.0.0-rc2-*",
+        "System.Text.RegularExpressions": "4.0.12-rc2-*"
     },
 
     "testRunner": "xunit",
