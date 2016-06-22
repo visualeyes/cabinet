@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Cabinet.Migrator.Config {
     public static class FileCabinetConfigConvertFactoryExtensions {
 
-        public static IFileCabinetConfigConvertFactory RegisterMigratorConfigConverter(this IFileCabinetConfigConvertFactory factory, ICabinetProviderConfigStore store) {
+        public static IFileCabinetConfigConverterFactory RegisterMigratorConfigConverter(this IFileCabinetConfigConverterFactory factory, ICabinetProviderConfigStore store) {
             var migratorConverter = new MigratorProviderConfigConverter(store);
             
             factory.RegisterProvider(MigrationProviderConfig.ProviderType, migratorConverter);

@@ -18,7 +18,7 @@ namespace Cabinet.Migrator.Replication {
             this.Replica = replica;
         }
 
-        public IStorageProviderConfig Master { get; set; }
-        public IStorageProviderConfig Replica { get; set; }
+        public IStorageProviderConfig Master { get; }
+        public IStorageProviderConfig Replica { get; }
     }
 }

@@ -404,7 +404,7 @@ namespace Cabinet.Tests.S3 {
         }
 
         [Fact]
-        public async Task Move_File_Path_Empty_Key_Throws() {
+        public async Task Move_File_Path_Null_Config_Throws() {
             var provider = GetProvider();
             AmazonS3CabinetConfig config = null;
             string sourceKey = @"source.txt";
@@ -413,6 +413,20 @@ namespace Cabinet.Tests.S3 {
 
             await Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await provider.MoveFileAsync(sourceKey, destKey, HandleExistingMethod.Overwrite, config)
+            );
+        }
+
+        [Theory]
+        [InlineData(HandleExistingMethod.Skip), InlineData(HandleExistingMethod.Throw)]
+        public async Task Move_File_Not_Overwrite_Throws(HandleExistingMethod handleExisting) {
+            var provider = GetProvider();
+            var config = GetConfig(ValidBucketName);
+            string sourceKey = @"source.txt";
+            string destKey = @"dest.txt";
+            var mockProgress = new Mock<IProgress<IWriteProgress>>();
+
+            await Assert.ThrowsAsync<NotImplementedException>(async () =>
+                await provider.MoveFileAsync(sourceKey, destKey, handleExisting, config)
             );
         }
 

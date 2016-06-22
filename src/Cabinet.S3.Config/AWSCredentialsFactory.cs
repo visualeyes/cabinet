@@ -30,6 +30,8 @@ namespace Cabinet.S3.Config {
         }
 
         public AWSCredentials GetStoredProfileCredentials(string name) {
+            Contract.NotNullOrEmpty(name, nameof(name));
+
             return new StoredProfileAWSCredentials(name);
         }
     }

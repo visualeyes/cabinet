@@ -24,10 +24,26 @@ namespace Cabinet.Tests.Web {
         }
         
         [Theory]
-        [InlineData("blah.jpg", "image/jpeg")]
-        public void GetKey(string fileName, string contentType) {
+        [InlineData("blah.jpg", "blah.jpg", "image/jpeg")]
+        public void GetKey(string fileName, string expectedFileName, string contentType) {
             string key = provider.GetKey(fileName, contentType);
-            Assert.Matches(GuidRegex + @"\\" + fileName + ".upload", key);
+            Assert.Matches(GuidRegex + @"\\" + expectedFileName + ".upload", key);
+        }
+
+        [Fact]
+        public void Get_Long_Key() {
+            string expectedFileName = new string('a', 241);
+            expectedFileName += "---.jpg.upload";
+
+            string fileName = new string('a', 300);
+            fileName += ".jpg";
+
+            string key = provider.GetKey(fileName, "image/jpeg");
+
+            Assert.NotNull(key);
+
+            string actualFileName = Path.GetFileName(key);
+            Assert.Equal(expectedFileName, actualFileName);
         }
 
         [Theory]
@@ -38,6 +54,7 @@ namespace Cabinet.Tests.Web {
 
         [Theory]
         [InlineData("bb38c5af-477a-4178-836c-17b445f733c7\blah.jpg.upload", "bb38c5af-477a-4178-836c-17b445f733c7\blah.jpg")]
+        [InlineData("bb38c5af-477a-4178-836c-17b445f733c7\blah.jpg", "bb38c5af-477a-4178-836c-17b445f733c7\blah.jpg")]
         public void NormalizeKey(string key, string expected) {
             string normalisedKey = provider.NormalizeKey(key);
             Assert.Equal(expected, normalisedKey);

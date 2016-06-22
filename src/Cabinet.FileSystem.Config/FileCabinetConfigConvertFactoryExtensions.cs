@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Cabinet.FileSystem.Config {
     public static class FileCabinetConfigConvertFactoryExtensions {
 
-        public static IFileCabinetConfigConvertFactory RegisterFileSystemConfigConverter(this IFileCabinetConfigConvertFactory factory, IPathMapper pathMapper) {
+        public static IFileCabinetConfigConverterFactory RegisterFileSystemConfigConverter(this IFileCabinetConfigConverterFactory factory, IPathMapper pathMapper) {
             factory.RegisterProvider(FileSystemCabinetConfig.ProviderType, new FileSystemConfigConverter(pathMapper));
             return factory;
         }

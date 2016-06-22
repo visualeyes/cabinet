@@ -13,15 +13,25 @@ namespace Cabinet.Tests.Config {
     public class FileCabinetProviderConfigStoreFacts {
         private const string ConfigPath = @"c:\test\config";
 
-        private readonly Mock<IFileCabinetConfigConvertFactory> mockConverterFactory;
+        private readonly Mock<IFileCabinetConfigConverterFactory> mockConverterFactory;
         private readonly Mock<ICabinetProviderConfigConverter> mockConverter;
         private readonly MockFileSystem mockFs;
 
         public FileCabinetProviderConfigStoreFacts() {
-            this.mockConverterFactory = new Mock<IFileCabinetConfigConvertFactory>();
+            this.mockConverterFactory = new Mock<IFileCabinetConfigConverterFactory>();
             this.mockConverter = new Mock<ICabinetProviderConfigConverter>();
             this.mockFs = new MockFileSystem();
             this.mockConverterFactory.Setup(f => f.GetConverter(It.IsAny<string>())).Returns(mockConverter.Object);
+        }
+
+        [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public void Get_Config_NullEmpty_Name(string name) {
+            SetupValidConfig();
+
+            var store = GetConfigStore();
+
+            Assert.Throws<ArgumentNullException>(() => store.GetConfig(name));
         }
 
         [Theory]
@@ -37,6 +47,18 @@ namespace Cabinet.Tests.Config {
             this.mockConverter.Verify(c => c.ToConfig(It.IsAny<JToken>()), Times.Once);
         }
 
+        [Theory]
+        [InlineData("blah"), InlineData("missingType")]
+        public void Get_Missing_Config(string name) {
+            SetupValidConfig();
+
+            var store = GetConfigStore();
+
+            var config = store.GetConfig(name);
+
+            Assert.Null(config);
+        }
+
         private void SetupValidConfig() {
             string configJsonString = @"{
     ""ondisk"": {
@@ -46,6 +68,8 @@ namespace Cabinet.Tests.Config {
     ""amazon"": {
         ""type"": ""AmazonS3"",
         ""config"": {}
+    },
+    ""missingType"": {
     }
 }";
             this.mockFs.AddFile(ConfigPath, new MockFileData(configJsonString));

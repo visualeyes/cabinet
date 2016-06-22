@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace Cabinet.Web {
     public class UploadKeyProvider : IUploadKeyProvider {
         private const string UploadExt = ".upload";
+        private const string TrimmedSuffix = "---";
         private const int MaxFileNameLength = 255;
 
         /// <summary>
@@ -31,7 +32,8 @@ namespace Cabinet.Web {
 
             if (fileName.Length > maxUploadFileNameLength) {
                 string ext = Path.GetExtension(fileName);
-                fileName = fileName.Substring(0, maxUploadFileNameLength - ext.Length);
+                fileName = fileName.Substring(0, maxUploadFileNameLength - ext.Length - TrimmedSuffix.Length);
+                fileName += TrimmedSuffix + ext;
             }
 
             fileName += UploadExt;

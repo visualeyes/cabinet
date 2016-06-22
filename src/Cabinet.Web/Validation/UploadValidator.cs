@@ -1,4 +1,5 @@
-﻿using Cabinet.Web.Files;
+﻿using Cabinet.Core;
+using Cabinet.Web.Files;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,9 @@ namespace Cabinet.Web.Validation {
         private readonly IValidationSettings validationSettings;
 
         public UploadValidator(IFileTypeProvider typeProvider, IValidationSettings validationSettings) {
+            Contract.NotNull(typeProvider, nameof(typeProvider));
+            Contract.NotNull(validationSettings, nameof(validationSettings));
+
             this.typeProvider = typeProvider;
             this.validationSettings = validationSettings;
         }
@@ -24,6 +28,9 @@ namespace Cabinet.Web.Validation {
         }
 
         public bool IsFileTypeWhitelisted(string extension, string contentType) {
+            if(String.IsNullOrWhiteSpace(extension)) return false;
+            if(String.IsNullOrWhiteSpace(contentType)) return false;
+
             var types = typeProvider.GetFileTypes();
             var fileType = types.GetFileType(contentType);
 

@@ -57,7 +57,7 @@ namespace Cabinet.Web.SelfHostTest {
             string configPath = pathMapper.MapPath(ConfigFilePath);
 
             var cabinetFactory = new FileCabinetFactory();
-            var cabinetConfigFactory = new FileCabinetConfigConvertFactory();
+            var cabinetConfigFactory = new FileCabinetConfigConverterFactory();
             var cabinetConfigStore = new FileCabinetProviderConfigStore(configPath, cabinetConfigFactory);
 
             cabinetFactory
@@ -72,7 +72,7 @@ namespace Cabinet.Web.SelfHostTest {
 
             builder.RegisterInstance<IPathMapper>(pathMapper);
             builder.RegisterInstance<IFileCabinetFactory>(cabinetFactory);
-            builder.RegisterInstance<IFileCabinetConfigConvertFactory>(cabinetConfigFactory);
+            builder.RegisterInstance<IFileCabinetConfigConverterFactory>(cabinetConfigFactory);
             builder.RegisterInstance<ICabinetProviderConfigStore>(cabinetConfigStore);
 
             // Register one cabinet for the whole app
