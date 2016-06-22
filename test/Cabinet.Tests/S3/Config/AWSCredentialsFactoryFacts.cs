@@ -36,18 +36,18 @@ namespace Cabinet.Tests.S3.Config {
             Assert.Throws<ArgumentNullException>(() => factory.GetBasicCredentials(accessKey, secretKey));
         }
 
-        [Fact]
-        public void Environment_Credentials() {
-            var credentials = factory.GetEnvironmentCredentials();
-            var envAwsCredentials = credentials as EnvironmentAWSCredentials;
+        //[Fact] -- would require app.config with AWSAccessKey and AWSSecretKey set
+        //public void Environment_Credentials() {
+        //    var credentials = factory.GetEnvironmentCredentials();
+        //    var envAwsCredentials = credentials as EnvironmentAWSCredentials;
 
-            Assert.NotNull(envAwsCredentials);
-        }
+        //    Assert.NotNull(envAwsCredentials);
+        //}
 
         //[Fact] -- would require environment variables to be set
         //public void Environment_Variable_Credentials() {
         //    var credentials = factory.GetEnvironmentVariableCredentials();
-            
+
         //    var envVarCrednetials = credentials as EnvironmentVariablesAWSCredentials;
 
         //    Assert.NotNull(envVarCrednetials);
