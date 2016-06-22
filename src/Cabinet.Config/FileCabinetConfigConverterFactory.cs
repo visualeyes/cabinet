@@ -1,4 +1,5 @@
-﻿using Cabinet.Core.Providers;
+﻿using Cabinet.Core;
+using Cabinet.Core.Providers;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,11 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cabinet.Config {
-    public class FileCabinetConfigConvertFactory : IFileCabinetConfigConvertFactory {
+    public class FileCabinetConfigConverterFactory : IFileCabinetConfigConverterFactory {
         private static ConcurrentDictionary<string, ICabinetProviderConfigConverter> converterCache = new ConcurrentDictionary<string, ICabinetProviderConfigConverter>();
 
         public ICabinetProviderConfigConverter GetConverter(string providerType) {
-            if (String.IsNullOrWhiteSpace(providerType)) throw new ArgumentNullException(nameof(providerType));
+            Contract.NotNullOrEmpty(providerType, nameof(providerType));
 
             ICabinetProviderConfigConverter converter;
 
@@ -23,9 +24,9 @@ namespace Cabinet.Config {
         }
 
         public void RegisterProvider(string providerType, ICabinetProviderConfigConverter converter) {
-            if (String.IsNullOrWhiteSpace(providerType)) throw new ArgumentNullException(nameof(providerType));
-            if (converter == null) throw new ArgumentNullException(nameof(converter));
-            
+            Contract.NotNullOrEmpty(providerType, nameof(providerType));
+            Contract.NotNull(converter, nameof(converter));
+
             converterCache.AddOrUpdate(providerType, converter, (key, existing) => converter);
         }
     }

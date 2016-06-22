@@ -15,14 +15,14 @@ namespace Cabinet.Config {
         private const string ConfigKey = "config";
 
         private readonly string configFilePath;
-        private readonly IFileCabinetConfigConvertFactory converterFactory;
+        private readonly IFileCabinetConfigConverterFactory converterFactory;
         private readonly IFileSystem fs;
 
-        public FileCabinetProviderConfigStore(string configFilePath, IFileCabinetConfigConvertFactory converterFactory)
+        public FileCabinetProviderConfigStore(string configFilePath, IFileCabinetConfigConverterFactory converterFactory)
             : this(configFilePath, converterFactory, new FileSystem()) {
         }
 
-        public FileCabinetProviderConfigStore(string configFilePath, IFileCabinetConfigConvertFactory converterFactory, IFileSystem fs) {
+        public FileCabinetProviderConfigStore(string configFilePath, IFileCabinetConfigConverterFactory converterFactory, IFileSystem fs) {
             this.configFilePath = configFilePath;
             this.converterFactory = converterFactory;
             this.fs = fs;

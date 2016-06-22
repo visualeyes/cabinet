@@ -15,7 +15,7 @@ namespace Cabinet.Tests.FileSystem {
 
         [Fact]
         public void Registers_Config() {
-            var mockFactory = new Mock<IFileCabinetConfigConvertFactory>();
+            var mockFactory = new Mock<IFileCabinetConfigConverterFactory>();
             var pathMapper = new Mock<IPathMapper>();
 
             mockFactory.Object.RegisterFileSystemConfigConverter(pathMapper.Object);

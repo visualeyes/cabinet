@@ -13,12 +13,12 @@ namespace Cabinet.Tests.Config {
     public class FileCabinetProviderConfigStoreFacts {
         private const string ConfigPath = @"c:\test\config";
 
-        private readonly Mock<IFileCabinetConfigConvertFactory> mockConverterFactory;
+        private readonly Mock<IFileCabinetConfigConverterFactory> mockConverterFactory;
         private readonly Mock<ICabinetProviderConfigConverter> mockConverter;
         private readonly MockFileSystem mockFs;
 
         public FileCabinetProviderConfigStoreFacts() {
-            this.mockConverterFactory = new Mock<IFileCabinetConfigConvertFactory>();
+            this.mockConverterFactory = new Mock<IFileCabinetConfigConverterFactory>();
             this.mockConverter = new Mock<ICabinetProviderConfigConverter>();
             this.mockFs = new MockFileSystem();
             this.mockConverterFactory.Setup(f => f.GetConverter(It.IsAny<string>())).Returns(mockConverter.Object);

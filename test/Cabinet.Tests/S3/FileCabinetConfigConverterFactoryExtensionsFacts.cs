@@ -15,7 +15,7 @@ namespace Cabinet.Tests.S3 {
 
         [Fact]
         public void Registers_Config() {
-            var mockFactory = new Mock<IFileCabinetConfigConvertFactory>();
+            var mockFactory = new Mock<IFileCabinetConfigConverterFactory>();
 
             mockFactory.Object.RegisterAmazonS3ConfigConverter();
 
