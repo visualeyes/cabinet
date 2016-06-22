@@ -25,6 +25,16 @@ namespace Cabinet.Tests.Config {
         }
 
         [Theory]
+        [InlineData(null), InlineData(""), InlineData(" ")]
+        public void Get_Config_NullEmpty_Name(string name) {
+            SetupValidConfig();
+
+            var store = GetConfigStore();
+
+            Assert.Throws<ArgumentNullException>(() => store.GetConfig(name));
+        }
+
+        [Theory]
         [InlineData("ondisk", "FileSystem"), InlineData("amazon", "AmazonS3")]
         public void Get_Config(string name, string type) {
             SetupValidConfig();
@@ -37,6 +47,18 @@ namespace Cabinet.Tests.Config {
             this.mockConverter.Verify(c => c.ToConfig(It.IsAny<JToken>()), Times.Once);
         }
 
+        [Theory]
+        [InlineData("blah"), InlineData("missingType")]
+        public void Get_Missing_Config(string name) {
+            SetupValidConfig();
+
+            var store = GetConfigStore();
+
+            var config = store.GetConfig(name);
+
+            Assert.Null(config);
+        }
+
         private void SetupValidConfig() {
             string configJsonString = @"{
     ""ondisk"": {
@@ -46,6 +68,8 @@ namespace Cabinet.Tests.Config {
     ""amazon"": {
         ""type"": ""AmazonS3"",
         ""config"": {}
+    },
+    ""missingType"": {
     }
 }";
             this.mockFs.AddFile(ConfigPath, new MockFileData(configJsonString));
