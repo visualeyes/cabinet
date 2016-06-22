@@ -1,4 +1,5 @@
-﻿using Cabinet.Core.Results;
+﻿using Cabinet.Core;
+using Cabinet.Core.Results;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +11,9 @@ namespace Cabinet.Migrator.Results {
         private readonly string errorMsg;
 
         private MoveResult(string sourceKey, string destKey) {
-            if (String.IsNullOrWhiteSpace(sourceKey)) throw new ArgumentNullException(nameof(sourceKey));
-            if (String.IsNullOrWhiteSpace(destKey)) throw new ArgumentNullException(nameof(destKey));
+            Contract.NotNullOrEmpty(sourceKey, nameof(sourceKey));
+            Contract.NotNullOrEmpty(destKey, nameof(destKey));
+
             this.SourceKey = sourceKey;
             this.DestKey = destKey;
         }
@@ -24,7 +26,8 @@ namespace Cabinet.Migrator.Results {
 
         public MoveResult(string sourceKey, string destKey, Exception e, string errorMsg = null)
             : this(sourceKey, destKey) {
-            if (e == null) throw new ArgumentNullException(nameof(e));
+            Contract.NotNull(e, nameof(e));
+
             this.SourceKey = sourceKey;
             this.DestKey = destKey;
             this.Exception = e;
@@ -38,7 +41,7 @@ namespace Cabinet.Migrator.Results {
 
         public Exception Exception { get; private set; }
 
-        public bool AlreadyExists { get; set; }
+        public bool AlreadyExists { get; }
 
         public string GetErrorMessage() {
             return errorMsg;
