@@ -1,7 +1,17 @@
 ﻿{
     "version": "1.1.0-*",
+    "buildOptions": {
+        "emitEntryPoint": true
+    },
+
+    "publishOptions": {
+        "include": [
+            "cabinet-config.json"
+        ]
+    },
 
     "dependencies": {
+        "ByteSize": "1.2.0",
         "Cabinet.Config": "1.1.0-*",
         "Cabinet.Core": "1.1.0-*",
         "Cabinet.FileSystem": "1.1.0-*",

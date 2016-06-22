@@ -13,26 +13,26 @@ namespace Cabinet.Tests.S3 {
 
         [Fact]
         public void Provider_Type() {
-            var fileInfo = new AmazonS3CabinetItemInfo(ValidKey, true, ItemType.File, null);
+            var fileInfo = new AmazonS3CabinetItemInfo(ValidKey, true, ItemType.File);
             Assert.Equal(AmazonS3CabinetConfig.ProviderType, fileInfo.ProviderType);
         }
 
         [Theory]
         [InlineData(null), InlineData(""), InlineData(" ")]
         public void Null_Key_Throws(string key) {
-            Assert.Throws<ArgumentNullException>(() => new AmazonS3CabinetItemInfo(key, true, ItemType.File, null));
+            Assert.Throws<ArgumentNullException>(() => new AmazonS3CabinetItemInfo(key, true, ItemType.File));
         }
 
         [Fact]
         public void Key_Set() {
-            var fileInfo = new AmazonS3CabinetItemInfo(ValidKey, true, ItemType.File, null);
+            var fileInfo = new AmazonS3CabinetItemInfo(ValidKey, true, ItemType.File);
             Assert.Equal(ValidKey, fileInfo.Key);
         }
 
         [Theory]
         [InlineData(true), InlineData(false)]
         public void Exists_Set(bool exists) {
-            var fileInfo = new AmazonS3CabinetItemInfo(ValidKey, exists, ItemType.File, null);
+            var fileInfo = new AmazonS3CabinetItemInfo(ValidKey, exists, ItemType.File);
             Assert.Equal(exists, fileInfo.Exists);
         }
 
@@ -41,7 +41,10 @@ namespace Cabinet.Tests.S3 {
         public void LastModified_Set(string date) {
             DateTime? lastModified = String.IsNullOrWhiteSpace(date) ? null : (DateTime?)DateTime.Parse(date);
 
-            var fileInfo = new AmazonS3CabinetItemInfo(ValidKey, true, ItemType.File, lastModified);
+            var fileInfo = new AmazonS3CabinetItemInfo(ValidKey, true, ItemType.File) {
+                LastModifiedUtc = lastModified
+            };
+
             Assert.Equal(lastModified, fileInfo.LastModifiedUtc);
         }
     }

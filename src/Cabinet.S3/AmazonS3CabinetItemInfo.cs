@@ -15,18 +15,19 @@ namespace Cabinet.S3 {
             get { return AmazonS3CabinetConfig.ProviderType; }
         }
 
-        public AmazonS3CabinetItemInfo(string key, bool exists, ItemType type, DateTime? lastModifiedUtc) {
+        public AmazonS3CabinetItemInfo(string key, bool exists, ItemType type) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
 
             this.Key = key;
             this.Exists = exists;
             this.Type = type;
-            this.LastModifiedUtc = lastModifiedUtc;
         }
 
         public string Key { get; private set; }
         public bool Exists { get; private set; }
         public ItemType Type { get; private set; }
-        public DateTime? LastModifiedUtc { get; private set; }
+
+        public long? Size { get; internal set; }
+        public DateTime? LastModifiedUtc { get; internal set; }
     }
 }

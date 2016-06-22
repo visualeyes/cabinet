@@ -17,7 +17,7 @@ namespace Cabinet.ConsoleTest {
         private const string ConfigFilePath = "~/cabinet-config.json";
 
         public static readonly FileCabinetFactory CabinetFactory;
-        public static readonly FileCabinetConfigConvertFactory CabinetConfigFactory;
+        public static readonly FileCabinetConfigConverterFactory CabinetConfigFactory;
         public static readonly FileCabinetProviderConfigStore CabinetConfigStore;
 
         static Program() {
@@ -26,7 +26,7 @@ namespace Cabinet.ConsoleTest {
             string configPath = pathMapper.MapPath(ConfigFilePath);
 
             CabinetFactory = new FileCabinetFactory();
-            CabinetConfigFactory = new FileCabinetConfigConvertFactory();
+            CabinetConfigFactory = new FileCabinetConfigConverterFactory();
             CabinetConfigStore = new FileCabinetProviderConfigStore(configPath, CabinetConfigFactory);
 
             CabinetFactory

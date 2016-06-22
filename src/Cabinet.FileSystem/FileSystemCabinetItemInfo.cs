@@ -21,13 +21,19 @@ namespace Cabinet.FileSystem {
             this.Type = GetItemType(itemInfo);
             this.Key = GetItemKey(itemInfo, baseDirectory);
             this.Exists = itemInfo.Exists;
-            this.LastModifiedUtc = itemInfo.Exists && this.Type == ItemType.File ? (DateTime?)itemInfo.LastWriteTimeUtc : null;
+
+            bool isExistingFile = itemInfo.Exists && this.Type == ItemType.File;
+            var fileInfo = itemInfo as FileInfoBase;
+            
+            this.Size = isExistingFile ? fileInfo?.Length : null;
+            this.LastModifiedUtc =  isExistingFile ? fileInfo?.LastWriteTimeUtc : null;
         }
 
         public ItemType Type { get; private set; }
         public string Key { get; private set; }
         public bool Exists { get; private set; }
 
+        public long? Size { get; private set; }
         public DateTime? LastModifiedUtc { get; private set; }
 
         public static string GetItemKey(FileSystemInfoBase itemInfo, string baseDirectory) {

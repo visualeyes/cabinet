@@ -1,4 +1,5 @@
 ﻿using Cabinet.Core;
+using Cabinet.Core.Progress;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Cabinet.Tests.Core {
+namespace Cabinet.Tests.Core.Progress {
     public class ProgressStreamFacts {
 
         [Theory]

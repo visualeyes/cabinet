@@ -65,7 +65,7 @@ namespace Cabinet.Tests.S3 {
         }
 
         private static AmazonS3CabinetItemInfo GetAmazonItemInfo(string key1, ItemType itemType1) {
-            return new AmazonS3CabinetItemInfo(key1, true, itemType1, null);
+            return new AmazonS3CabinetItemInfo(key1, true, itemType1);
         }
     }
 }

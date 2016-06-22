@@ -2,7 +2,7 @@
 using Cabinet.Core.Providers;
 
 namespace Cabinet.Config {
-    public interface IFileCabinetConfigConvertFactory {
+    public interface IFileCabinetConfigConverterFactory {
         ICabinetProviderConfigConverter GetConverter(string providerType);
         void RegisterProvider(string providerType, ICabinetProviderConfigConverter converter);
     }

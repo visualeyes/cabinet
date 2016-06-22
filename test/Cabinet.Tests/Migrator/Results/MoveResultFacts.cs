@@ -21,6 +21,14 @@ namespace Cabinet.Tests.Migrator.Results {
             Assert.Equal(errorMsg, result.GetErrorMessage());
         }
 
+        [Theory]
+        [InlineData(null, "destKey"), InlineData("", "destKey"), InlineData("  ", "destKey")]
+        [InlineData("sourceKey", null), InlineData("sourceKey", ""), InlineData("sourceKey", "  ")]
+        public void NullEmpty_Keys_Exception_Throws(string sourceKey, string destKey) {
+            Exception e = new Exception();
+            Assert.Throws<ArgumentNullException>(() => new MoveResult(sourceKey, destKey, e));
+        }
+
         [Fact]
         public void Null_Exception_Throws() {
             Exception e = null;

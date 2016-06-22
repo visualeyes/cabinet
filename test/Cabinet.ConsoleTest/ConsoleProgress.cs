@@ -1,4 +1,5 @@
-﻿using Cabinet.Core;
+﻿using ByteSizeLib;
+using Cabinet.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +10,16 @@ namespace Cabinet.ConsoleTest {
     public class ConsoleProgress : IProgress<IWriteProgress> {
 
         public void Report(IWriteProgress value) {
-            DrawUnknownLengthProgress(value.BytesWritten, "bytes");
+            if(value.TotalBytes.HasValue) {
+                DrawKnownLengthProgressBar(value.BytesWritten, value.TotalBytes.Value);
+            } else {
+                DrawUnknownLengthProgress(value.BytesWritten, "bytes");
+            }
         }
 
         public static void DrawUnknownLengthProgress(long progress, string type) {
             Console.CursorLeft = 0;
-            Console.Write("{0} {1}", progress, type);
+            Console.Write($"{ByteSize.FromBytes(progress)} {type}");
         }
 
         public static void DrawKnownLengthProgressBar(long progress, long total) {
@@ -44,7 +49,7 @@ namespace Cabinet.ConsoleTest {
             //draw totals
             Console.CursorLeft = 35;
             Console.BackgroundColor = ConsoleColor.Black;
-            Console.Write(progress.ToString() + " of " + total.ToString() + "    "); //blanks at the end remove any excess
+            Console.Write($"{ByteSize.FromBytes(progress)} of {ByteSize.FromBytes(total)}    "); //blanks at the end remove any excess
         }
     }
 }
