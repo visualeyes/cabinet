@@ -28,7 +28,7 @@ namespace Cabinet.Tests.Config {
         }
 
         [Fact]
-        public void Null_Converter_Throws(string providerType) {
+        public void Null_Converter_Throws() {
             ICabinetProviderConfigConverter converter = null;
             Assert.Throws<ArgumentNullException>(() => this.converterFactory.RegisterProvider("providerType", converter));
         }
