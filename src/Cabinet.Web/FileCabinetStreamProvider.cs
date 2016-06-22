@@ -23,6 +23,11 @@ namespace Cabinet.Web {
 
         public FileCabinetStreamProvider(IFileCabinet fileCabinet, IUploadValidator fileValidator, IKeyProvider keyProvider, string tempFileFolder)
             : base(tempFileFolder) {
+            Contract.NotNull(fileCabinet, nameof(fileCabinet));
+            Contract.NotNull(fileValidator, nameof(fileValidator));
+            Contract.NotNull(keyProvider, nameof(keyProvider));
+            Contract.NotNullOrEmpty(tempFileFolder, nameof(tempFileFolder));
+
             this.fileCabinet = fileCabinet;
             this.fileValidator = fileValidator;
             this.keyProvider = keyProvider;
