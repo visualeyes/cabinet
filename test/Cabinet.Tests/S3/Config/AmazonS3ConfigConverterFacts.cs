@@ -24,7 +24,11 @@ namespace Cabinet.Tests.S3.Config {
 
         [Theory]
         [MemberData("GetConfigStrings")]
-        public void To_Config(string configStr, string expectedBucketName, RegionEndpoint expectedRegion, Expression<Action<IAWSCredentialsFactory>> verify) {
+        public void To_Config(
+            string configStr,
+            string expectedBucketName,RegionEndpoint expectedRegion, string expectedkeyPrefix, string expectedDelimiter,
+            Expression<Action<IAWSCredentialsFactory>> verify
+        ) {
             var configToken = JToken.Parse(configStr);
 
             var config = this.converter.ToConfig(configToken);
@@ -36,12 +40,17 @@ namespace Cabinet.Tests.S3.Config {
 
             Assert.Equal(expectedBucketName, s3Config.BucketName);
             Assert.Equal(expectedRegion, s3Config.AmazonS3Config.RegionEndpoint);
+            Assert.Equal(expectedkeyPrefix, s3Config.KeyPrefix);
+            Assert.Equal(expectedDelimiter, s3Config.Delimiter);
 
             this.mockCredentialsFactory.Verify(verify, Times.Once);
         }
 
 
         public static object[] GetConfigStrings() {
+            string defaultKeyPrefix = null;
+            string defaultDelimiter = AmazonS3CabinetConfig.DefaultDelimiter;
+
             Expression<Action<IAWSCredentialsFactory>> basicVerify = (f) => f.GetBasicCredentials(It.IsAny<string>(), It.IsAny<string>());
             Expression<Action<IAWSCredentialsFactory>> instanceProfileVerify = (f) => f.GetInstanceProfileCredentials(It.IsAny<string>());
             Expression<Action<IAWSCredentialsFactory>> storedProfileVerify = (f) => f.GetStoredProfileCredentials(It.IsAny<string>());
@@ -57,11 +66,12 @@ namespace Cabinet.Tests.S3.Config {
                         ""secret_key"": ""secret""
                     },
                     ""region"": ""ap-southeast-1"",
-                    ""bucket"": ""test-bucket""
+                    ""bucket"": ""test-bucket"",
+                    ""keyPrefix"": ""production/a/""
                 }",
-                "test-bucket",
-                RegionEndpoint.APSoutheast1,
-                basicVerify
+                "test-bucket", RegionEndpoint.APSoutheast1, "production/a/", defaultDelimiter,
+                basicVerify,
+                
                 },
                 new object[] { @"{
                     ""credentials"": {
@@ -69,10 +79,10 @@ namespace Cabinet.Tests.S3.Config {
                         ""role"": ""some-role""
                     },
                     ""region"": ""ap-southeast-2"",
-                    ""bucket"": ""test-bucket""
+                    ""bucket"": ""test-bucket"",
+                    ""delimiter"": "";""
                 }",
-                "test-bucket",
-                RegionEndpoint.APSoutheast2,
+                "test-bucket", RegionEndpoint.APSoutheast2, defaultKeyPrefix, ";",
                 instanceProfileVerify
                 },
                 new object[] { @"{
@@ -81,10 +91,11 @@ namespace Cabinet.Tests.S3.Config {
                         ""name"": ""some-name""
                     },
                     ""region"": ""ap-southeast-2"",
-                    ""bucket"": ""test-bucket""
+                    ""bucket"": ""test-bucket"",
+                    ""keyPrefix"": ""production/b"",
+                    ""delimiter"": "";""
                 }",
-                "test-bucket",
-                RegionEndpoint.APSoutheast2,
+                "test-bucket", RegionEndpoint.APSoutheast2, "production/b", ";",
                 storedProfileVerify
                 },
                 new object[] { @"{
@@ -94,8 +105,7 @@ namespace Cabinet.Tests.S3.Config {
                     ""region"": ""us-east-1"",
                     ""bucket"": ""test-bucket""
                 }",
-                "test-bucket",
-                RegionEndpoint.USEast1,
+                "test-bucket", RegionEndpoint.USEast1, defaultKeyPrefix, defaultDelimiter,
                 environmentVerify
                 },
                 new object[] { @"{
@@ -105,8 +115,7 @@ namespace Cabinet.Tests.S3.Config {
                     ""region"": ""us-west-2"",
                     ""bucket"": ""test-bucket""
                 }",
-                "test-bucket",
-                RegionEndpoint.USWest2,
+                "test-bucket", RegionEndpoint.USWest2, defaultKeyPrefix, defaultDelimiter,
                 environmentVariableVerify
                 }
             };

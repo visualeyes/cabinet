@@ -25,10 +25,12 @@ namespace Cabinet.S3 {
             this.Delimiter = DefaultDelimiter;
         }
 
-        public AWSCredentials AWSCredentials { get; private set; }
-        public AmazonS3Config AmazonS3Config { get; private set; }
+        public AWSCredentials AWSCredentials { get; }
+        public AmazonS3Config AmazonS3Config { get; }
 
-        public string BucketName { get; private set; }
+        public string BucketName { get; }
+
+        public string KeyPrefix { get; set; }
         public string Delimiter { get; set; }
     }
 }
