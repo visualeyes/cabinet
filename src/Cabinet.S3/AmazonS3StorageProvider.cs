@@ -26,8 +26,8 @@ namespace Cabinet.S3 {
         }
 
         public async Task<bool> ExistsAsync(string key, AmazonS3CabinetConfig config) {
-            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            Contract.NotNullOrEmpty(key, nameof(key));
+            Contract.NotNull(config, nameof(config));
 
             using (var s3Client = GetS3Client(config)) {
                 return await ExistsInternalAsync(key, config, s3Client);
@@ -35,7 +35,7 @@ namespace Cabinet.S3 {
         }
 
         public async Task<IEnumerable<string>> ListKeysAsync(AmazonS3CabinetConfig config, string keyPrefix = null, bool recursive = true) {
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            Contract.NotNull(config, nameof(config));
 
             using (var s3Client = GetS3Client(config)) {
                 var s3Objects = await GetS3Objects(keyPrefix, recursive, config, s3Client);
@@ -45,8 +45,8 @@ namespace Cabinet.S3 {
         }
 
         public async Task<ICabinetItemInfo> GetFileAsync(string key, AmazonS3CabinetConfig config) {
-            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            Contract.NotNullOrEmpty(key, nameof(key));
+            Contract.NotNull(config, nameof(config));
 
             using (var s3Client = GetS3Client(config)) {
                 using (var response = await GetS3Object(key, config, s3Client, CancellationToken.None)) {
@@ -61,7 +61,7 @@ namespace Cabinet.S3 {
         }
 
         public async Task<IEnumerable<ICabinetItemInfo>> GetItemsAsync(AmazonS3CabinetConfig config, string keyPrefix = null, bool recursive = true) {
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            Contract.NotNull(config, nameof(config));
 
             using (var s3Client = GetS3Client(config)) {
                 var s3Objects = await GetS3Objects(keyPrefix, recursive, config, s3Client);
@@ -71,8 +71,8 @@ namespace Cabinet.S3 {
         }
 
         public async Task<Stream> OpenReadStreamAsync(string key, AmazonS3CabinetConfig config) {
-            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            Contract.NotNullOrEmpty(key, nameof(key));
+            Contract.NotNull(config, nameof(config));
 
             using (var s3Client = GetS3Client(config)) {
                 var transferUtility = GetTransferUtility(s3Client);
@@ -81,9 +81,9 @@ namespace Cabinet.S3 {
         }
 
         public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, AmazonS3CabinetConfig config) {
-            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
-            if (content == null) throw new ArgumentNullException(nameof(content));
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            Contract.NotNullOrEmpty(key, nameof(key));
+            Contract.NotNull(content, nameof(content));
+            Contract.NotNull(config, nameof(config));
 
             if(handleExisting != HandleExistingMethod.Overwrite) {
                 throw new NotImplementedException();
@@ -106,9 +106,9 @@ namespace Cabinet.S3 {
         }
 
         public async Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, AmazonS3CabinetConfig config) {
-            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
-            if (String.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            Contract.NotNullOrEmpty(key, nameof(key));
+            Contract.NotNullOrEmpty(filePath, nameof(filePath));
+            Contract.NotNull(config, nameof(config));
 
             if (handleExisting != HandleExistingMethod.Overwrite) {
                 throw new NotImplementedException();
@@ -131,9 +131,9 @@ namespace Cabinet.S3 {
         }
 
         public async Task<IMoveResult> MoveFileAsync(string sourceKey, string destKey, HandleExistingMethod handleExisting, AmazonS3CabinetConfig config) {
-            if (String.IsNullOrWhiteSpace(sourceKey)) throw new ArgumentNullException(nameof(sourceKey));
-            if (String.IsNullOrWhiteSpace(destKey)) throw new ArgumentNullException(nameof(destKey));
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            Contract.NotNullOrEmpty(sourceKey, nameof(sourceKey));
+            Contract.NotNullOrEmpty(destKey, nameof(destKey));
+            Contract.NotNull(config, nameof(config));
 
             if (handleExisting != HandleExistingMethod.Overwrite) {
                 throw new NotImplementedException();
@@ -166,8 +166,8 @@ namespace Cabinet.S3 {
         }
 
         public async Task<IDeleteResult> DeleteFileAsync(string key, AmazonS3CabinetConfig config) {
-            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            Contract.NotNullOrEmpty(key, nameof(key));
+            Contract.NotNull(config, nameof(config));
 
             using (var s3Client = GetS3Client(config)) {
                 return await DeleteInternal(key, config, s3Client);
@@ -175,9 +175,9 @@ namespace Cabinet.S3 {
         }
 
         private static async Task<bool> ExistsInternalAsync(string key, AmazonS3CabinetConfig config, IAmazonS3 s3Client) {
-            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
-            if (config == null) throw new ArgumentNullException(nameof(config));
-            if (s3Client == null) throw new ArgumentNullException(nameof(s3Client));
+            Contract.NotNullOrEmpty(key, nameof(key));
+            Contract.NotNull(config, nameof(config));
+            Contract.NotNull(s3Client, nameof(s3Client));
 
             using (var response = await GetS3Object(key, config, s3Client, CancellationToken.None)) {
                 return response.HttpStatusCode == HttpStatusCode.OK;
@@ -185,6 +185,10 @@ namespace Cabinet.S3 {
         }
         
         private async Task UploadInternal(string key, AmazonS3CabinetConfig config, IAmazonS3 s3Client, IProgress<IWriteProgress> progress, TransferUtilityUploadRequest uploadRequest) {
+            Contract.NotNullOrEmpty(key, nameof(key));
+            Contract.NotNull(config, nameof(config));
+            Contract.NotNull(s3Client, nameof(s3Client));
+
             var utilty = GetTransferUtility(s3Client);
 
             uploadRequest.BucketName = config.BucketName;
@@ -198,8 +202,9 @@ namespace Cabinet.S3 {
         }
 
         private static async Task<IEnumerable<AmazonS3CabinetItemInfo>> GetS3Objects(string keyPrefix, bool recursive, AmazonS3CabinetConfig config, IAmazonS3 s3Client) {
-            if (config == null) throw new ArgumentNullException(nameof(config));
-            if (s3Client == null) throw new ArgumentNullException(nameof(s3Client));
+            Contract.NotNullOrEmpty(keyPrefix, nameof(keyPrefix));
+            Contract.NotNull(config, nameof(config));
+            Contract.NotNull(s3Client, nameof(s3Client));
 
             var fileInfos = new List<AmazonS3CabinetItemInfo>();
             
@@ -239,9 +244,9 @@ namespace Cabinet.S3 {
         }
 
         private static async Task<GetObjectResponse> GetS3Object(string key, AmazonS3CabinetConfig config, IAmazonS3 s3Client, CancellationToken cancellationToken) {
-            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
-            if (config == null) throw new ArgumentNullException(nameof(config));
-            if (s3Client == null) throw new ArgumentNullException(nameof(s3Client));
+            Contract.NotNullOrEmpty(key, nameof(key));
+            Contract.NotNull(config, nameof(config));
+            Contract.NotNull(s3Client, nameof(s3Client));
 
             var request = new GetObjectRequest {
                 BucketName = config.BucketName,
@@ -254,9 +259,9 @@ namespace Cabinet.S3 {
         }
 
         private static async Task<IDeleteResult> DeleteInternal(string key, AmazonS3CabinetConfig config, IAmazonS3 s3Client) {
-            if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
-            if (config == null) throw new ArgumentNullException(nameof(config));
-            if (s3Client == null) throw new ArgumentNullException(nameof(s3Client));
+            Contract.NotNullOrEmpty(key, nameof(key));
+            Contract.NotNull(config, nameof(config));
+            Contract.NotNull(s3Client, nameof(s3Client));
 
             try {
                 var deleteObjectRequest = new DeleteObjectRequest {
@@ -273,13 +278,13 @@ namespace Cabinet.S3 {
         }
 
         private IAmazonS3 GetS3Client(AmazonS3CabinetConfig config) {
-            if (config == null) throw new ArgumentNullException(nameof(config));
+            Contract.NotNull(config, nameof(config));
 
             return clientFactory.GetS3Client(config);
         }
 
         private ITransferUtility GetTransferUtility(IAmazonS3 client) {
-            if (client == null) throw new ArgumentNullException(nameof(client));
+            Contract.NotNull(client, nameof(client));
 
             return clientFactory.GetTransferUtility(client);
         }
