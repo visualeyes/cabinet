@@ -84,7 +84,7 @@ namespace Cabinet.Tests.S3 {
             var provider = GetProvider();
             var config = GetConfig(bucketName, configKeyPrefix);
 
-            SetupGetObjectsRequest(bucketName, expectedKeyPrefix, code, expectedS3Objects);
+            SetupGetObjectsRequest(bucketName, expectedKeyPrefix, recursive, config.Delimiter, code, expectedS3Objects);
 
             var keys = await provider.ListKeysAsync(config, keyPrefix: keyPrefix, recursive: recursive);
             var keysList = keys.ToList();
@@ -138,7 +138,7 @@ namespace Cabinet.Tests.S3 {
             var provider = GetProvider();
             var config = GetConfig(bucketName, configKeyPrefix);
 
-            SetupGetObjectsRequest(bucketName, expectedKeyPrefix, code, expectedS3Objects);
+            SetupGetObjectsRequest(bucketName, expectedKeyPrefix, recursive, config.Delimiter, code, expectedS3Objects);
 
             var expectedFileInfos = expectedS3Objects.Select(o => new AmazonS3CabinetItemInfo(o.Key, true, ItemType.File) {
                 LastModifiedUtc = o.LastModified
@@ -544,9 +544,16 @@ namespace Cabinet.Tests.S3 {
             });
         }
 
-        private void SetupGetObjectsRequest(string bucketName, string expectedKeyPrefix, HttpStatusCode code, List<S3Object> s3Objects) {
+        private void SetupGetObjectsRequest(string bucketName, string expectedKeyPrefix, bool recursive, string delimiter, HttpStatusCode code, List<S3Object> s3Objects) {
             this.mockS3Client.Setup(
-                s3 => s3.ListObjectsAsync(It.Is<ListObjectsRequest>((r) => r.BucketName == bucketName && r.Prefix == expectedKeyPrefix), It.IsAny<CancellationToken>())
+                s3 => s3.ListObjectsAsync(
+                    It.Is<ListObjectsRequest>((r) => 
+                        r.BucketName == bucketName && 
+                        r.Prefix == expectedKeyPrefix &&
+                        (recursive ? String.IsNullOrWhiteSpace(r.Delimiter) : r.Delimiter == delimiter)
+                    ), 
+                    It.IsAny<CancellationToken>()
+                )
             )
             .ReturnsAsync(new ListObjectsResponse() {
                 HttpStatusCode = code,
@@ -579,20 +586,21 @@ namespace Cabinet.Tests.S3 {
             // The response under the prefix will be all the keys with that prefix
 
             string barPrefix = "bar";
-            string bazPrefix = "bar/baz";
+            string bazPrefix = "baz";
+            string barBazPrefix = "bar/baz";
 
             var barObjects = s3Objects.Where(o => o.Key.StartsWith(barPrefix)).ToList();
-            var bazObjects = s3Objects.Where(o => o.Key.StartsWith(bazPrefix)).ToList();
-            //var barDirectChildObjects = barObjects.Where(o => o.Key);
+            var bazObjects = s3Objects.Where(o => o.Key.StartsWith(barBazPrefix)).ToList();
+            var barDirectChildObjects = barObjects.Where(o => o.Key.StartsWith(barPrefix) && !o.Key.StartsWith(barBazPrefix + "/")).ToList();
 
             return new object[] {
-                new object[] { "test-bucket", "", "", true, HttpStatusCode.OK, s3Objects, "" },
-                new object[] { "test-bucket", "", "bar", true, HttpStatusCode.OK, barObjects, "bar" },
-                new object[] { "test-bucket", "bar", "", true, HttpStatusCode.OK, barObjects, "bar" },
-                new object[] { "test-bucket", "bar", "baz", true, HttpStatusCode.OK, bazObjects, "bar/baz" },
-                //new object[] { "test-bucket", barPrefix, true, HttpStatusCode.OK, barObjects,barObjects },
-                //new object[] { "test-bucket", "", false, HttpStatusCode.OK, s3Objects, s3Objects.Select(o => o.Key == "file.txt").ToList() },
-                //new object[] { "test-bucket", barPrefix, true, HttpStatusCode.OK, barObjects, barObjects },
+                new object[] { "test-bucket", "",        "",        true, HttpStatusCode.OK, s3Objects,  "" },
+                new object[] { "test-bucket", "",        barPrefix, true, HttpStatusCode.OK, barObjects, barPrefix },
+                new object[] { "test-bucket", barPrefix, "",        true, HttpStatusCode.OK, barObjects, barPrefix },
+                new object[] { "test-bucket", barPrefix, bazPrefix, true, HttpStatusCode.OK, bazObjects, barBazPrefix },
+
+                new object[] { "test-bucket", "", "",        false, HttpStatusCode.OK, s3Objects.Where(o => o.Key == "file.txt").ToList(), "" },
+                new object[] { "test-bucket", "", barPrefix, false, HttpStatusCode.OK, barDirectChildObjects,                               barPrefix },
             };
         }
     }
