@@ -13,13 +13,13 @@ namespace Cabinet.Core {
             if(String.IsNullOrWhiteSpace(prefix)) {
                 return key ?? "";
             }
-
-            if(!prefix.EndsWith(delimiter)) {
-                prefix += delimiter;
-            }
             
             if(String.IsNullOrWhiteSpace(key)) {
                 return prefix;
+            }
+
+            if(!prefix.EndsWith(delimiter)) {
+                prefix += delimiter;
             }
 
             if(key.StartsWith(delimiter)) {

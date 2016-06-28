@@ -52,7 +52,7 @@ namespace Cabinet.S3 {
                 using (var response = await GetS3Object(key, config, s3Client, CancellationToken.None)) {
                     bool exists = response.HttpStatusCode == HttpStatusCode.OK;
                     
-                    return new AmazonS3CabinetItemInfo(response.Key, exists, ItemType.File) {
+                    return new AmazonS3CabinetItemInfo(key, exists, ItemType.File) {
                         Size = response.ContentLength,
                         LastModifiedUtc = response.LastModified.ToUniversalTime()
                     };
@@ -76,7 +76,8 @@ namespace Cabinet.S3 {
 
             using (var s3Client = GetS3Client(config)) {
                 var transferUtility = GetTransferUtility(s3Client);
-                return await transferUtility.OpenStreamAsync(config.BucketName, key);
+                string itemKey = GetKey(key, config);
+                return await transferUtility.OpenStreamAsync(config.BucketName, itemKey);
             }
         }
 
@@ -144,8 +145,8 @@ namespace Cabinet.S3 {
                     var copyRequest = new CopyObjectRequest {
                         SourceBucket = config.BucketName,
                         DestinationBucket = config.BucketName,
-                        SourceKey = sourceKey,
-                        DestinationKey = destKey
+                        SourceKey = GetKey(sourceKey, config),
+                        DestinationKey = GetKey(destKey, config)
                     };
 
                     var response = await s3Client.CopyObjectAsync(copyRequest);
@@ -192,7 +193,7 @@ namespace Cabinet.S3 {
             var utilty = GetTransferUtility(s3Client);
 
             uploadRequest.BucketName = config.BucketName;
-            uploadRequest.Key = key;
+            uploadRequest.Key = GetKey(key, config);
 
             uploadRequest.UploadProgressEvent += (sender, e) => {
                 progress?.Report(new WriteProgress(key, e.TransferredBytes, e.TotalBytes));
@@ -202,7 +203,6 @@ namespace Cabinet.S3 {
         }
 
         private static async Task<IEnumerable<AmazonS3CabinetItemInfo>> GetS3Objects(string keyPrefix, bool recursive, AmazonS3CabinetConfig config, IAmazonS3 s3Client) {
-            Contract.NotNullOrEmpty(keyPrefix, nameof(keyPrefix));
             Contract.NotNull(config, nameof(config));
             Contract.NotNull(s3Client, nameof(s3Client));
 
@@ -213,7 +213,7 @@ namespace Cabinet.S3 {
 
             var request = new ListObjectsRequest {
                 BucketName = config.BucketName,
-                Prefix = keyPrefix
+                Prefix = GetKey(keyPrefix, config)
             };
 
             if (!recursive) {
@@ -250,7 +250,7 @@ namespace Cabinet.S3 {
 
             var request = new GetObjectRequest {
                 BucketName = config.BucketName,
-                Key = key
+                Key = GetKey(key, config)
             };
 
             using (var response = await s3Client.GetObjectAsync(request, cancellationToken)) {
@@ -266,7 +266,7 @@ namespace Cabinet.S3 {
             try {
                 var deleteObjectRequest = new DeleteObjectRequest {
                     BucketName = config.BucketName,
-                    Key = key
+                    Key = GetKey(key, config)
                 };
 
                 var response = await s3Client.DeleteObjectAsync(deleteObjectRequest);
@@ -287,6 +287,10 @@ namespace Cabinet.S3 {
             Contract.NotNull(client, nameof(client));
 
             return clientFactory.GetTransferUtility(client);
+        }
+
+        private static string GetKey(string key, AmazonS3CabinetConfig config) {
+            return KeyUtils.JoinKeys(config.KeyPrefix, key, config.Delimiter);
         }
     }
 }
