@@ -14,6 +14,7 @@ using System.Net;
 using Cabinet.S3.Results;
 using System.Threading;
 using Amazon.S3.Transfer;
+using Cabinet.Core.Exceptions;
 
 namespace Cabinet.S3 {
     internal class AmazonS3StorageProvider : IStorageProvider<AmazonS3CabinetConfig> {
@@ -77,7 +78,12 @@ namespace Cabinet.S3 {
             using (var s3Client = GetS3Client(config)) {
                 var transferUtility = GetTransferUtility(s3Client);
                 string itemKey = GetKey(key, config);
-                return await transferUtility.OpenStreamAsync(config.BucketName, itemKey);
+
+                try {
+                    return await transferUtility.OpenStreamAsync(config.BucketName, itemKey);
+                } catch(Exception e) {
+                    throw new CabinetFileOpenException(itemKey, e);
+                }
             }
         }
 
