@@ -10,7 +10,7 @@ namespace Cabinet.Migrator {
     public class MigrationTaskRunner : IMigrationTaskRunner {
         private const int BatchSize = 20;
 
-        public async Task RunTasks<I, T>(Func<I, Task<T>> task, IEnumerable<I> inputes, CancellationToken cancellationToken) {
+        public async Task RunTasks<I, T>(Func<I, Task<T>> task, IEnumerable<I> inputs, CancellationToken cancellationToken) {
             var buffer = new BufferBlock<I>(new DataflowBlockOptions {
                 BoundedCapacity = BatchSize,
                 CancellationToken = cancellationToken
@@ -23,7 +23,7 @@ namespace Cabinet.Migrator {
 
             buffer.LinkTo(taskBlock, new DataflowLinkOptions { PropagateCompletion = true });
 
-            foreach (var key in inputes) {
+            foreach (var key in inputs) {
                 await Task.WhenAny(buffer.SendAsync(key, cancellationToken), taskBlock.Completion);
             }
 

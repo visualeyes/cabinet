@@ -1,4 +1,5 @@
 ﻿using Cabinet.Core;
+using Cabinet.Core.Exceptions;
 using Cabinet.Core.Progress;
 using Cabinet.Core.Providers;
 using Cabinet.Core.Results;
@@ -65,13 +66,18 @@ namespace Cabinet.FileSystem {
         public Task<Stream> OpenReadStreamAsync(string key, FileSystemCabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
-
-
+            
             var fs = GetFileSystem(config);
 
             var fileInfo = this.GetFileInfo(key, config);
-            var stream = fileInfo.OpenRead();
-            return Task.FromResult(stream);
+            try {
+                var stream = fileInfo.OpenRead();
+                return Task.FromResult(stream);
+            } catch(UnauthorizedAccessException e) {
+                throw new CabinetFileOpenException(key, e);
+            } catch(IOException e) {
+                throw new CabinetFileOpenException(key, e);
+            }
         }
 
         public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, FileSystemCabinetConfig config) {
