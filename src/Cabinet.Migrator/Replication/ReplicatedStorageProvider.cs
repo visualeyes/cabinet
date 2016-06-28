@@ -12,14 +12,12 @@ using Cabinet.Migrator.Results;
 namespace Cabinet.Migrator.Replication {
     /// <summary>
     /// Replicated provider to provide for faster replication of files
-    ///  -- should be used in conjunction with the <see cref="CabinetReplicator" />
+    ///  -- should be used in conjunction with the <see cref="CabinetFileReplicator" />
     /// </summary>
     public class ReplicatedStorageProvider : IStorageProvider<ReaplicatedProviderConfig> {
         private readonly IFileCabinetFactory cabinetFactory;
 
-        public string ProviderType {
-            get { return ReaplicatedProviderConfig.ProviderType; }
-        }
+        public string ProviderType  => ReaplicatedProviderConfig.ProviderType;
 
         public ReplicatedStorageProvider(IFileCabinetFactory cabinetFactory) {
             this.cabinetFactory = cabinetFactory;
