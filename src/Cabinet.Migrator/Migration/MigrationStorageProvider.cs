@@ -8,6 +8,7 @@ using Cabinet.Core.Providers;
 using Cabinet.Core.Results;
 using System.IO;
 using Cabinet.Migrator.Results;
+using Cabinet.Core.Exceptions;
 
 namespace Cabinet.Migrator.Migration {
     /// <summary>
@@ -18,9 +19,7 @@ namespace Cabinet.Migrator.Migration {
     public class MigrationStorageProvider : IStorageProvider<MigrationProviderConfig> {
         private readonly IFileCabinetFactory cabinetFactory;
 
-        public string ProviderType {
-            get { return MigrationProviderConfig.ProviderType; }
-        }
+        public string ProviderType => MigrationProviderConfig.ProviderType;
 
         public MigrationStorageProvider(IFileCabinetFactory cabinetFactory) {
             this.cabinetFactory = cabinetFactory;
@@ -30,12 +29,12 @@ namespace Cabinet.Migrator.Migration {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(config, nameof(config));
 
-            var to = GetToConfig(config);
+            var to = GetToCabinet(config);
 
             bool exists = await to.ExistsAsync(key);
 
             if (!exists) {
-                var from = GetFromConfig(config);
+                var from = GetFromCabinet(config);
                 exists = await from.ExistsAsync(key); // might not be migrated yet
             }
 
@@ -45,8 +44,8 @@ namespace Cabinet.Migrator.Migration {
         public async Task<IEnumerable<string>> ListKeysAsync(MigrationProviderConfig config, string keyPrefix = "", bool recursive = true) {
             Contract.NotNull(config, nameof(config));
 
-            var from = GetFromConfig(config);
-            var to = GetToConfig(config);
+            var from = GetFromCabinet(config);
+            var to = GetToCabinet(config);
 
             var keyLists = await Task.WhenAll(
                 to.ListKeysAsync(keyPrefix, recursive),
@@ -66,12 +65,12 @@ namespace Cabinet.Migrator.Migration {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(config, nameof(config));
 
-            var from = GetFromConfig(config);
-            var to = GetToConfig(config);
+            var to = GetToCabinet(config);
 
             var item = await to.GetItemAsync(key);
 
             if (!item.Exists) {
+                var from = GetFromCabinet(config);
                 item = await from.GetItemAsync(key);
             }
 
@@ -87,27 +86,23 @@ namespace Cabinet.Migrator.Migration {
         public async Task<Stream> OpenReadStreamAsync(string key, MigrationProviderConfig config) {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(config, nameof(config));
-
-            var from = GetFromConfig(config);
-            var to = GetToConfig(config);
-
             if (key == null) throw new ArgumentNullException(nameof(key));
 
-            var stream = await CheckExistsThenOpenAsync(to, key);
-            if (stream == null) {
-                stream = await CheckExistsThenOpenAsync(from, key);
+            try {
+                var to = GetToCabinet(config);
+                return await to.OpenReadStreamAsync(key);
+            } catch(CabinetFileOpenException) {
+                var from = GetFromCabinet(config);
+                return await from.OpenReadStreamAsync(key);
             }
-
-            return stream;
         }
 
         public async Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, MigrationProviderConfig config) {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNullOrEmpty(filePath, nameof(filePath));
             Contract.NotNull(config, nameof(config));
-
-            var from = GetFromConfig(config);
-            var to = GetToConfig(config);
+            
+            var to = GetToCabinet(config);
 
             return await to.SaveFileAsync(key, filePath, handleExisting, progress);
         }
@@ -117,8 +112,8 @@ namespace Cabinet.Migrator.Migration {
             Contract.NotNull(content, nameof(content));
             Contract.NotNull(config, nameof(config));
 
-            var from = GetFromConfig(config);
-            var to = GetToConfig(config);
+            var from = GetFromCabinet(config);
+            var to = GetToCabinet(config);
 
             return await to.SaveFileAsync(key, content, handleExisting, progress);
         }
@@ -128,8 +123,8 @@ namespace Cabinet.Migrator.Migration {
             Contract.NotNullOrEmpty(destKey, nameof(destKey));
             Contract.NotNull(config, nameof(config));
 
-            var from = GetFromConfig(config);
-            var to = GetToConfig(config);
+            var from = GetFromCabinet(config);
+            var to = GetToCabinet(config);
 
             bool sourceExistsInTo = await to.ExistsAsync(sourceKey);
 
@@ -158,22 +153,22 @@ namespace Cabinet.Migrator.Migration {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(config, nameof(config));
 
-            var from = GetFromConfig(config);
-            var to = GetToConfig(config);
+            var from = GetFromCabinet(config);
+            var to = GetToCabinet(config);
 
-            var fromResult = await from.DeleteFileAsync(key);
-            var toResult = await to.DeleteFileAsync(key);
+            var fromResultTask = from.DeleteFileAsync(key);
+            var toResultTask = to.DeleteFileAsync(key);
 
-            //TODO: Combine results
+            await Task.WhenAll(fromResultTask, toResultTask);
 
-            return toResult;
+            return new DeleteResult(fromResultTask.Result, toResultTask.Result);
         }
 
-        private IFileCabinet GetFromConfig(MigrationProviderConfig config) {
+        private IFileCabinet GetFromCabinet(MigrationProviderConfig config) {
             return GetCabinet(config.From, "from");
         }
 
-        private IFileCabinet GetToConfig(MigrationProviderConfig config) {
+        private IFileCabinet GetToCabinet(MigrationProviderConfig config) {
             return GetCabinet(config.To, "to");
         }
 
@@ -185,15 +180,6 @@ namespace Cabinet.Migrator.Migration {
             }
 
             return cabinet;
-        }
-
-        private static async Task<Stream> CheckExistsThenOpenAsync(IFileCabinet cabinet, string key) {
-            bool exists = await cabinet.ExistsAsync(key);
-            if (exists) {
-                return await cabinet.OpenReadStreamAsync(key);
-            }
-
-            return null;
         }
     }
 }
