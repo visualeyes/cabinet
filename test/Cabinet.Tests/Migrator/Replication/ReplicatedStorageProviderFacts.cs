@@ -90,7 +90,7 @@ namespace Cabinet.Tests.Migrator.Replication {
             
             this.mockMasterCabinet.Setup(c => c.ListKeysAsync(keyPrefix, recursive)).ReturnsAsync(expectedKeys);
 
-            var keys = await provider.ListKeysAsync(this.config);
+            var keys = await provider.ListKeysAsync(this.config, keyPrefix, recursive);
 
             this.mockMasterCabinet.Verify(c => c.ListKeysAsync(keyPrefix, recursive), Times.Once);
             this.mockReplicaCabinet.Verify(c => c.ListKeysAsync(keyPrefix, recursive), Times.Never);
@@ -248,11 +248,14 @@ namespace Cabinet.Tests.Migrator.Replication {
             await Assert.ThrowsAsync<ArgumentNullException>(() => provider.DeleteFileAsync("key", config));
         }
 
-        [Fact]
-        public async Task Delete_File() {
+        [Theory]
+        [InlineData(true), InlineData(false)]
+        public async Task Delete_File(bool masterSuccess) {
             string key = "test";
 
             var mockMasterSaveResult = new Mock<IDeleteResult>();
+            mockMasterSaveResult.SetupGet(m => m.Success).Returns(masterSuccess);
+
             var mockReplicaSaveResult = new Mock<IDeleteResult>();
 
             this.mockMasterCabinet.Setup(c => c.DeleteFileAsync(key)).ReturnsAsync(mockMasterSaveResult.Object);
@@ -261,7 +264,7 @@ namespace Cabinet.Tests.Migrator.Replication {
             var result = await provider.DeleteFileAsync(key, config);
 
             this.mockMasterCabinet.Verify(c => c.DeleteFileAsync(key), Times.Once);
-            this.mockReplicaCabinet.Verify(c => c.DeleteFileAsync(key), Times.Once);
+            this.mockReplicaCabinet.Verify(c => c.DeleteFileAsync(key), masterSuccess ? Times.Once() : Times.Never());
 
             Assert.Equal(mockMasterSaveResult.Object, result);
         }
