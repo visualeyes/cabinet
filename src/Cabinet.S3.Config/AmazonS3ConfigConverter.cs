@@ -24,11 +24,20 @@ namespace Cabinet.S3.Config {
             string credentialsType = config.SelectToken("$.credentials.type").Value<string>();
             string regionString = config.Value<string>("region");
             string bucket = config.Value<string>("bucket");
+            string keyPrefix = config.Value<string>("keyPrefix");
+            string delimiter = config.Value<string>("delimiter");
+
+            if(String.IsNullOrWhiteSpace(delimiter)) {
+                delimiter = AmazonS3CabinetConfig.DefaultDelimiter;
+            }
 
             var credentials = GetCredentials(credentialsType, config["credentials"]);
             var region = RegionEndpoint.GetBySystemName(regionString);
 
-            return new AmazonS3CabinetConfig(bucket, region, credentials);
+            return new AmazonS3CabinetConfig(bucket, region, credentials) {
+                KeyPrefix = keyPrefix,
+                Delimiter = delimiter
+            };
         }
 
         private AWSCredentials GetCredentials(string credentialsType, JToken jToken) {

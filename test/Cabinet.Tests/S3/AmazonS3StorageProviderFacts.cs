@@ -56,15 +56,16 @@ namespace Cabinet.Tests.S3 {
         }
 
         [Theory]
-        [InlineData("test-bucket", "test-key", HttpStatusCode.OK, true)]
-        [InlineData("test-bucket", "test-key", HttpStatusCode.NotFound, false)]
-        [InlineData("test-bucket", "test-key", HttpStatusCode.Forbidden, false)]
-        [InlineData("test-bucket", "test-key", HttpStatusCode.Unauthorized, false)]
-        public async Task Exists(string bucketName, string key, HttpStatusCode code, bool expectedExists) {
+        [InlineData("test-bucket", null, "test-key", HttpStatusCode.OK, true, "test-key")]
+        [InlineData("test-bucket", "folder", "test-key", HttpStatusCode.OK, true, "folder/test-key")]
+        [InlineData("test-bucket", "", "test-key", HttpStatusCode.NotFound, false, "test-key")]
+        [InlineData("test-bucket", "", "test-key", HttpStatusCode.Forbidden, false, "test-key")]
+        [InlineData("test-bucket", "folder", "test-key", HttpStatusCode.Unauthorized, false, "folder/test-key")]
+        public async Task Exists(string bucketName, string keyPrefix, string key, HttpStatusCode code, bool expectedExists, string expectedKey) {
             var provider = GetProvider();
-            var config = GetConfig(bucketName);
+            var config = GetConfig(bucketName, keyPrefix);
 
-            SetupGetObjectRequest(bucketName, key, code);
+            SetupGetObjectRequest(bucketName, expectedKey, code);
 
             bool actualExists = await provider.ExistsAsync(key, config);
             Assert.Equal(expectedExists, expectedExists);
@@ -79,11 +80,11 @@ namespace Cabinet.Tests.S3 {
 
         [Theory]
         [MemberData("GetTestS3Objects")]
-        public async Task List_Keys(string bucketName, string keyPrefix, bool recursive, HttpStatusCode code, List<S3Object> s3Objects, List<S3Object> expectedS3Objects) {
+        public async Task List_Keys(string bucketName, string configKeyPrefix, string keyPrefix, bool recursive, HttpStatusCode code, List<S3Object> expectedS3Objects, string expectedKeyPrefix) {
             var provider = GetProvider();
-            var config = GetConfig(bucketName);
+            var config = GetConfig(bucketName, configKeyPrefix);
 
-            SetupGetObjectsRequest(bucketName, keyPrefix, code, s3Objects);
+            SetupGetObjectsRequest(bucketName, expectedKeyPrefix, recursive, config.Delimiter, code, expectedS3Objects);
 
             var keys = await provider.ListKeysAsync(config, keyPrefix: keyPrefix, recursive: recursive);
             var keysList = keys.ToList();
@@ -107,15 +108,16 @@ namespace Cabinet.Tests.S3 {
         }
 
         [Theory]
-        [InlineData("test-bucket", "test-key", HttpStatusCode.OK, true)]
-        [InlineData("test-bucket", "test-key", HttpStatusCode.NotFound, false)]
-        [InlineData("test-bucket", "test-key", HttpStatusCode.Forbidden, false)]
-        [InlineData("test-bucket", "test-key", HttpStatusCode.Unauthorized, false)]
-        public async Task Get_File(string bucketName, string key, HttpStatusCode code, bool expectedExists) {
+        [InlineData("test-bucket", null, "test-key", HttpStatusCode.OK, true, "test-key")]
+        [InlineData("test-bucket", "folder", "test-key", HttpStatusCode.OK, true, "folder/test-key")]
+        [InlineData("test-bucket", "", "test-key", HttpStatusCode.NotFound, false, "test-key")]
+        [InlineData("test-bucket", "", "test-key", HttpStatusCode.Forbidden, false, "test-key")]
+        [InlineData("test-bucket", "folder", "test-key", HttpStatusCode.Unauthorized, false, "folder/test-key")]
+        public async Task Get_File(string bucketName, string keyPrefix, string key, HttpStatusCode code, bool expectedExists, string expectedKey) {
             var provider = GetProvider();
-            var config = GetConfig(bucketName);
+            var config = GetConfig(bucketName, keyPrefix);
 
-            SetupGetObjectRequest(bucketName, key, code);
+            SetupGetObjectRequest(bucketName, expectedKey, code);
 
             var file = await provider.GetFileAsync(key, config);
 
@@ -132,11 +134,11 @@ namespace Cabinet.Tests.S3 {
 
         [Theory]
         [MemberData("GetTestS3Objects")]
-        public async Task Get_Items(string bucketName, string keyPrefix, bool recursive, HttpStatusCode code, List<S3Object> s3Objects, List<S3Object> expectedS3Objects) {
+        public async Task Get_Items(string bucketName, string configKeyPrefix, string keyPrefix, bool recursive, HttpStatusCode code, List<S3Object> expectedS3Objects, string expectedKeyPrefix) {
             var provider = GetProvider();
-            var config = GetConfig(bucketName);
+            var config = GetConfig(bucketName, configKeyPrefix);
 
-            SetupGetObjectsRequest(bucketName, keyPrefix, code, s3Objects);
+            SetupGetObjectsRequest(bucketName, expectedKeyPrefix, recursive, config.Delimiter, code, expectedS3Objects);
 
             var expectedFileInfos = expectedS3Objects.Select(o => new AmazonS3CabinetItemInfo(o.Key, true, ItemType.File) {
                 LastModifiedUtc = o.LastModified
@@ -162,17 +164,19 @@ namespace Cabinet.Tests.S3 {
             await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.OpenReadStreamAsync(ValidFileKey, config));
         }
 
-        [Fact]
-        public async Task Open_Read_Stream() {
+        [Theory]
+        [InlineData("", ValidFileKey, ValidFileKey)]
+        [InlineData("folder", ValidFileKey, "folder/" + ValidFileKey)]
+        public async Task Open_Read_Stream(string keyPrefix, string key, string expectedKey) {
             var provider = GetProvider();
-            var config = GetConfig(ValidBucketName);
+            var config = GetConfig(ValidBucketName, keyPrefix);
             var mockStream = new Mock<Stream>();
 
             this.mockS3TransferUtility
-                    .Setup(t => t.OpenStreamAsync(config.BucketName, ValidFileKey, default(CancellationToken)))
+                    .Setup(t => t.OpenStreamAsync(config.BucketName, expectedKey, default(CancellationToken)))
                     .ReturnsAsync(mockStream.Object);
 
-            var stream = await provider.OpenReadStreamAsync(ValidFileKey, config);
+            var stream = await provider.OpenReadStreamAsync(key, config);
 
             Assert.Equal(mockStream.Object, stream);
         }
@@ -214,41 +218,56 @@ namespace Cabinet.Tests.S3 {
             );
         }
 
-        [Fact]
-        public async Task Save_File_Path() {
+        [Theory]
+        [InlineData("", ValidFileKey, ValidFileKey)]
+        [InlineData("folder", ValidFileKey, "folder/" + ValidFileKey)]
+        public async Task Save_File_Path(string keyPrefix, string key, string expectedKey) {
             var provider = GetProvider();
-            var config = GetConfig(ValidBucketName);
+            var config = GetConfig(ValidBucketName, keyPrefix);
 
             string filePath = @"C:\test\test.txt";
             var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             this.mockS3TransferUtility
-                    .Setup(t => t.UploadAsync(It.IsAny<TransferUtilityUploadRequest>(), default(CancellationToken)))
+                    .Setup(t =>
+                        t.UploadAsync(
+                            It.Is<TransferUtilityUploadRequest>(r => r.Key == expectedKey),
+                            default(CancellationToken)
+                        )
+                    )
                     .Returns(Task.FromResult(0));
 
-            var result = await provider.SaveFileAsync(ValidFileKey, filePath, HandleExistingMethod.Overwrite, mockProgress.Object, config);
+            var result = await provider.SaveFileAsync(key, filePath, HandleExistingMethod.Overwrite, mockProgress.Object, config);
 
             Assert.True(result.Success);
-            Assert.Equal(ValidFileKey, result.Key);
+            Assert.Equal(key, result.Key);
         }
 
-        [Fact]
-        public async Task Save_File_Path_Exists_Overwrite() {
+        [Theory]
+        [InlineData("", ValidFileKey, ValidFileKey)]
+        [InlineData("folder", ValidFileKey, "folder/" + ValidFileKey)]
+        public async Task Save_File_Path_Exists_Overwrite(string keyPrefix, string key, string expectedKey) {
             var provider = GetProvider();
-            var config = GetConfig(ValidBucketName);
+            var config = GetConfig(ValidBucketName, keyPrefix);
 
             string filePath = @"C:\test\test.txt";
             var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
-            SetupGetObjectRequest(ValidBucketName, ValidFileKey, HttpStatusCode.OK);
+            SetupGetObjectRequest(ValidBucketName, expectedKey, HttpStatusCode.OK);
+
             this.mockS3TransferUtility
-                    .Setup(t => t.UploadAsync(It.IsAny<TransferUtilityUploadRequest>(), default(CancellationToken)))
+                    .Setup(t => 
+                        t.UploadAsync(
+                            It.Is<TransferUtilityUploadRequest>(r => r.Key == expectedKey),
+                            default(CancellationToken)
+                        )
+                    )
                     .Returns(Task.FromResult(0));
 
-            var result = await provider.SaveFileAsync(ValidFileKey, filePath, HandleExistingMethod.Overwrite, mockProgress.Object, config);
+            var result = await provider.SaveFileAsync(key, filePath, HandleExistingMethod.Overwrite, mockProgress.Object, config);
 
             Assert.True(result.Success);
-            Assert.Equal(ValidFileKey, result.Key);
+            Assert.Equal(key, result.Key);
         }
 
         [Fact]
@@ -314,41 +333,51 @@ namespace Cabinet.Tests.S3 {
             );
         }
 
-        [Fact]
-        public async Task Save_File_Stream() {
+        [Theory]
+        [InlineData("", ValidFileKey, ValidFileKey)]
+        [InlineData("folder", ValidFileKey, "folder/" + ValidFileKey)]
+        public async Task Save_File_Stream(string keyPrefix, string key, string expectedKey) {
             var provider = GetProvider();
-            var config = GetConfig(ValidBucketName);
+            var config = GetConfig(ValidBucketName, keyPrefix);
 
             var mockStream = new Mock<Stream>();
             var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
             this.mockS3TransferUtility
-                    .Setup(t => t.UploadAsync(It.IsAny<TransferUtilityUploadRequest>(), default(CancellationToken)))
+                    .Setup(t => 
+                        t.UploadAsync(
+                            It.Is<TransferUtilityUploadRequest>(r => r.Key == expectedKey),
+                            default(CancellationToken)
+                        )
+                    )
                     .Returns(Task.FromResult(0));
 
-            var result = await provider.SaveFileAsync(ValidFileKey, mockStream.Object, HandleExistingMethod.Overwrite, mockProgress.Object, config);
+            var result = await provider.SaveFileAsync(key, mockStream.Object, HandleExistingMethod.Overwrite, mockProgress.Object, config);
 
             Assert.True(result.Success);
-            Assert.Equal(ValidFileKey, result.Key);
+            Assert.Equal(key, result.Key);
         }
 
-        [Fact]
-        public async Task Save_File_Stream_Exists_Overwrite() {
+        [Theory]
+        [InlineData("", ValidFileKey, ValidFileKey)]
+        [InlineData("folder", ValidFileKey, "folder/" + ValidFileKey)]
+        public async Task Save_File_Stream_Exists_Overwrite(string keyPrefix, string key, string expectedKey) {
             var provider = GetProvider();
-            var config = GetConfig(ValidBucketName);
+            var config = GetConfig(ValidBucketName, keyPrefix);
 
             var mockStream = new Mock<Stream>();
             var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
-            SetupGetObjectRequest(ValidBucketName, ValidFileKey, HttpStatusCode.OK);
+            SetupGetObjectRequest(ValidBucketName, expectedKey, HttpStatusCode.OK);
+
             this.mockS3TransferUtility
                     .Setup(t => t.UploadAsync(It.IsAny<TransferUtilityUploadRequest>(), default(CancellationToken)))
                     .Returns(Task.FromResult(0));
 
-            var result = await provider.SaveFileAsync(ValidFileKey, mockStream.Object, HandleExistingMethod.Overwrite, mockProgress.Object, config);
+            var result = await provider.SaveFileAsync(key, mockStream.Object, HandleExistingMethod.Overwrite, mockProgress.Object, config);
 
             Assert.True(result.Success);
-            Assert.Equal(ValidFileKey, result.Key);
+            Assert.Equal(key, result.Key);
         }
 
         [Fact]
@@ -431,20 +460,29 @@ namespace Cabinet.Tests.S3 {
         }
 
         [Theory]
-        [InlineData("source.txt", "dest.txt", HttpStatusCode.OK)]
-        [InlineData("source.txt", "dest.txt", HttpStatusCode.NotFound)]
-        public async Task Move_File(string sourceKey, string destKey, HttpStatusCode copyResult) {
+        [InlineData(null, "source.txt", "dest.txt", "source.txt", "dest.txt", HttpStatusCode.OK)]
+        [InlineData("folder", "source.txt", "dest.txt", "folder/source.txt", "folder/dest.txt", HttpStatusCode.OK)]
+        [InlineData("", "source.txt", "dest.txt", "source.txt", "dest.txt", HttpStatusCode.NotFound)]
+        public async Task Move_File(string keyPrefix, string sourceKey, string destKey, string expectedSourceKey, string expectedDestKey, HttpStatusCode copyResult) {
             var provider = GetProvider();
-            var config = GetConfig(ValidBucketName);
+            var config = GetConfig(ValidBucketName, keyPrefix);
 
             var mockProgress = new Mock<IProgress<IWriteProgress>>();
 
-            this.mockS3Client.Setup(s3 => s3.CopyObjectAsync(It.IsAny<CopyObjectRequest>(), default(CancellationToken)))
+            this.mockS3Client.Setup(s3 => 
+                s3.CopyObjectAsync(
+                    It.Is<CopyObjectRequest>((r) => r.SourceKey == expectedSourceKey && r.DestinationKey == expectedDestKey),
+                    default(CancellationToken)
+                ))
                 .ReturnsAsync(new CopyObjectResponse {
                     HttpStatusCode = copyResult
                 });
 
-            this.mockS3Client.Setup(s3 => s3.DeleteObjectAsync(It.IsAny<DeleteObjectRequest>(), default(CancellationToken)))
+            this.mockS3Client.Setup(s3 => 
+                s3.DeleteObjectAsync(
+                    It.Is<DeleteObjectRequest>(r => r.Key == sourceKey),
+                    default(CancellationToken)
+                ))
                 .ReturnsAsync(new DeleteObjectResponse {
                     HttpStatusCode = HttpStatusCode.OK
                 });
@@ -462,7 +500,7 @@ namespace Cabinet.Tests.S3 {
         [InlineData(null), InlineData(""), InlineData(" ")]
         public async Task Delete_File_Empty_Key_Throws(string key) {
             var provider = GetProvider();
-            var config = GetConfig(ValidBucketName);
+            var config = GetConfig(ValidBucketName, null);
             await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.DeleteFileAsync(key, config));
         }
 
@@ -474,15 +512,20 @@ namespace Cabinet.Tests.S3 {
         }
 
         [Theory]
-        [InlineData("file.txt", HttpStatusCode.OK)]
-        [InlineData("file.txt", HttpStatusCode.NotFound)]
-        public async Task Delete_File(string key, HttpStatusCode httpResult) {
+        [InlineData(null, "file.txt", "file.txt", HttpStatusCode.OK)]
+        [InlineData("folder", "file.txt", "folder/file.txt", HttpStatusCode.OK)]
+        [InlineData("", "file.txt", "file.txt", HttpStatusCode.NotFound)]
+        public async Task Delete_File(string keyPrefix, string key, string expectedKey, HttpStatusCode httpResult) {
             var provider = GetProvider();
-            var config = GetConfig(ValidBucketName);
+            var config = GetConfig(ValidBucketName, keyPrefix);
 
             var mockProgress = new Mock<IProgress<IWriteProgress>>();
             
-            this.mockS3Client.Setup(s3 => s3.DeleteObjectAsync(It.IsAny<DeleteObjectRequest>(), default(CancellationToken)))
+            this.mockS3Client.Setup(s3 => 
+                s3.DeleteObjectAsync(
+                    It.Is<DeleteObjectRequest>((r) => r.Key == expectedKey),
+                    default(CancellationToken)
+                ))
                 .ReturnsAsync(new DeleteObjectResponse {
                     HttpStatusCode = httpResult
                 });
@@ -501,9 +544,16 @@ namespace Cabinet.Tests.S3 {
             });
         }
 
-        private void SetupGetObjectsRequest(string bucketName, string keyPrefix, HttpStatusCode code, List<S3Object> s3Objects) {
+        private void SetupGetObjectsRequest(string bucketName, string expectedKeyPrefix, bool recursive, string delimiter, HttpStatusCode code, List<S3Object> s3Objects) {
             this.mockS3Client.Setup(
-                s3 => s3.ListObjectsAsync(It.Is<ListObjectsRequest>((r) => r.BucketName == bucketName && r.Prefix == keyPrefix), It.IsAny<CancellationToken>())
+                s3 => s3.ListObjectsAsync(
+                    It.Is<ListObjectsRequest>((r) => 
+                        r.BucketName == bucketName && 
+                        r.Prefix == expectedKeyPrefix &&
+                        (recursive ? String.IsNullOrWhiteSpace(r.Delimiter) : r.Delimiter == delimiter)
+                    ), 
+                    It.IsAny<CancellationToken>()
+                )
             )
             .ReturnsAsync(new ListObjectsResponse() {
                 HttpStatusCode = code,
@@ -516,8 +566,10 @@ namespace Cabinet.Tests.S3 {
             return provider;
         }
 
-        private AmazonS3CabinetConfig GetConfig(string bucketName) {
-            var config = new AmazonS3CabinetConfig(bucketName, RegionEndpoint.APSoutheast2, null);
+        private AmazonS3CabinetConfig GetConfig(string bucketName, string keyPrefix = null) {
+            var config = new AmazonS3CabinetConfig(bucketName, RegionEndpoint.APSoutheast2, null) {
+                KeyPrefix = keyPrefix
+            };
             return config;
         }
 
@@ -534,15 +586,21 @@ namespace Cabinet.Tests.S3 {
             // The response under the prefix will be all the keys with that prefix
 
             string barPrefix = "bar";
+            string bazPrefix = "baz";
+            string barBazPrefix = "bar/baz";
 
             var barObjects = s3Objects.Where(o => o.Key.StartsWith(barPrefix)).ToList();
-            //var barDirectChildObjects = barObjects.Where(o => o.Key);
+            var bazObjects = s3Objects.Where(o => o.Key.StartsWith(barBazPrefix)).ToList();
+            var barDirectChildObjects = barObjects.Where(o => o.Key.StartsWith(barPrefix) && !o.Key.StartsWith(barBazPrefix + "/")).ToList();
 
             return new object[] {
-                new object[] { "test-bucket", "", true, HttpStatusCode.OK, s3Objects, s3Objects },
-                //new object[] { "test-bucket", barPrefix, true, HttpStatusCode.OK, barObjects,barObjects },
-                //new object[] { "test-bucket", "", false, HttpStatusCode.OK, s3Objects, s3Objects.Select(o => o.Key == "file.txt").ToList() },
-                //new object[] { "test-bucket", barPrefix, true, HttpStatusCode.OK, barObjects, barObjects },
+                new object[] { "test-bucket", "",        "",        true, HttpStatusCode.OK, s3Objects,  "" },
+                new object[] { "test-bucket", "",        barPrefix, true, HttpStatusCode.OK, barObjects, barPrefix },
+                new object[] { "test-bucket", barPrefix, "",        true, HttpStatusCode.OK, barObjects, barPrefix },
+                new object[] { "test-bucket", barPrefix, bazPrefix, true, HttpStatusCode.OK, bazObjects, barBazPrefix },
+
+                new object[] { "test-bucket", "", "",        false, HttpStatusCode.OK, s3Objects.Where(o => o.Key == "file.txt").ToList(), "" },
+                new object[] { "test-bucket", "", barPrefix, false, HttpStatusCode.OK, barDirectChildObjects,                               barPrefix },
             };
         }
     }
