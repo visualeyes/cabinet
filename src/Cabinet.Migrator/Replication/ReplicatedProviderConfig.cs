@@ -7,10 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cabinet.Migrator.Replication {
-    public class ReaplicatedProviderConfig : IStorageProviderConfig {
-        public const string ProviderType = "Reaplicated";
+    public class ReplicatedProviderConfig : IStorageProviderConfig {
+        public const string ProviderType = "Replicated";
 
-        public ReaplicatedProviderConfig(IStorageProviderConfig master, IStorageProviderConfig replica) {
+        public ReplicatedProviderConfig(IStorageProviderConfig master, IStorageProviderConfig replica) {
             Contract.NotNull(master, nameof(master));
             Contract.NotNull(replica, nameof(replica));
 

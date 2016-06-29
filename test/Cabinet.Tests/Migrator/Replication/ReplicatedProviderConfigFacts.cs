@@ -15,7 +15,7 @@ namespace Cabinet.Tests.Migrator.Replication {
             var master = new Mock<IStorageProviderConfig>();
             IStorageProviderConfig replica = null;
 
-            Assert.Throws<ArgumentNullException>(() => new ReaplicatedProviderConfig(master.Object, replica));
+            Assert.Throws<ArgumentNullException>(() => new ReplicatedProviderConfig(master.Object, replica));
         }
 
         [Fact]
@@ -23,7 +23,7 @@ namespace Cabinet.Tests.Migrator.Replication {
             IStorageProviderConfig master = null;
             var replica = new Mock<IStorageProviderConfig>();
 
-            Assert.Throws<ArgumentNullException>(() => new ReaplicatedProviderConfig(master, replica.Object));
+            Assert.Throws<ArgumentNullException>(() => new ReplicatedProviderConfig(master, replica.Object));
         }
 
         [Fact]
@@ -31,7 +31,7 @@ namespace Cabinet.Tests.Migrator.Replication {
             var master = new Mock<IStorageProviderConfig>();
             var replica = new Mock<IStorageProviderConfig>();
 
-            var config = new ReaplicatedProviderConfig(master.Object, replica.Object);
+            var config = new ReplicatedProviderConfig(master.Object, replica.Object);
             
             Assert.Equal(master.Object, config.Master);
             Assert.Equal(replica.Object, config.Replica);

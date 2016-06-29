@@ -25,7 +25,7 @@ namespace Cabinet.Tests.Migrator.Replication {
         private readonly Mock<IStorageProviderConfig> mockReplicaConfig;
         private readonly Mock<IFileCabinet> mockMasterCabinet;
         private readonly Mock<IFileCabinet> mockReplicaCabinet;
-        private readonly ReaplicatedProviderConfig config;
+        private readonly ReplicatedProviderConfig config;
         private readonly ReplicatedStorageProvider provider;
 
         public ReplicatedStorageProviderFacts() {
@@ -36,7 +36,7 @@ namespace Cabinet.Tests.Migrator.Replication {
             this.mockMasterCabinet = new Mock<IFileCabinet>();
             this.mockReplicaCabinet = new Mock<IFileCabinet>();
 
-            this.config = new ReaplicatedProviderConfig(mockMasterConfig.Object, mockReplicaConfig.Object);
+            this.config = new ReplicatedProviderConfig(mockMasterConfig.Object, mockReplicaConfig.Object);
 
             this.mockCabinetFactory.Setup(f => f.GetCabinet(mockMasterConfig.Object)).Returns(mockMasterCabinet.Object);
             this.mockCabinetFactory.Setup(f => f.GetCabinet(mockReplicaConfig.Object)).Returns(mockReplicaCabinet.Object);
@@ -46,7 +46,7 @@ namespace Cabinet.Tests.Migrator.Replication {
 
         [Fact]
         public void Provider_Type() {
-            Assert.Equal(ReaplicatedProviderConfig.ProviderType, provider.ProviderType);
+            Assert.Equal(ReplicatedProviderConfig.ProviderType, provider.ProviderType);
         }
         
         [Theory]
@@ -57,7 +57,7 @@ namespace Cabinet.Tests.Migrator.Replication {
 
         [Fact]
         public async Task Exists_Null_Config() {
-            ReaplicatedProviderConfig nullConfig = null;
+            ReplicatedProviderConfig nullConfig = null;
             await Assert.ThrowsAsync<ArgumentNullException>(() => provider.ExistsAsync(ValidKey, nullConfig));
         }
 
@@ -79,7 +79,7 @@ namespace Cabinet.Tests.Migrator.Replication {
 
         [Fact]
         public async Task List_Keys_Null_Config() {
-            ReaplicatedProviderConfig nullConfig = null;
+            ReplicatedProviderConfig nullConfig = null;
             await Assert.ThrowsAsync<ArgumentNullException>(() => provider.ListKeysAsync(nullConfig));
         }
 
@@ -106,7 +106,7 @@ namespace Cabinet.Tests.Migrator.Replication {
 
         [Fact]
         public async Task Get_File_Async_NullConfig_Throws() {
-            ReaplicatedProviderConfig config = null;
+            ReplicatedProviderConfig config = null;
             await Assert.ThrowsAsync<ArgumentNullException>(() => provider.GetFileAsync("key", config));
         }
 
@@ -163,7 +163,7 @@ namespace Cabinet.Tests.Migrator.Replication {
 
         [Fact]
         public async Task Save_File_Path_NullConfig_Throws() {
-            ReaplicatedProviderConfig config = null;
+            ReplicatedProviderConfig config = null;
 
             await Assert.ThrowsAsync<ArgumentNullException>(() => 
                 provider.SaveFileAsync("key", "C:\test\file.txt", HandleExistingMethod.Overwrite, null, config)
@@ -207,7 +207,7 @@ namespace Cabinet.Tests.Migrator.Replication {
         [Fact]
         public async Task Save_File_Stream_NullConfig_Throws() {
             var mockStream = new Mock<Stream>();
-            ReaplicatedProviderConfig config = null;
+            ReplicatedProviderConfig config = null;
 
             await Assert.ThrowsAsync<ArgumentNullException>(() =>
                 provider.SaveFileAsync("key", mockStream.Object, HandleExistingMethod.Overwrite, null, config)
@@ -244,7 +244,7 @@ namespace Cabinet.Tests.Migrator.Replication {
         
         [Fact]
         public async Task Delete_File_NullConfig_Throws() {
-            ReaplicatedProviderConfig config = null;
+            ReplicatedProviderConfig config = null;
             await Assert.ThrowsAsync<ArgumentNullException>(() => provider.DeleteFileAsync("key", config));
         }
 
