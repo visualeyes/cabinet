@@ -14,16 +14,16 @@ namespace Cabinet.Migrator.Replication {
     /// Replicated provider to provide for faster replication of files
     ///  -- should be used in conjunction with the <see cref="CabinetFileReplicator" />
     /// </summary>
-    public class ReplicatedStorageProvider : IStorageProvider<ReaplicatedProviderConfig> {
+    public class ReplicatedStorageProvider : IStorageProvider<ReplicatedProviderConfig> {
         private readonly IFileCabinetFactory cabinetFactory;
 
-        public string ProviderType  => ReaplicatedProviderConfig.ProviderType;
+        public string ProviderType  => ReplicatedProviderConfig.ProviderType;
 
         public ReplicatedStorageProvider(IFileCabinetFactory cabinetFactory) {
             this.cabinetFactory = cabinetFactory;
         }
 
-        public async Task<bool> ExistsAsync(string key, ReaplicatedProviderConfig config) {
+        public async Task<bool> ExistsAsync(string key, ReplicatedProviderConfig config) {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(config, nameof(config));
 
@@ -33,7 +33,7 @@ namespace Cabinet.Migrator.Replication {
             return exists;
         }
 
-        public async Task<IEnumerable<string>> ListKeysAsync(ReaplicatedProviderConfig config, string keyPrefix = "", bool recursive = true) {
+        public async Task<IEnumerable<string>> ListKeysAsync(ReplicatedProviderConfig config, string keyPrefix = "", bool recursive = true) {
             Contract.NotNull(config, nameof(config));
 
             var master = GetMasterConfig(config);
@@ -42,7 +42,7 @@ namespace Cabinet.Migrator.Replication {
             return keys;
         }
 
-        public async Task<ICabinetItemInfo> GetFileAsync(string key, ReaplicatedProviderConfig config) {
+        public async Task<ICabinetItemInfo> GetFileAsync(string key, ReplicatedProviderConfig config) {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(config, nameof(config));
 
@@ -52,7 +52,7 @@ namespace Cabinet.Migrator.Replication {
             return item;
         }
 
-        public async Task<IEnumerable<ICabinetItemInfo>> GetItemsAsync(ReaplicatedProviderConfig config, string keyPrefix = "", bool recursive = true) {
+        public async Task<IEnumerable<ICabinetItemInfo>> GetItemsAsync(ReplicatedProviderConfig config, string keyPrefix = "", bool recursive = true) {
             Contract.NotNull(config, nameof(config));
 
             var master = GetMasterConfig(config);
@@ -61,7 +61,7 @@ namespace Cabinet.Migrator.Replication {
             return files;
         }
 
-        public async Task<Stream> OpenReadStreamAsync(string key, ReaplicatedProviderConfig config) {
+        public async Task<Stream> OpenReadStreamAsync(string key, ReplicatedProviderConfig config) {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(config, nameof(config));
 
@@ -71,7 +71,7 @@ namespace Cabinet.Migrator.Replication {
             return stream;
         }
 
-        public async Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, ReaplicatedProviderConfig config) {
+        public async Task<ISaveResult> SaveFileAsync(string key, string filePath, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, ReplicatedProviderConfig config) {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNullOrEmpty(filePath, nameof(filePath));
             Contract.NotNull(config, nameof(config));
@@ -81,7 +81,7 @@ namespace Cabinet.Migrator.Replication {
             }, config);
         }
 
-        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, ReaplicatedProviderConfig config) {
+        public async Task<ISaveResult> SaveFileAsync(string key, Stream content, HandleExistingMethod handleExisting, IProgress<IWriteProgress> progress, ReplicatedProviderConfig config) {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(content, nameof(content));
             Contract.NotNull(config, nameof(config));
@@ -91,7 +91,7 @@ namespace Cabinet.Migrator.Replication {
             }, config);
         }
 
-        public async Task<IMoveResult> MoveFileAsync(string sourceKey, string destKey, HandleExistingMethod handleExisting, ReaplicatedProviderConfig config) {
+        public async Task<IMoveResult> MoveFileAsync(string sourceKey, string destKey, HandleExistingMethod handleExisting, ReplicatedProviderConfig config) {
             Contract.NotNullOrEmpty(sourceKey, nameof(sourceKey));
             Contract.NotNullOrEmpty(destKey, nameof(destKey));
             Contract.NotNull(config, nameof(config));
@@ -112,7 +112,7 @@ namespace Cabinet.Migrator.Replication {
             return masterResult;
         }
 
-        public async Task<IDeleteResult> DeleteFileAsync(string key, ReaplicatedProviderConfig config) {
+        public async Task<IDeleteResult> DeleteFileAsync(string key, ReplicatedProviderConfig config) {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(config, nameof(config));
 
@@ -132,11 +132,11 @@ namespace Cabinet.Migrator.Replication {
             return masterResult;
         }
 
-        private IFileCabinet GetMasterConfig(ReaplicatedProviderConfig config) {
+        private IFileCabinet GetMasterConfig(ReplicatedProviderConfig config) {
             return GetCabinet(config.Master, "master");
         }
 
-        private IFileCabinet GetReplicaConfig(ReaplicatedProviderConfig config) {
+        private IFileCabinet GetReplicaConfig(ReplicatedProviderConfig config) {
             return GetCabinet(config.Replica, "replica");
         }
 
@@ -150,7 +150,7 @@ namespace Cabinet.Migrator.Replication {
             return cabinet;
         }
 
-        private async Task<ISaveResult> SaveReplica(Func<IFileCabinet, Task<ISaveResult>> saveTask, ReaplicatedProviderConfig config) {
+        private async Task<ISaveResult> SaveReplica(Func<IFileCabinet, Task<ISaveResult>> saveTask, ReplicatedProviderConfig config) {
             var master = GetMasterConfig(config);
 
             var masterResult = await saveTask(master);
