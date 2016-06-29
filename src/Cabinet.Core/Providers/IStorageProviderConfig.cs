@@ -6,5 +6,6 @@ using System.Threading.Tasks;
 
 namespace Cabinet.Core.Providers {
     public interface IStorageProviderConfig {
+        string Delimiter { get; }
     }
 }

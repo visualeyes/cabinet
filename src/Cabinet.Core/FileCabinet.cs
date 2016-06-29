@@ -20,6 +20,10 @@ namespace Cabinet.Core {
             this.config = config;
         }
 
+        public string GetKeyDelimiter() {
+            return this.config.Delimiter;
+        }
+
         public async Task<bool> ExistsAsync(string key) {
             return await provider.ExistsAsync(key, config);
         }

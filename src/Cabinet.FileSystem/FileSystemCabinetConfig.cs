@@ -1,6 +1,7 @@
 ﻿using Cabinet.Core.Providers;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,7 +16,9 @@ namespace Cabinet.FileSystem {
             this.CreateIfNotExists = createIfNotExists;
         }
 
-        public string Directory { get; private set; }
+        public string Delimiter => Path.DirectorySeparatorChar.ToString();
+        public string Directory { get; }
+
         public bool CreateIfNotExists { get; set; }
     }
 }

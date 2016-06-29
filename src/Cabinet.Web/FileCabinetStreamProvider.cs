@@ -57,7 +57,8 @@ namespace Cabinet.Web {
                     return new UploadSaveResult(uploadFileName, uploadMediaType, "The file is too small");
                 }
 
-                string key = this.keyProvider.GetKey(uploadFileName, uploadMediaType);
+                string delimiter = this.fileCabinet.GetKeyDelimiter();
+                string key = this.keyProvider.GetKey(uploadFileName, uploadMediaType, delimiter);
 
                 if(String.IsNullOrWhiteSpace(key)) {
                     return new UploadSaveResult(uploadFileName, uploadMediaType, "No key was provided");
