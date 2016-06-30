@@ -11,6 +11,6 @@ namespace Cabinet.Web {
     /// -- It is recommended to use an algorithm to determine the filenames. For instance, a filename can be a MD5 hash of the name of file plus the date of the day.
     /// </summary>
     public interface IKeyProvider {
-        string GetKey(string fileName, string contentType);
+        string GetKey(string fileName, string contentType, string delimiter);
     }
 }

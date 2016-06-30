@@ -7,5 +7,10 @@ using System.Threading.Tasks;
 
 namespace Cabinet.Tests.Core {
     public class TestProviderConfiguration : IStorageProviderConfig {
+        public TestProviderConfiguration() {
+            this.Delimiter = "/";
+        }
+
+        public string Delimiter { get; set; }
     }
 }

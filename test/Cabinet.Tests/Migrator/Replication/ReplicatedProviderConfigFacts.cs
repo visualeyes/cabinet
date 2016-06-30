@@ -27,7 +27,7 @@ namespace Cabinet.Tests.Migrator.Replication {
         }
 
         [Fact]
-        public void Config_Set() {
+        public void Cabinet_Config_Set() {
             var master = new Mock<IStorageProviderConfig>();
             var replica = new Mock<IStorageProviderConfig>();
 
@@ -35,6 +35,29 @@ namespace Cabinet.Tests.Migrator.Replication {
             
             Assert.Equal(master.Object, config.Master);
             Assert.Equal(replica.Object, config.Replica);
+        }
+
+        [Fact]
+        public void Delimiter_DefaultConfig_Set() {
+            var master = new Mock<IStorageProviderConfig>();
+            master.SetupGet(m => m.Delimiter).Returns("/");
+
+            var replica = new Mock<IStorageProviderConfig>();
+
+            var config = new ReplicatedProviderConfig(master.Object, replica.Object);
+
+            Assert.Equal(master.Object.Delimiter, config.Delimiter);
+        }
+
+        [Fact]
+        public void Delimiter_Config_Set() {
+            string delimiter = "/";
+            var master = new Mock<IStorageProviderConfig>();
+            var replica = new Mock<IStorageProviderConfig>();
+
+            var config = new ReplicatedProviderConfig(master.Object, replica.Object, delimiter);
+            
+            Assert.Equal(delimiter, config.Delimiter);
         }
     }
 }

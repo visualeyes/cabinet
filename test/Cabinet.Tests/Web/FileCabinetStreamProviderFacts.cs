@@ -1,10 +1,13 @@
 ﻿using Cabinet.Core;
+using Cabinet.Core.Progress;
 using Cabinet.Web;
 using Cabinet.Web.Validation;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -37,11 +40,34 @@ namespace Cabinet.Tests.Web {
             Assert.Throws<ArgumentNullException>(() => new FileCabinetStreamProvider(fileCabinet.Object, fileValidator.Object, null, tempFileFolder));
         }
 
-        [InlineData]
-        [InlineData(null), InlineData(""), InlineData("  ")]
-        public void NullEmpty_FileFolder_Throws(string badTemp) {
+        [Theory]
+        [InlineData(null)]
+        public void Null_FileFolder_Throws(string badTemp) {
             Assert.Throws<ArgumentNullException>(() => new FileCabinetStreamProvider(fileCabinet.Object, fileValidator.Object, keyProvider.Object, badTemp));
         }
+
+        [Theory]
+        [InlineData(""), InlineData("  ")]
+        public void Empty_FileFolder_Throws(string badTemp) {
+            Assert.Throws<ArgumentException>(() => new FileCabinetStreamProvider(fileCabinet.Object, fileValidator.Object, keyProvider.Object, badTemp));
+        }
+
+        //[Fact]
+        //public void Get_Stream() {
+        //    var streamProvider = new FileCabinetStreamProvider(fileCabinet.Object, fileValidator.Object, keyProvider.Object, tempFileFolder);
+
+        //    var httpContent = new StringContent("content");
+        //    httpContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") {
+        //        FileName = "foo.txt",
+        //        Size = 100
+        //    };
+
+        //    var stream = streamProvider.GetStream(httpContent, httpContent.Headers);
+
+        //    var progressStream = stream as ProgressStream;
+
+        //    Assert.NotNull(progressStream);
+        //}
         
         private FileCabinetStreamProvider GetStreamProvider() {
             return new FileCabinetStreamProvider(fileCabinet.Object, fileValidator.Object, keyProvider.Object, tempFileFolder);
