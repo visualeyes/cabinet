@@ -101,13 +101,13 @@ namespace Cabinet.Tests.Migrator.Replication {
         [Theory]
         [InlineData(null), InlineData(""), InlineData(" ")]
         public async Task Get_File_Async_NullKey_Throws(string key) {
-            await Assert.ThrowsAsync<ArgumentNullException>(() => provider.GetFileAsync(key, config));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => provider.GetItemAsync(key, config));
         }
 
         [Fact]
         public async Task Get_File_Async_NullConfig_Throws() {
             ReplicatedProviderConfig config = null;
-            await Assert.ThrowsAsync<ArgumentNullException>(() => provider.GetFileAsync("key", config));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => provider.GetItemAsync("key", config));
         }
 
         [Theory]
@@ -118,7 +118,7 @@ namespace Cabinet.Tests.Migrator.Replication {
             
             this.mockMasterCabinet.Setup(c => c.GetItemAsync(key)).ReturnsAsync(exectedItem);
 
-            var item = await provider.GetFileAsync(key, config);
+            var item = await provider.GetItemAsync(key, config);
 
             this.mockMasterCabinet.Verify(c => c.GetItemAsync(key), Times.Once);
             this.mockReplicaCabinet.Verify(c => c.GetItemAsync(key), Times.Never);

@@ -29,10 +29,10 @@ namespace Cabinet.Core {
         }
 
         public async Task<ICabinetItemInfo> GetItemAsync(string key) {
-            return await provider.GetFileAsync(key, config);
+            return await provider.GetItemAsync(key, config);
         }
 
-        public async Task<IEnumerable<ICabinetItemInfo>> GetItemAsync(string keyPrefix = "", bool recursive = true) {
+        public async Task<IEnumerable<ICabinetItemInfo>> GetItemsAsync(string keyPrefix = "", bool recursive = true) {
             return await provider.GetItemsAsync(keyPrefix: keyPrefix, recursive: recursive, config: config);
         }
 

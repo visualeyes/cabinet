@@ -13,8 +13,6 @@ namespace Cabinet.ConsoleTest {
         private string configName;
         private string key;
 
-        private HandleExistingMethod handleExisting = HandleExistingMethod.Throw;
-
         public GetCommand() {
             IsCommand("get", "Gets a file from the cabinet");
 

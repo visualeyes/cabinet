@@ -43,7 +43,7 @@ namespace Cabinet.FileSystem {
             return Task.FromResult(keys);
         }
 
-        public Task<ICabinetItemInfo> GetFileAsync(string key, FileSystemCabinetConfig config) {
+        public Task<ICabinetItemInfo> GetItemAsync(string key, FileSystemCabinetConfig config) {
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
             if (config == null) throw new ArgumentNullException(nameof(config));
 

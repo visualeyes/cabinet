@@ -63,11 +63,11 @@ namespace Cabinet.Tests.Core {
         [InlineData("key")]
         public async Task Get_File(string key) {
             var mockFile = new Mock<ICabinetItemInfo>();
-            this.mockStorageProvider.Setup(s => s.GetFileAsync(key, config)).ReturnsAsync(mockFile.Object);
+            this.mockStorageProvider.Setup(s => s.GetItemAsync(key, config)).ReturnsAsync(mockFile.Object);
 
             var actualFile = await this.fileCabinet.GetItemAsync(key);
 
-            this.mockStorageProvider.Verify(s => s.GetFileAsync(key, config), Times.Once);
+            this.mockStorageProvider.Verify(s => s.GetItemAsync(key, config), Times.Once);
 
             Assert.Equal(mockFile.Object, actualFile);
         }
@@ -80,7 +80,7 @@ namespace Cabinet.Tests.Core {
             var expectedFiles = new List<ICabinetItemInfo>() { mockFile.Object };
             this.mockStorageProvider.Setup(s => s.GetItemsAsync(config, keyPrefix, recursive)).ReturnsAsync(expectedFiles);
 
-            var actualFiles = await this.fileCabinet.GetItemAsync(keyPrefix: keyPrefix, recursive: recursive);
+            var actualFiles = await this.fileCabinet.GetItemsAsync(keyPrefix: keyPrefix, recursive: recursive);
 
             this.mockStorageProvider.Verify(s => s.GetItemsAsync(config, keyPrefix, recursive), Times.Once);
 

@@ -1,4 +1,6 @@
 ﻿using Amazon;
+using Amazon.Runtime.Internal;
+using Amazon.Runtime.Internal.Transform;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
@@ -97,14 +99,14 @@ namespace Cabinet.Tests.S3 {
         public async Task Get_File_Empty_Key_Throws(string key) {
             var provider = GetProvider();
             var config = GetConfig(ValidBucketName);
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.GetFileAsync(key, config));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.GetItemAsync(key, config));
         }
 
         [Fact]
         public async Task Get_File_Null_Config_Throws() {
             var provider = GetProvider();
             AmazonS3CabinetConfig config = null;
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.GetFileAsync(ValidFileKey, config));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.GetItemAsync(ValidFileKey, config));
         }
 
         [Theory]
@@ -119,10 +121,35 @@ namespace Cabinet.Tests.S3 {
 
             SetupGetObjectRequest(bucketName, expectedKey, code);
 
-            var file = await provider.GetFileAsync(key, config);
+            var file = await provider.GetItemAsync(key, config);
 
             Assert.Equal(key, file.Key);
             Assert.Equal(expectedExists, file.Exists);
+        }
+
+
+        [Theory]
+        [InlineData("test-bucket", "", "test-key", HttpStatusCode.NotFound, false, "test-key")]
+        [InlineData("test-bucket", "", "test-key", HttpStatusCode.Forbidden, false, "test-key")]
+        [InlineData("test-bucket", "folder", "test-key", HttpStatusCode.Unauthorized, false, "folder/test-key")]
+        public async Task Get_File_Throws_AmazonException(string bucketName, string keyPrefix, string key, HttpStatusCode code, bool expectedExists, string expectedKey) {
+            var provider = GetProvider();
+            var config = GetConfig(bucketName, keyPrefix);
+
+            var data = new Mock<IWebResponseData>();
+            data.SetupGet(d => d.StatusCode).Returns(code);
+            data.SetupGet(d => d.ContentLength).Returns(-1);
+
+            this.mockS3Client.Setup(
+                s3 => s3.GetObjectAsync(It.Is<GetObjectRequest>((r) => r.BucketName == bucketName && r.Key == expectedKey), It.IsAny<CancellationToken>())
+            )
+            .ThrowsAsync(new AmazonS3Exception(new HttpErrorResponseException(data.Object)));
+
+            var file = await provider.GetItemAsync(key, config);
+
+            Assert.Equal(key, file.Key);
+            Assert.Equal(expectedExists, file.Exists);
+            Assert.Equal(-1, file.Size);
         }
 
         [Fact]

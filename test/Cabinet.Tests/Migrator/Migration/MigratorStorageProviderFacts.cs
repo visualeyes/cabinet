@@ -106,13 +106,13 @@ namespace Cabinet.Tests.Migrator.Migration {
         [Theory]
         [InlineData(null), InlineData(""), InlineData(" ")]
         public async Task Get_File_Async_NullKey_Throws(string key) {
-            await Assert.ThrowsAsync<ArgumentNullException>(() => provider.GetFileAsync(key, config));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => provider.GetItemAsync(key, config));
         }
 
         [Fact]
         public async Task Get_File_Async_NullConfig_Throws() {
             MigrationProviderConfig config = null;
-            await Assert.ThrowsAsync<ArgumentNullException>(() => provider.GetFileAsync("key", config));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => provider.GetItemAsync("key", config));
         }
 
         [Theory]
@@ -125,7 +125,7 @@ namespace Cabinet.Tests.Migrator.Migration {
             this.mockToCabinet.Setup(c => c.GetItemAsync(key)).ReturnsAsync(toItem);
             this.mockFromCabinet.Setup(c => c.GetItemAsync(key)).ReturnsAsync(fromItem);
 
-            var item = await provider.GetFileAsync(key, config);
+            var item = await provider.GetItemAsync(key, config);
 
             this.mockToCabinet.Verify(c => c.GetItemAsync(key), Times.Once);
             this.mockFromCabinet.Verify(c => c.GetItemAsync(key), existsInTo ? Times.Never() : Times.Once());
