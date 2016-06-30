@@ -14,7 +14,7 @@ namespace Cabinet.Migrator.Migration {
             Contract.NotNull(from, nameof(from));
             Contract.NotNull(to, nameof(to));
 
-            this.Delimiter = String.IsNullOrWhiteSpace(delimiter) ? delimiter : from.Delimiter;
+            this.Delimiter = !String.IsNullOrWhiteSpace(delimiter) ? delimiter : from.Delimiter;
 
             this.From = from;
             this.To = to;

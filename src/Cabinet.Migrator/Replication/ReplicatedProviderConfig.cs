@@ -14,7 +14,7 @@ namespace Cabinet.Migrator.Replication {
             Contract.NotNull(master, nameof(master));
             Contract.NotNull(replica, nameof(replica));
 
-            this.Delimiter = String.IsNullOrWhiteSpace(delimiter) ? delimiter : master.Delimiter;
+            this.Delimiter = !String.IsNullOrWhiteSpace(delimiter) ? delimiter : master.Delimiter;
             
             this.Master = master;
             this.Replica = replica;
