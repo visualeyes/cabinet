@@ -10,10 +10,11 @@
         "type": "AmazonS3",
         "config": {
             "credentials": {
-                "type": "stored-profile"
+                "type": "stored-profile",
+                "name": "careerhub"
             },
             "region": "ap-southeast-2",
-            "bucket": "testbucket"
+            "bucket": "visualeyes-dev-testing"
         }
     }
 }

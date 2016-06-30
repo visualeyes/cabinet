@@ -25,7 +25,7 @@ namespace Cabinet.Web.SelfHostTest.Controllers {
 
         [Route(""), HttpGet]
         public async Task<IHttpActionResult> Get(string keyPrefix = "", bool recursive = false) {
-            var files = await fileCabinet.GetItemAsync(keyPrefix: keyPrefix, recursive: recursive);
+            var files = await fileCabinet.GetItemsAsync(keyPrefix: keyPrefix, recursive: recursive);
 
             return this.Ok(files);
         }

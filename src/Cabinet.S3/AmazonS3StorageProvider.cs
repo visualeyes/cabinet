@@ -15,6 +15,7 @@ using Cabinet.S3.Results;
 using System.Threading;
 using Amazon.S3.Transfer;
 using Cabinet.Core.Exceptions;
+using Amazon.Runtime.Internal;
 
 namespace Cabinet.S3 {
     internal class AmazonS3StorageProvider : IStorageProvider<AmazonS3CabinetConfig> {
@@ -30,7 +31,7 @@ namespace Cabinet.S3 {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(config, nameof(config));
 
-            using (var s3Client = GetS3Client(config)) {
+            using(var s3Client = GetS3Client(config)) {
                 return await ExistsInternalAsync(key, config, s3Client);
             }
         }
@@ -38,33 +39,33 @@ namespace Cabinet.S3 {
         public async Task<IEnumerable<string>> ListKeysAsync(AmazonS3CabinetConfig config, string keyPrefix = null, bool recursive = true) {
             Contract.NotNull(config, nameof(config));
 
-            using (var s3Client = GetS3Client(config)) {
+            using(var s3Client = GetS3Client(config)) {
                 var s3Objects = await GetS3Objects(keyPrefix, recursive, config, s3Client);
 
                 return s3Objects.Select(o => o.Key);
             }
         }
 
-        public async Task<ICabinetItemInfo> GetFileAsync(string key, AmazonS3CabinetConfig config) {
+        public async Task<ICabinetItemInfo> GetItemAsync(string key, AmazonS3CabinetConfig config) {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(config, nameof(config));
 
-            using (var s3Client = GetS3Client(config)) {
-                using (var response = await GetS3Object(key, config, s3Client, CancellationToken.None)) {
-                    bool exists = response.HttpStatusCode == HttpStatusCode.OK;
-                    
-                    return new AmazonS3CabinetItemInfo(key, exists, ItemType.File) {
-                        Size = response.ContentLength,
-                        LastModifiedUtc = response.LastModified.ToUniversalTime()
-                    };
-                }
+            using(var s3Client = GetS3Client(config)) {
+                var response = await GetS3Object(key, config, s3Client, CancellationToken.None);
+                bool exists = response.StatusCode == HttpStatusCode.OK;
+
+                return new AmazonS3CabinetItemInfo(key, exists, ItemType.File) {
+                    Size = response.Size,
+                    LastModifiedUtc = response.LastModifiedUtc
+                };
+
             }
         }
 
         public async Task<IEnumerable<ICabinetItemInfo>> GetItemsAsync(AmazonS3CabinetConfig config, string keyPrefix = null, bool recursive = true) {
             Contract.NotNull(config, nameof(config));
 
-            using (var s3Client = GetS3Client(config)) {
+            using(var s3Client = GetS3Client(config)) {
                 var s3Objects = await GetS3Objects(keyPrefix, recursive, config, s3Client);
 
                 return s3Objects;
@@ -75,7 +76,7 @@ namespace Cabinet.S3 {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(config, nameof(config));
 
-            using (var s3Client = GetS3Client(config)) {
+            using(var s3Client = GetS3Client(config)) {
                 var transferUtility = GetTransferUtility(s3Client);
                 string itemKey = GetKey(key, config);
 
@@ -96,17 +97,17 @@ namespace Cabinet.S3 {
                 throw new NotImplementedException();
             }
 
-            using (var s3Client = GetS3Client(config)) {
+            using(var s3Client = GetS3Client(config)) {
                 try {
                     // Use the transfer utility as it handle large files in a better way
                     var uploadRequest = new TransferUtilityUploadRequest {
                         InputStream = content,
                     };
-                    
+
                     await UploadInternal(key, config, s3Client, progress, uploadRequest);
 
                     return new SaveResult(key);
-                } catch (Exception e) {
+                } catch(Exception e) {
                     return new SaveResult(key, e);
                 }
             }
@@ -117,21 +118,21 @@ namespace Cabinet.S3 {
             Contract.NotNullOrEmpty(filePath, nameof(filePath));
             Contract.NotNull(config, nameof(config));
 
-            if (handleExisting != HandleExistingMethod.Overwrite) {
+            if(handleExisting != HandleExistingMethod.Overwrite) {
                 throw new NotImplementedException();
             }
 
-            using (var s3Client = GetS3Client(config)) {
+            using(var s3Client = GetS3Client(config)) {
                 try {
                     // Use the transfer utility as it handle large files in a better way
                     var uploadRequest = new TransferUtilityUploadRequest {
                         FilePath = filePath,
                     };
-                    
+
                     await UploadInternal(key, config, s3Client, progress, uploadRequest);
 
                     return new SaveResult(key);
-                } catch (Exception e) {
+                } catch(Exception e) {
                     return new SaveResult(key, e);
                 }
             }
@@ -142,11 +143,11 @@ namespace Cabinet.S3 {
             Contract.NotNullOrEmpty(destKey, nameof(destKey));
             Contract.NotNull(config, nameof(config));
 
-            if (handleExisting != HandleExistingMethod.Overwrite) {
+            if(handleExisting != HandleExistingMethod.Overwrite) {
                 throw new NotImplementedException();
             }
 
-            using (var s3Client = GetS3Client(config)) {
+            using(var s3Client = GetS3Client(config)) {
                 try {
                     var copyRequest = new CopyObjectRequest {
                         SourceBucket = config.BucketName,
@@ -157,16 +158,16 @@ namespace Cabinet.S3 {
 
                     var response = await s3Client.CopyObjectAsync(copyRequest);
 
-                    if (response.HttpStatusCode == HttpStatusCode.OK) {
+                    if(response.HttpStatusCode == HttpStatusCode.OK) {
                         var deleteResult = await DeleteInternal(sourceKey, config, s3Client);
 
-                        if (!deleteResult.Success) {
+                        if(!deleteResult.Success) {
                             return new MoveResult(sourceKey, destKey, deleteResult.Exception, deleteResult.GetErrorMessage());
                         }
                     }
 
                     return new MoveResult(sourceKey, destKey, response.HttpStatusCode);
-                } catch (Exception e) {
+                } catch(Exception e) {
                     return new MoveResult(sourceKey, destKey, e);
                 }
             }
@@ -176,7 +177,7 @@ namespace Cabinet.S3 {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(config, nameof(config));
 
-            using (var s3Client = GetS3Client(config)) {
+            using(var s3Client = GetS3Client(config)) {
                 return await DeleteInternal(key, config, s3Client);
             }
         }
@@ -186,11 +187,10 @@ namespace Cabinet.S3 {
             Contract.NotNull(config, nameof(config));
             Contract.NotNull(s3Client, nameof(s3Client));
 
-            using (var response = await GetS3Object(key, config, s3Client, CancellationToken.None)) {
-                return response.HttpStatusCode == HttpStatusCode.OK;
-            }
+            var response = await GetS3Object(key, config, s3Client, CancellationToken.None);
+            return response.StatusCode == HttpStatusCode.OK;
         }
-        
+
         private async Task UploadInternal(string key, AmazonS3CabinetConfig config, IAmazonS3 s3Client, IProgress<IWriteProgress> progress, TransferUtilityUploadRequest uploadRequest) {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(config, nameof(config));
@@ -204,7 +204,7 @@ namespace Cabinet.S3 {
             uploadRequest.UploadProgressEvent += (sender, e) => {
                 progress?.Report(new WriteProgress(key, e.TransferredBytes, e.TotalBytes));
             };
-            
+
             await utilty.UploadAsync(uploadRequest);
         }
 
@@ -213,7 +213,7 @@ namespace Cabinet.S3 {
             Contract.NotNull(s3Client, nameof(s3Client));
 
             var fileInfos = new List<AmazonS3CabinetItemInfo>();
-            
+
             // If a delimiter is not specified, the response will include all keys i.e. recursive
             // If a delimiter is specified, the response will return files under the prefix and the CommonPrefixes
 
@@ -222,7 +222,7 @@ namespace Cabinet.S3 {
                 Prefix = GetKey(keyPrefix, config)
             };
 
-            if (!recursive) {
+            if(!recursive) {
                 request.Delimiter = config.Delimiter;
             }
 
@@ -235,21 +235,21 @@ namespace Cabinet.S3 {
                     Size = o.Size,
                     LastModifiedUtc = o.LastModified.ToUniversalTime()
                 });
-                
+
                 fileInfos.AddRange(directories);
                 fileInfos.AddRange(files);
 
-                if (response.IsTruncated) {
+                if(response.IsTruncated) {
                     request.Marker = response.NextMarker;
                 } else {
                     request = null;
                 }
-            } while (request != null);
+            } while(request != null);
 
             return fileInfos;
         }
 
-        private static async Task<GetObjectResponse> GetS3Object(string key, AmazonS3CabinetConfig config, IAmazonS3 s3Client, CancellationToken cancellationToken) {
+        private static async Task<GetObjectResult> GetS3Object(string key, AmazonS3CabinetConfig config, IAmazonS3 s3Client, CancellationToken cancellationToken) {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(config, nameof(config));
             Contract.NotNull(s3Client, nameof(s3Client));
@@ -258,9 +258,24 @@ namespace Cabinet.S3 {
                 BucketName = config.BucketName,
                 Key = GetKey(key, config)
             };
-
-            using (var response = await s3Client.GetObjectAsync(request, cancellationToken)) {
-                return response;
+            try {
+                using(var response = await s3Client.GetObjectAsync(request, cancellationToken)) {
+                    return new GetObjectResult {
+                        StatusCode = response.HttpStatusCode,
+                        Size = response.ContentLength,
+                        LastModifiedUtc = response.LastModified.ToUniversalTime()
+                    };
+                }
+            } catch(AmazonS3Exception e) {
+                var httpResponseEx = e.InnerException as HttpErrorResponseException;
+                if(httpResponseEx != null) {
+                    var response = httpResponseEx.Response;
+                    return new GetObjectResult {
+                        StatusCode = response.StatusCode,
+                        Size = response.ContentLength
+                    };
+                }
+                throw;
             }
         }
 
@@ -278,7 +293,7 @@ namespace Cabinet.S3 {
                 var response = await s3Client.DeleteObjectAsync(deleteObjectRequest);
 
                 return new DeleteResult(response.HttpStatusCode);
-            } catch (Exception e) {
+            } catch(Exception e) {
                 return new DeleteResult(e);
             }
         }

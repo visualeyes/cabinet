@@ -62,13 +62,13 @@ namespace Cabinet.Tests.FileSystem {
         public async Task GetFile_Empty_Key_Throws(string key) {
             var provider = GetProvider(ValidBasePath);
             var config = GetConfig(ValidBasePath);
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.GetFileAsync(key, config));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.GetItemAsync(key, config));
         }
 
         [Fact]
         public async Task GetFile_Null_Config_Throws() {
             var provider = GetProvider(ValidBasePath);
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.GetFileAsync(ValidFileKey, null));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await provider.GetItemAsync(ValidFileKey, null));
         }
 
         [Theory]
@@ -81,7 +81,7 @@ namespace Cabinet.Tests.FileSystem {
 
             Assert.True(this.mockFileSystem.FileExists(expectedFilePath));
 
-            var fileInfo = await provider.GetFileAsync(key, config);
+            var fileInfo = await provider.GetItemAsync(key, config);
 
             Assert.Equal(FileSystemCabinetConfig.ProviderType, fileInfo.ProviderType);
             Assert.Equal(expectedFileKey, fileInfo.Key);
@@ -96,7 +96,7 @@ namespace Cabinet.Tests.FileSystem {
 
             Assert.False(this.mockFileSystem.FileExists(expectedFilePath));
 
-            var fileInfo = await provider.GetFileAsync(key, config);
+            var fileInfo = await provider.GetItemAsync(key, config);
 
             Assert.Equal(FileSystemCabinetConfig.ProviderType, fileInfo.ProviderType);
             Assert.Equal(expectedFileKey, fileInfo.Key);

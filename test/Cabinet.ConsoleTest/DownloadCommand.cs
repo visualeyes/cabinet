@@ -20,7 +20,7 @@ namespace Cabinet.ConsoleTest {
         private HandleExistingMethod handleExisting = HandleExistingMethod.Throw;
 
         public DownloadCommand() {
-            IsCommand("get", "Gets a file from the cabinet");
+            IsCommand("download", "Gets a file from the cabinet");
 
             HasRequiredOption("cabinet=|c=", "Cabinet to download the file from", c => configName = c);
             HasRequiredOption("key=|k=", "Key to of the file to download", k => key = k);

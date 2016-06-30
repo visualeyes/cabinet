@@ -11,7 +11,7 @@ namespace Cabinet.Core {
         Task<IEnumerable<string>> ListKeysAsync(string keyPrefix = "", bool recursive = true);
 
         Task<ICabinetItemInfo> GetItemAsync(string key);
-        Task<IEnumerable<ICabinetItemInfo>> GetItemAsync(string keyPrefix = "", bool recursive = true);
+        Task<IEnumerable<ICabinetItemInfo>> GetItemsAsync(string keyPrefix = "", bool recursive = true);
 
         Task<Stream> OpenReadStreamAsync(string key);
 

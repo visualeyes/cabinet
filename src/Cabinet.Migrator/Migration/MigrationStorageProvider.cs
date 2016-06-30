@@ -61,7 +61,7 @@ namespace Cabinet.Migrator.Migration {
             return keys;
         }
 
-        public async Task<ICabinetItemInfo> GetFileAsync(string key, MigrationProviderConfig config) {
+        public async Task<ICabinetItemInfo> GetItemAsync(string key, MigrationProviderConfig config) {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(config, nameof(config));
 

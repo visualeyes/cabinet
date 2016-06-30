@@ -42,7 +42,7 @@ namespace Cabinet.Migrator.Replication {
             return keys;
         }
 
-        public async Task<ICabinetItemInfo> GetFileAsync(string key, ReplicatedProviderConfig config) {
+        public async Task<ICabinetItemInfo> GetItemAsync(string key, ReplicatedProviderConfig config) {
             Contract.NotNullOrEmpty(key, nameof(key));
             Contract.NotNull(config, nameof(config));
 
@@ -56,7 +56,7 @@ namespace Cabinet.Migrator.Replication {
             Contract.NotNull(config, nameof(config));
 
             var master = GetMasterConfig(config);
-            var files = await master.GetItemAsync(keyPrefix: keyPrefix, recursive: recursive);
+            var files = await master.GetItemsAsync(keyPrefix: keyPrefix, recursive: recursive);
 
             return files;
         }
