@@ -27,6 +27,6 @@ namespace Cabinet.Core {
             }
 
             return prefix + key;
-        } 
+        }
     }
 }

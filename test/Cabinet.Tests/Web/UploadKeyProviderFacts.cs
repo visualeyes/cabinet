@@ -20,14 +20,14 @@ namespace Cabinet.Tests.Web {
         [InlineData("blah.jpg", null), InlineData("blah.jpg", ""), InlineData("blah.jpg", "  ")]
         [InlineData(null, "image/jpeg"), InlineData("", "image/jpeg"), InlineData("  ", "image/jpeg")]
         public void GetKey_Throws(string fileName, string contentType) {
-            Assert.Throws<ArgumentNullException>(() => provider.GetKey(fileName, contentType));
+            Assert.Throws<ArgumentNullException>(() => provider.GetKey(fileName, contentType, "/"));
         }
         
         [Theory]
-        [InlineData("blah.jpg", "blah.jpg", "image/jpeg")]
-        public void GetKey(string fileName, string expectedFileName, string contentType) {
-            string key = provider.GetKey(fileName, contentType);
-            Assert.Matches(GuidRegex + @"\\" + expectedFileName + ".upload", key);
+        [InlineData("blah.jpg", "/", "blah.jpg", "image/jpeg")]
+        public void GetKey(string fileName, string delimiter, string expectedFileName, string contentType) {
+            string key = provider.GetKey(fileName, contentType, delimiter);
+            Assert.Matches(GuidRegex + delimiter + expectedFileName + ".upload", key);
         }
 
         [Fact]
@@ -38,7 +38,7 @@ namespace Cabinet.Tests.Web {
             string fileName = new string('a', 300);
             fileName += ".jpg";
 
-            string key = provider.GetKey(fileName, "image/jpeg");
+            string key = provider.GetKey(fileName, "image/jpeg", "/");
 
             Assert.NotNull(key);
 

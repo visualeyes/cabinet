@@ -16,7 +16,7 @@ namespace Cabinet.Web {
         /// Gets a key based on a filename
         /// Please consider security implication of selecting a key - https://www.owasp.org/index.php/Unrestricted_File_Upload
         /// </summary>
-        public string GetKey(string fileName, string contentType) {
+        public string GetKey(string fileName, string contentType, string delimiter) {
             Contract.NotNullOrEmpty(fileName, nameof(fileName));
             Contract.NotNullOrEmpty(contentType, nameof(contentType));
 
@@ -38,7 +38,9 @@ namespace Cabinet.Web {
 
             fileName += UploadExt;
 
-            return Path.Combine(guid, fileName);
+            string key = KeyUtils.JoinKeys(guid, fileName, delimiter);
+
+            return key;
         }
 
         public string NormalizeKey(string key) {

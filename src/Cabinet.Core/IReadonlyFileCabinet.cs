@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using Cabinet.Core.Providers;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
 namespace Cabinet.Core {
     public interface IReadonlyFileCabinet {
+        string GetKeyDelimiter();
+
         Task<bool> ExistsAsync(string key);
         Task<IEnumerable<string>> ListKeysAsync(string keyPrefix = "", bool recursive = true);
 
