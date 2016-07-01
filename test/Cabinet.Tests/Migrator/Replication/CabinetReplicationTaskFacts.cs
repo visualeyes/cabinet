@@ -36,13 +36,13 @@ namespace Cabinet.Tests.Migrator.Replication {
                 .ReturnsAsync(keys);
 
             mockTaskRunner
-                .Setup(r => r.RunTasks(It.IsAny<Func<string, Task<string>>>(), keys, default(CancellationToken)))
+                .Setup(r => r.RunTasks(It.IsAny<Func<string, Task>>(), keys, default(CancellationToken)))
                 .Returns(Task.FromResult(0));
                 
             await cabinetReplicatorTask.ReplicateCabinetAsync(mockMasterCabinet.Object, mockReplicaCabinet.Object, CancellationToken.None);
 
             mockMasterCabinet.Verify(c => c.ListKeysAsync("", true), Times.Once);
-            mockTaskRunner.Verify(r => r.RunTasks(It.IsAny<Func<string, Task<string>>>(), keys, default(CancellationToken)), Times.Once);
+            mockTaskRunner.Verify(r => r.RunTasks(It.IsAny<Func<string, Task>>(), keys, default(CancellationToken)), Times.Once);
         }
     }
 }
