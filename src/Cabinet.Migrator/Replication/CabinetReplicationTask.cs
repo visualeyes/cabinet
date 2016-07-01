@@ -29,7 +29,6 @@ namespace Cabinet.Migrator.Replication {
 
             await taskRunner.RunTasks(async (key) => {
                 await cabinetReplicator.ReplicateKeyAsync(key, masterCabinet, replicaCabinet);
-                return key;
             }, sourceKeys, cancellationToken);
         }
     }

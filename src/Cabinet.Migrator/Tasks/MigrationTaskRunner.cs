@@ -10,25 +10,21 @@ namespace Cabinet.Migrator {
     public class MigrationTaskRunner : IMigrationTaskRunner {
         private const int BatchSize = 20;
 
-        public async Task RunTasks<I, T>(Func<I, Task<T>> task, IEnumerable<I> inputs, CancellationToken cancellationToken) {
-            var buffer = new BufferBlock<I>(new DataflowBlockOptions {
+        public async Task RunTasks<I>(Func<I, Task> task, IEnumerable<I> inputs, CancellationToken cancellationToken) {
+            var taskBlock = new ActionBlock<I>(task, new ExecutionDataflowBlockOptions {
                 BoundedCapacity = BatchSize,
-                CancellationToken = cancellationToken
-            });
-
-            var taskBlock = new TransformBlock<I, T>(task, new ExecutionDataflowBlockOptions {
                 CancellationToken = cancellationToken,
                 MaxDegreeOfParallelism = 5
             });
 
-            buffer.LinkTo(taskBlock, new DataflowLinkOptions { PropagateCompletion = true });
-
             foreach (var key in inputs) {
-                await Task.WhenAny(buffer.SendAsync(key, cancellationToken), taskBlock.Completion);
+                cancellationToken.ThrowIfCancellationRequested();
+
+                await Task.WhenAny(taskBlock.SendAsync(key, cancellationToken), taskBlock.Completion);
             }
 
-            buffer.Complete();
-
+            taskBlock.Complete();
+            
             await taskBlock.Completion;
         }
     }
