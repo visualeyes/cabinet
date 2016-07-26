@@ -8,7 +8,7 @@ namespace Cabinet.Web.Files {
     public static class FileTypeExtensions {
 
         public static bool IsValidExtension(this IFileType type, string extension) {
-            return type.Extensions.Contains(extension);
+            return type.Extensions.Contains(extension, StringComparer.OrdinalIgnoreCase);
         }
     }
 }
