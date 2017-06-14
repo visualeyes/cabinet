@@ -1,23 +1,13 @@
-﻿using ByteSizeLib;
-using Cabinet.Core;
-using Cabinet.Core.Progress;
-using Cabinet.Core.Providers;
-using Cabinet.Core.Results;
+﻿using Cabinet.Core.Progress;
 using ManyConsole;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Cabinet.ConsoleTest {
     public class DownloadCommand : ConsoleCommand {
         private string configName;
         private string key;
         private string filePath;
-
-        private HandleExistingMethod handleExisting = HandleExistingMethod.Throw;
 
         public DownloadCommand() {
             IsCommand("download", "Gets a file from the cabinet");
