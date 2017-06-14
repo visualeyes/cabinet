@@ -1,12 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{B9A4FEFD-3FA8-4CC4-A237-484BCCF70E48}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
-		global.json = global.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Info", "Info", "{21B0400E-D953-41EA-8398-3F6072E46B51}"
@@ -17,31 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Info", "Info", "{21B0400E-D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{217A90A2-3FE3-4089-B560-8F1B5ADA16D2}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cabinet.Core", "src\Cabinet.Core\Cabinet.Core.xproj", "{DBDF6CA2-31D3-469E-A9D6-9E3F13B01001}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cabinet.S3", "src\Cabinet.S3\Cabinet.S3.xproj", "{790F406F-ACDC-4CD1-8541-21F42C844EC2}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cabinet.FileSystem", "src\Cabinet.FileSystem\Cabinet.FileSystem.xproj", "{0896C531-C5C4-4CB3-99EF-73B264E0DDE0}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cabinet.Migrator", "src\Cabinet.Migrator\Cabinet.Migrator.xproj", "{FEC7949E-6925-4B44-B2C0-2D695C750C72}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cabinet.Web", "src\Cabinet.Web\Cabinet.Web.xproj", "{C74037B5-9D95-4806-9BE7-89BBA1B07F4E}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cabinet.Config", "src\Cabinet.Config\Cabinet.Config.xproj", "{5B871962-B15D-4954-9E17-C4DFA8C64E29}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cabinet.FileSystem.Config", "src\Cabinet.FileSystem.Config\Cabinet.FileSystem.Config.xproj", "{6ED4B1AD-6604-4BC3-A325-59484EED5D4F}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cabinet.S3.Config", "src\Cabinet.S3.Config\Cabinet.S3.Config.xproj", "{79B8EDB4-7488-4732-BA2B-27EC3FBFFA53}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cabinet.Migrator.Config", "src\Cabinet.Migrator.Config\Cabinet.Migrator.Config.xproj", "{C747700E-6FAC-4F8B-A384-2658C0E52ABF}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{37F76245-6518-4295-9372-6BD297A6A628}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cabinet.Tests", "test\Cabinet.Tests\Cabinet.Tests.xproj", "{3D50F9E9-6CF7-4A38-8074-614F95B2C382}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cabinet.ConsoleTest", "test\Cabinet.ConsoleTest\Cabinet.ConsoleTest.xproj", "{80824195-32CF-4500-AF72-3EA904C9F3F9}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cabinet.Web.SelfHostTest", "test\Cabinet.Web.SelfHostTest\Cabinet.Web.SelfHostTest.xproj", "{AC2A8304-DBC8-452D-AA16-02423EDBB571}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{9489D3FA-35AA-46B5-9931-23C4417F9C21}"
 	ProjectSection(SolutionItems) = preProject
@@ -52,6 +27,30 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{9489
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "example", "example", "{62320D0E-EC56-4D76-A7C0-CB6E14CB77C9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabinet.Core", "src\Cabinet.Core\Cabinet.Core.csproj", "{DBDF6CA2-31D3-469E-A9D6-9E3F13B01001}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabinet.S3", "src\Cabinet.S3\Cabinet.S3.csproj", "{790F406F-ACDC-4CD1-8541-21F42C844EC2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabinet.FileSystem", "src\Cabinet.FileSystem\Cabinet.FileSystem.csproj", "{0896C531-C5C4-4CB3-99EF-73B264E0DDE0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabinet.Migrator", "src\Cabinet.Migrator\Cabinet.Migrator.csproj", "{FEC7949E-6925-4B44-B2C0-2D695C750C72}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabinet.Web", "src\Cabinet.Web\Cabinet.Web.csproj", "{C74037B5-9D95-4806-9BE7-89BBA1B07F4E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabinet.Config", "src\Cabinet.Config\Cabinet.Config.csproj", "{5B871962-B15D-4954-9E17-C4DFA8C64E29}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabinet.FileSystem.Config", "src\Cabinet.FileSystem.Config\Cabinet.FileSystem.Config.csproj", "{6ED4B1AD-6604-4BC3-A325-59484EED5D4F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabinet.S3.Config", "src\Cabinet.S3.Config\Cabinet.S3.Config.csproj", "{79B8EDB4-7488-4732-BA2B-27EC3FBFFA53}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabinet.Migrator.Config", "src\Cabinet.Migrator.Config\Cabinet.Migrator.Config.csproj", "{C747700E-6FAC-4F8B-A384-2658C0E52ABF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabinet.Tests", "test\Cabinet.Tests\Cabinet.Tests.csproj", "{3D50F9E9-6CF7-4A38-8074-614F95B2C382}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabinet.ConsoleTest", "test\Cabinet.ConsoleTest\Cabinet.ConsoleTest.csproj", "{80824195-32CF-4500-AF72-3EA904C9F3F9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabinet.Web.SelfHostTest", "test\Cabinet.Web.SelfHostTest\Cabinet.Web.SelfHostTest.csproj", "{AC2A8304-DBC8-452D-AA16-02423EDBB571}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -112,6 +111,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{9489D3FA-35AA-46B5-9931-23C4417F9C21} = {B9A4FEFD-3FA8-4CC4-A237-484BCCF70E48}
 		{DBDF6CA2-31D3-469E-A9D6-9E3F13B01001} = {217A90A2-3FE3-4089-B560-8F1B5ADA16D2}
 		{790F406F-ACDC-4CD1-8541-21F42C844EC2} = {217A90A2-3FE3-4089-B560-8F1B5ADA16D2}
 		{0896C531-C5C4-4CB3-99EF-73B264E0DDE0} = {217A90A2-3FE3-4089-B560-8F1B5ADA16D2}
@@ -124,6 +124,5 @@ Global
 		{3D50F9E9-6CF7-4A38-8074-614F95B2C382} = {37F76245-6518-4295-9372-6BD297A6A628}
 		{80824195-32CF-4500-AF72-3EA904C9F3F9} = {37F76245-6518-4295-9372-6BD297A6A628}
 		{AC2A8304-DBC8-452D-AA16-02423EDBB571} = {37F76245-6518-4295-9372-6BD297A6A628}
-		{9489D3FA-35AA-46B5-9931-23C4417F9C21} = {B9A4FEFD-3FA8-4CC4-A237-484BCCF70E48}
 	EndGlobalSection
 EndGlobal
