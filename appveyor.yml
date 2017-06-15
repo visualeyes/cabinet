@@ -31,7 +31,7 @@ before_build:
   - appveyor-retry dotnet restore
   
 test_script:
-  - cmd: dotnet test .\test\Cabinet.Tests\
+  - cmd: dotnet test .\test\Cabinet.Tests\Cabinet.Tests.csproj
 
 build_script:
   - ps: Get-ChildItem src\Cabinet* | Foreach { dotnet pack $_ --output (Join-Path "artifacts\bin" $_.Name) }
