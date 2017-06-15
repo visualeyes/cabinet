@@ -9,6 +9,7 @@
     <AssemblyName>Cabinet.Config</AssemblyName>
     <PackageId>Cabinet.Config</PackageId>
     <PackageTags>Files;IO;S3</PackageTags>
+    <DebugType>full</DebugType>
     <RepositoryUrl>https://github.com/visualeyes/cabinet</RepositoryUrl>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>

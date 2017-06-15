@@ -1,8 +1,4 @@
-
 $PROJECT_ROOT=(Split-Path $PSScriptRoot -Parent)
-
-$PROJECTS_FILTER='Cabinet*'
-$TEST_PROJECTS_FILTER='Cabinet.Tests'
 
 $OPEN_COVER_VERSION='4.6.519'
 $OPEN_COVER_PATH=(Join-Path $env:USERPROFILE ".nuget\packages\OpenCover\$OPEN_COVER_VERSION\tools\OpenCover.Console.exe")
@@ -13,16 +9,9 @@ $COVERALLS_PATH=(Join-Path $env:USERPROFILE ".nuget\packages\coveralls.io\$COVER
 $COVERAGE_COMMAND=$OPEN_COVER_PATH + 
 	' -register:user' +
 	' -target:"C:\Program Files\dotnet\dotnet.exe"' +
-	" -filter:`"+[$PROJECTS_FILTER]* -[$TEST_PROJECTS_FILTER]*`""
-
-$TARGET_ARGS="test $PROJECT_ROOT\test\Cabinet.Tests\Cabinet.Tests.csproj"
-
-if($env:APPVEYOR -eq $true) {
-	Write-Host "Running on appveyor"
-	$TARGET_ARGS+=' -appveyor'
-}
-
-$COVERAGE_COMMAND+=" -targetargs:`"$TARGET_ARGS`""
+	' -filter:"+[Cabinet*]* -[Cabinet.Tests*]*"' +
+    " -searchdirs:`"$PROJECT_ROOT\test\Cabinet.Tests\bin\Release\net46`"" +
+    " -targetargs:`"test -f net46 -c Release $PROJECT_ROOT\test\Cabinet.Tests\Cabinet.Tests.csproj`""
 
 if($env:CI -eq $true) {
 	Write-Host "Outputting ci format"

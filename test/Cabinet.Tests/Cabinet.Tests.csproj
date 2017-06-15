@@ -4,6 +4,7 @@
     <TargetFrameworks>net451;net46</TargetFrameworks>
     <AssemblyName>Cabinet.Tests</AssemblyName>
     <PackageId>Cabinet.Tests</PackageId>
+    <DebugType>full</DebugType>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
