@@ -1,10 +1,7 @@
 ﻿using Cabinet.Core;
 using Cabinet.Web.Files;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Cabinet.Web.Validation {
     public class UploadValidator : IUploadValidator {
@@ -27,16 +24,11 @@ namespace Cabinet.Web.Validation {
             return fileSize < this.validationSettings.MinSize;
         }
 
-        public bool IsFileTypeWhitelisted(string extension, string contentType) {
+        public bool IsFileTypeWhitelisted(string extension) {
             if(String.IsNullOrWhiteSpace(extension)) return false;
-            if(String.IsNullOrWhiteSpace(contentType)) return false;
 
-            var types = typeProvider.GetFileTypes();
-            var fileType = types.GetFileType(contentType);
-
-            bool isValidExtension = fileType?.IsValidExtension(extension) ?? false;
-
-            if (!isValidExtension) {
+            var fileType = typeProvider.GetFileTypes().GetByExtension(extension);
+            if (fileType == null) {
                 // Potential funny business
                 return false;
             }

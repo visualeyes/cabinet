@@ -138,7 +138,7 @@ namespace Cabinet.FileSystem {
                 using (var readStream = fs.File.OpenRead(filePath)) {
                     return await this.SaveFileAsync(key, readStream, handleExisting, progress, config);
                 }
-            } catch (FileNotFoundException e) {
+            } catch (FileNotFoundException) {
                 return new SaveResult(key, success: false, errorMsg: $"File does not exist at path {filePath}");
             } catch (Exception e) {
                 return new SaveResult(key, e);

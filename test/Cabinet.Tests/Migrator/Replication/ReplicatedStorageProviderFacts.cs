@@ -174,7 +174,7 @@ namespace Cabinet.Tests.Migrator.Replication {
         [InlineData("test", "C:\test\file.txt", HandleExistingMethod.Overwrite, true)]
         [InlineData("test", "C:\test\file.txt", HandleExistingMethod.Skip, true)]
         [InlineData("test", "C:\test\file.txt", HandleExistingMethod.Throw, true)]
-        public async Task Save_File_Path(string key, string filePath, HandleExistingMethod handleExisting, bool masterSuccess) {
+        public async Task SaveFileAsync_FilePath_Theory(string key, string filePath, HandleExistingMethod handleExisting, bool masterSuccess) {
             var mockMasterSaveResult = new Mock<ISaveResult>();
             var mockReplicaSaveResult = new Mock<ISaveResult>();
 
@@ -187,6 +187,28 @@ namespace Cabinet.Tests.Migrator.Replication {
 
             this.mockMasterCabinet.Verify(c => c.SaveFileAsync(key, filePath, handleExisting, null), Times.Once);
             this.mockReplicaCabinet.Verify(c => c.SaveFileAsync(key, filePath, handleExisting, null), masterSuccess ? Times.Once() : Times.Never());
+
+            Assert.Equal(mockMasterSaveResult.Object, saveResult);
+        }
+
+        [Theory]
+        [InlineData("test", HandleExistingMethod.Overwrite, true)]
+        [InlineData("test", HandleExistingMethod.Skip, true)]
+        [InlineData("test", HandleExistingMethod.Throw, true)]
+        public async Task SaveFileAsync_Stream_Theory(string key, HandleExistingMethod handleExisting, bool masterSuccess) {
+            var mockStream = new Mock<Stream>();
+            var mockMasterSaveResult = new Mock<ISaveResult>();
+            var mockReplicaSaveResult = new Mock<ISaveResult>();
+
+            mockMasterSaveResult.SetupGet(r => r.Success).Returns(masterSuccess);
+
+            this.mockMasterCabinet.Setup(c => c.SaveFileAsync(key, mockStream.Object, handleExisting, null)).ReturnsAsync(mockMasterSaveResult.Object);
+            this.mockReplicaCabinet.Setup(c => c.SaveFileAsync(key, mockStream.Object, handleExisting, null)).ReturnsAsync(mockReplicaSaveResult.Object);
+
+            var saveResult = await provider.SaveFileAsync(key, mockStream.Object, handleExisting, null, config);
+
+            this.mockMasterCabinet.Verify(c => c.SaveFileAsync(key, mockStream.Object, handleExisting, null), Times.Once);
+            this.mockReplicaCabinet.Verify(c => c.SaveFileAsync(key, mockStream.Object, handleExisting, null), masterSuccess ? Times.Once() : Times.Never());
 
             Assert.Equal(mockMasterSaveResult.Object, saveResult);
         }
@@ -212,28 +234,6 @@ namespace Cabinet.Tests.Migrator.Replication {
             await Assert.ThrowsAsync<ArgumentNullException>(() =>
                 provider.SaveFileAsync("key", mockStream.Object, HandleExistingMethod.Overwrite, null, config)
             );
-        }
-
-        [Theory]
-        [InlineData("test", HandleExistingMethod.Overwrite, true)]
-        [InlineData("test", HandleExistingMethod.Skip, true)]
-        [InlineData("test", HandleExistingMethod.Throw, true)]
-        public async Task Save_File_Path(string key, HandleExistingMethod handleExisting, bool masterSuccess) {
-            var mockStream = new Mock<Stream>();
-            var mockMasterSaveResult = new Mock<ISaveResult>();
-            var mockReplicaSaveResult = new Mock<ISaveResult>();
-
-            mockMasterSaveResult.SetupGet(r => r.Success).Returns(masterSuccess);
-
-            this.mockMasterCabinet.Setup(c => c.SaveFileAsync(key, mockStream.Object, handleExisting, null)).ReturnsAsync(mockMasterSaveResult.Object);
-            this.mockReplicaCabinet.Setup(c => c.SaveFileAsync(key, mockStream.Object, handleExisting, null)).ReturnsAsync(mockReplicaSaveResult.Object);
-
-            var saveResult = await provider.SaveFileAsync(key, mockStream.Object, handleExisting, null, config);
-
-            this.mockMasterCabinet.Verify(c => c.SaveFileAsync(key, mockStream.Object, handleExisting, null), Times.Once);
-            this.mockReplicaCabinet.Verify(c => c.SaveFileAsync(key, mockStream.Object, handleExisting, null), masterSuccess ? Times.Once() : Times.Never());
-
-            Assert.Equal(mockMasterSaveResult.Object, saveResult);
         }
 
         [Theory]

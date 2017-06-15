@@ -1,18 +1,14 @@
 ﻿using Cabinet.Core;
 using Cabinet.Core.Progress;
 using Cabinet.Core.Providers;
-using Cabinet.Core.Results;
 using Cabinet.Web.AntiVirus;
-using Cabinet.Web.Files;
 using Cabinet.Web.Results;
 using Cabinet.Web.Validation;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Cabinet.Web {
@@ -42,7 +38,7 @@ namespace Cabinet.Web {
                 string uploadExtension = Path.GetExtension(uploadFileName)?.TrimStart('.');
                 string uploadMediaType = fd.Headers.ContentType?.MediaType;
 
-                if(!this.fileValidator.IsFileTypeWhitelisted(uploadExtension, uploadMediaType)) {
+                if(!this.fileValidator.IsFileTypeWhitelisted(uploadExtension)) {
                     return new UploadSaveResult(uploadFileName, uploadMediaType, "The file type is not allowed");
                 }
 
