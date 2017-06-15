@@ -28,7 +28,7 @@ after_test:
   - ps: .\scripts\coverage.ps1
 
 artifacts:
-  - path: artifacts
+  - path: artifacts\*.*
 
 deploy:
   provider: NuGet
