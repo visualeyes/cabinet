@@ -1,11 +1,10 @@
+os: Visual Studio 2017
+
 version: 1.1.0-{branch}-{build}
+
 environment:
     COVERALLS_REPO_TOKEN:
        secure: taR6Lo8ItJ2wz57yn2n8wwkTuiULP+n8EicEJck1CaxeDGLWHmZzw6NX1a7RR0Cd
-
-cache:
-  - '%APPDATA%\npm-cache'                               # npm cache
-  - '%USERPROFILE%\.nuget\packages -> **\project.json'  # project.json cache
 
 configuration: Release
 
@@ -16,31 +15,20 @@ assembly_info:
   assembly_file_version: "{version}"
   assembly_informational_version: "{version}"
 
-install:
-  - ps: iex .\scripts\dotnet-latest.ps1
-  # Prepend newly installed dotnet cli to the PATH of this build (this cannot be
-  # done from inside the powershell script as it would require to restart
-  # the parent CMD process).
-  - "SET PATH=C:\\Program Files\\dotnet\\bin;%PATH%"
-  - nuget sources add -Name https://api.nuget.org/v3/index.json -Source https://api.nuget.org/v3/index.json
-  - nuget sources disable -Name nuget.org -Source https://www.nuget.org/api/v2
-  - nuget sources list   # log what feeds we're using - in case of timeout
-
 before_build:
-  - ps: .\scripts\version-bump.ps1
   - appveyor-retry dotnet restore
   
 test_script:
-  - cmd: dotnet test .\test\Cabinet.Tests\Cabinet.Tests.csproj
+  - dotnet test "test\Cabinet.Tests\Cabinet.Tests.csproj"
 
 build_script:
-  - ps: Get-ChildItem src\Cabinet* | Foreach { dotnet pack $_ --output (Join-Path "artifacts\bin" $_.Name) }
+  - ps: .\scripts\pack.ps1
 
 after_test:
   - ps: .\scripts\coverage.ps1
 
 artifacts:
-  - path: artifacts\bin\Cabinet*\*.nupkg
+  - path: artifacts
 
 deploy:
   provider: NuGet

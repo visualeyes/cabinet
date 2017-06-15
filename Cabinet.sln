@@ -5,7 +5,9 @@ VisualStudioVersion = 15.0.26430.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{B9A4FEFD-3FA8-4CC4-A237-484BCCF70E48}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		appveyor.yml = appveyor.yml
+		nuget.config = nuget.config
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Info", "Info", "{21B0400E-D953-41EA-8398-3F6072E46B51}"
@@ -21,12 +23,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{9489D3FA-35AA-46B5-9931-23C4417F9C21}"
 	ProjectSection(SolutionItems) = preProject
 		scripts\coverage.ps1 = scripts\coverage.ps1
-		scripts\dotnet-latest.ps1 = scripts\dotnet-latest.ps1
-		scripts\show-dotnet-info.ps1 = scripts\show-dotnet-info.ps1
-		scripts\version-bump.ps1 = scripts\version-bump.ps1
+		scripts\pack.ps1 = scripts\pack.ps1
 	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "example", "example", "{62320D0E-EC56-4D76-A7C0-CB6E14CB77C9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabinet.Core", "src\Cabinet.Core\Cabinet.Core.csproj", "{DBDF6CA2-31D3-469E-A9D6-9E3F13B01001}"
 EndProject
