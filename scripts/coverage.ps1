@@ -15,7 +15,7 @@ $COVERAGE_COMMAND=$OPEN_COVER_PATH +
 	' -target:"C:\Program Files\dotnet\dotnet.exe"' +
 	" -filter:`"+[$PROJECTS_FILTER]* -[$TEST_PROJECTS_FILTER]*`""
 
-$TARGET_ARGS="test $PROJECT_ROOT\test\Cabinet.Tests\"
+$TARGET_ARGS="test $PROJECT_ROOT\test\Cabinet.Tests\Cabinet.Tests.csproj"
 
 if($env:APPVEYOR -eq $true) {
 	Write-Host "Running on appveyor"
