@@ -13,6 +13,7 @@ namespace Cabinet.Web.Files {
         Video = 4,
         Archive = 5,
         Html = 6,
-        Code = 7
+        Code = 7,
+        Font = 8
     }
 }
