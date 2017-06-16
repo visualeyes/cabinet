@@ -12,23 +12,26 @@ namespace Cabinet.Tests.Web.Files {
         }
 
         [Theory]
-        [InlineData(null, null)]
         [InlineData("", null)]
-        [InlineData("exe", null)]
-        [InlineData("jpg", "image/jpeg")]
-        [InlineData("JPG", "image/jpeg")]
-        public void GetByExtension_Theory(string ext, string expectedMimeType) {
-            var result = fileTypes.GetByExtension(ext);
-
-            if(expectedMimeType == null) {
-                Assert.Null(result);
-            } else {
-                Assert.Equal(expectedMimeType, result.MimeType);
-            }
+        [InlineData("invalid file path", null)]
+        [InlineData(".jpg", "image/jpeg")]
+        [InlineData("image.jpg", "image/jpeg")]
+        [InlineData("folder/image.jpg", "image/jpeg")]
+        public void GetByFilePath(string filePath, string expectedMimeType) {
+            AssertEqualMimeType(expectedMimeType, fileTypes.GetByFilePath(filePath));
         }
 
         [Theory]
-        [InlineData(null, null)]
+        [InlineData("", null)]
+        [InlineData("exe", null)]
+        [InlineData("jpg", "image/jpeg")]
+        [InlineData(".jpg", "image/jpeg")]
+        [InlineData("JPG", "image/jpeg")]
+        public void GetByExtension_Theory(string ext, string expectedMimeType) {
+            AssertEqualMimeType(expectedMimeType, fileTypes.GetByExtension(ext));
+        }
+
+        [Theory]
         [InlineData("", null)]
         [InlineData("application/octet-stream", null)]
         [InlineData("image/jpeg", "image/jpeg")]
@@ -36,8 +39,10 @@ namespace Cabinet.Tests.Web.Files {
         [InlineData("application/pjpeg", "image/jpeg")]
         [InlineData("aPplIcAtIon/pJpEg", "image/jpeg")]
         public void GetByMimeType_Theory(string mimeType, string expectedMimeType) {
-            var result = fileTypes.GetByMimeType(mimeType);
+            AssertEqualMimeType(expectedMimeType, fileTypes.GetByMimeType(mimeType));
+        }
 
+        private void AssertEqualMimeType(string expectedMimeType, IFileType result) {
             if(expectedMimeType == null) {
                 Assert.Null(result);
             } else {
