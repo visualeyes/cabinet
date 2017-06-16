@@ -3,13 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.13
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{B9A4FEFD-3FA8-4CC4-A237-484BCCF70E48}"
-	ProjectSection(SolutionItems) = preProject
-		.gitignore = .gitignore
-		appveyor.yml = appveyor.yml
-		nuget.config = nuget.config
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Info", "Info", "{21B0400E-D953-41EA-8398-3F6072E46B51}"
 	ProjectSection(SolutionItems) = preProject
 		LICENSE = LICENSE
@@ -19,12 +12,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{217A90A2-3FE3-4089-B560-8F1B5ADA16D2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{37F76245-6518-4295-9372-6BD297A6A628}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{9489D3FA-35AA-46B5-9931-23C4417F9C21}"
-	ProjectSection(SolutionItems) = preProject
-		scripts\coverage.ps1 = scripts\coverage.ps1
-		scripts\pack.ps1 = scripts\pack.ps1
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabinet.Core", "src\Cabinet.Core\Cabinet.Core.csproj", "{DBDF6CA2-31D3-469E-A9D6-9E3F13B01001}"
 EndProject
@@ -49,6 +36,16 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabinet.ConsoleTest", "test\Cabinet.ConsoleTest\Cabinet.ConsoleTest.csproj", "{80824195-32CF-4500-AF72-3EA904C9F3F9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabinet.Web.SelfHostTest", "test\Cabinet.Web.SelfHostTest\Cabinet.Web.SelfHostTest.csproj", "{AC2A8304-DBC8-452D-AA16-02423EDBB571}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{967C1EAA-5C70-42B2-9E2F-F285B763AB65}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		appveyor.yml = appveyor.yml
+		LICENSE = LICENSE
+		nuget.config = nuget.config
+		pack.ps1 = pack.ps1
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -109,7 +106,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{9489D3FA-35AA-46B5-9931-23C4417F9C21} = {B9A4FEFD-3FA8-4CC4-A237-484BCCF70E48}
 		{DBDF6CA2-31D3-469E-A9D6-9E3F13B01001} = {217A90A2-3FE3-4089-B560-8F1B5ADA16D2}
 		{790F406F-ACDC-4CD1-8541-21F42C844EC2} = {217A90A2-3FE3-4089-B560-8F1B5ADA16D2}
 		{0896C531-C5C4-4CB3-99EF-73B264E0DDE0} = {217A90A2-3FE3-4089-B560-8F1B5ADA16D2}

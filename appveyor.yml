@@ -4,7 +4,7 @@ version: 1.1.0-{branch}-{build}
 
 environment:
     COVERALLS_REPO_TOKEN:
-       secure: taR6Lo8ItJ2wz57yn2n8wwkTuiULP+n8EicEJck1CaxeDGLWHmZzw6NX1a7RR0Cd
+       secure: "taR6Lo8ItJ2wz57yn2n8wwkTuiULP+n8EicEJck1CaxeDGLWHmZzw6NX1a7RR0Cd"
 
 configuration: Release
 
@@ -22,14 +22,29 @@ test_script:
   - dotnet test "test\Cabinet.Tests\Cabinet.Tests.csproj"
 
 build_script:
-  - ps: .\scripts\pack.ps1
+  - ps: .\pack.ps1
 
 after_test:
-  - ps: .\scripts\coverage.ps1
+  - cmd: >- 
+      "%USERPROFILE%\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe"
+      -register:user
+      -target:"C:\Program Files\dotnet\dotnet.exe" -filter:"+[Cabinet*]* -[Cabinet.Tests*]*"
+      -output:"artifacts\coverage.xml"
+      -searchdirs:"test\Cabinet.Tests\bin\Release\net46"
+      -targetargs:"test -f net46 -c Release test\Cabinet.Tests\Cabinet.Tests.csproj"
+
+  - cmd: >-
+      IF DEFINED COVERALLS_REPO_TOKEN "%USERPROFILE%\.nuget\packages\coveralls.io\1.3.4\tools\coveralls.net.exe"
+      --opencover
+      --repo-token %COVERALLS_REPO_TOKEN%
+      --full-sources "artifacts\coverage.xml"
 
 artifacts:
   - path: artifacts\*.*
 
+cache:
+  - '%USERPROFILE%\.nuget\packages -> **\*.csproj'
+  
 deploy:
   provider: NuGet
   api_key:
