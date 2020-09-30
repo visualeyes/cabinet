@@ -60,8 +60,8 @@ namespace Cabinet.Tests.Migrator.Results {
             Assert.Equal(msg, result.GetErrorMessage());
         }
 
-        public static object[] GetExceptionMessages() {
-            return new object[] {
+        public static object[][] GetExceptionMessages() {
+            return new [] {
                 new object[] { new Exception("test"), "System.Exception: test" },
             };
         }

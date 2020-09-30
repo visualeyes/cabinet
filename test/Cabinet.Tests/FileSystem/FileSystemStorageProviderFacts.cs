@@ -591,8 +591,8 @@ namespace Cabinet.Tests.FileSystem {
             return config;
         }
 
-        public static object[] GetSafeTestPaths() {
-            return new object[] {
+        public static object[][] GetSafeTestPaths() {
+            return new [] {
                 new object[] { @"c:\foo", @"file.txt", @"c:\foo\file.txt", @"file.txt" },
                 new object[] { @"c:\foo", @"bar\file.txt", @"c:\foo\bar\file.txt", @"bar/file.txt" },
                 new object[] { @"c:\foo", @"bar\baz", @"c:\foo\bar\baz", @"bar/baz" },
@@ -601,13 +601,13 @@ namespace Cabinet.Tests.FileSystem {
             };
         }
 
-        public static object[] GetMoveTestPaths() {
-            return new object[] {
+        public static object[][] GetMoveTestPaths() {
+            return new [] {
                 new object[] { @"c:\foo", @"from.txt", @"c:\foo\from.txt", @"to.txt", @"c:\foo\to.txt" },
             };
         }
 
-        public static object[] GetListTestPaths() {
+        public static object[][] GetListTestPaths() {
             string baseDir = @"C:\data";
 
             var files = new Dictionary<string, string> {
@@ -618,7 +618,7 @@ namespace Cabinet.Tests.FileSystem {
                 { @"foo\one.txt", "one" },
             };
             
-            return new object[] {
+            return new [] {
                 new object[] { baseDir, files, "", true, new Dictionary<string, ItemType> {
                         { @"file.txt", ItemType.File },
                         { @"bar/one.txt", ItemType.File },

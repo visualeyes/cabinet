@@ -44,8 +44,8 @@ namespace Cabinet.Tests.FileSystem.Config {
         }
 
 
-        public static object[] GetConfigStrings() {
-            return new object[] {
+        public static object[][] GetConfigStrings() {
+            return new [] {
                 new object[] { @"{
                     ""dir"": ""~/App_Data/Uploads"",
                     ""createIfNotExists"": true

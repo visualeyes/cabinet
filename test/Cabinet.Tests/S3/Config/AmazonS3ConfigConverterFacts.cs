@@ -47,7 +47,7 @@ namespace Cabinet.Tests.S3.Config {
         }
 
 
-        public static object[] GetConfigStrings() {
+        public static object[][] GetConfigStrings() {
             string defaultKeyPrefix = null;
             string defaultDelimiter = AmazonS3CabinetConfig.DefaultDelimiter;
 
@@ -57,7 +57,7 @@ namespace Cabinet.Tests.S3.Config {
             Expression<Action<IAWSCredentialsFactory>> environmentVerify = (f) => f.GetEnvironmentCredentials();
             Expression<Action<IAWSCredentialsFactory>> environmentVariableVerify = (f) => f.GetEnvironmentVariableCredentials();
             
-            return new object[] { 
+            return new [] { 
                 //Types: basic, stored-profile, environment, environment-variable
                 new object[] { @"{
                     ""credentials"": {

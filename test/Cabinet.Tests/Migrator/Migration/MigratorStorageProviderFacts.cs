@@ -269,8 +269,8 @@ namespace Cabinet.Tests.Migrator.Migration {
             }
         }
 
-        public static object[] GetListKeysData() {
-            return new object[] {
+        public static object[][] GetListKeysData() {
+            return new [] {
                 new object[] { "", true, new string[] { }, new string[] { }, new string[] { } },
                 new object[] { "", true, new string[] { "one", "two", "three" }, new string[] { }, new string[] { "one", "two", "three" } },
                 new object[] { "", true, new string[] { }, new string[] { "one", "two", "three" }, new string[] { "one", "two", "three" } },
