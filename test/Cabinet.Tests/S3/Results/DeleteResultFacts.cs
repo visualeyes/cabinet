@@ -42,8 +42,8 @@ namespace Cabinet.Tests.S3.Results {
             Assert.Equal(msg, result.GetErrorMessage());
         }
 
-        public static object[] GetExceptionMessages() {
-            return new object[] {
+        public static object[][] GetExceptionMessages() {
+            return new [] {
                 new object[] { new Exception(), "System.Exception: Exception of type 'System.Exception' was thrown." },
             };
         }

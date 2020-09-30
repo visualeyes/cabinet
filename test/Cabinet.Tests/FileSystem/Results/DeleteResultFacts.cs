@@ -38,8 +38,8 @@ namespace Cabinet.Tests.FileSystem.Results {
             Assert.Equal(msg, result.GetErrorMessage());
         }
 
-        public static object[] GetExceptionMessages() {
-            return new object[] {
+        public static object[][] GetExceptionMessages() {
+            return new [] {
                 new object[] { new DirectoryNotFoundException(), "Could not find the file" },
                 new object[] { new PathTooLongException(), "The path is too long. The path must be less than 248 characters and file name less than 260 characters." },
                 new object[] { new UnauthorizedAccessException(), "Could not delete the file" },

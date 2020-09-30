@@ -69,8 +69,8 @@ namespace Cabinet.Tests.FileSystem {
             Assert.Equal(isChildOf, actualResult);
         }
 
-        public static object[] GetTestPaths() {
-            return new object[] {
+        public static object[][] GetTestPaths() {
+            return new [] {
                 new object[] { @"c:\foo", @"c:", false, false },
                 new object[] { @"c:\foo", @"c:\", true, false },
                 new object[] { @"c:\foo", @"c:\foo", false, true },

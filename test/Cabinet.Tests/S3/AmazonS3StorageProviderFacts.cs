@@ -600,7 +600,7 @@ namespace Cabinet.Tests.S3 {
             return config;
         }
 
-        public static object[] GetTestS3Objects() {
+        public static object[][] GetTestS3Objects() {
             var s3Objects = new List<S3Object>() {
                 new S3Object() { Key = "file.txt", Size = 3, LastModified = DateTime.UtcNow.AddHours(-1) },
                 new S3Object() { Key = @"bar/one.txt", Size = 3, LastModified = DateTime.UtcNow.AddHours(-5) },
@@ -620,7 +620,7 @@ namespace Cabinet.Tests.S3 {
             var bazObjects = s3Objects.Where(o => o.Key.StartsWith(barBazPrefix)).ToList();
             var barDirectChildObjects = barObjects.Where(o => o.Key.StartsWith(barPrefix) && !o.Key.StartsWith(barBazPrefix + "/")).ToList();
 
-            return new object[] {
+            return new [] {
                 new object[] { "test-bucket", "",        "",        true, HttpStatusCode.OK, s3Objects,  "" },
                 new object[] { "test-bucket", "",        barPrefix, true, HttpStatusCode.OK, barObjects, barPrefix },
                 new object[] { "test-bucket", barPrefix, "",        true, HttpStatusCode.OK, barObjects, barPrefix },

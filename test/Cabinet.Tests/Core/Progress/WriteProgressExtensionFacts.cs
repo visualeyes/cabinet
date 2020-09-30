@@ -27,7 +27,7 @@ namespace Cabinet.Tests.Core.Progress {
         }
 
         [Theory]
-        [MemberData("GetProgressData")]
+        [MemberData(nameof(GetProgressData))]
         public void ProgressPercentage(long bytesWritten, long? totalBytes, double? expected) {
             var progress = new WriteProgress("key", bytesWritten, totalBytes);
 
@@ -36,8 +36,8 @@ namespace Cabinet.Tests.Core.Progress {
             Assert.Equal(expected, percentage);
         }
 
-        public static object[] GetProgressData() {
-            return new object[] {
+        public static object[][] GetProgressData() {
+            return new [] {
                 new object[] { 50, (long?)0, null },
                 new object[] { 100, (long?)50, (double?)2 },
                 new object[] { 50, (long?)100, (double?)0.5 },

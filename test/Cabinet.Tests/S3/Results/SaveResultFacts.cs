@@ -23,7 +23,7 @@ namespace Cabinet.Tests.S3.Results {
         [InlineData(HttpStatusCode.Forbidden, false, null)]
         [InlineData(HttpStatusCode.Unauthorized, false, "Access to the bucket is denied")]
         [InlineData(HttpStatusCode.InternalServerError, false, null)]
-        public void Sets_Success(HttpStatusCode code, bool success, string errorMsg) {
+        public void Sets_Code_Success(HttpStatusCode code, bool success, string errorMsg) {
             var result = new SaveResult("key", code);
             Assert.Equal(success, result.Success);
             Assert.Equal(errorMsg, result.GetErrorMessage());
@@ -82,8 +82,8 @@ namespace Cabinet.Tests.S3.Results {
             Assert.Equal(msg, result.GetErrorMessage());
         }
 
-        public static object[] GetExceptionMessages() {
-            return new object[] {
+        public static object[][] GetExceptionMessages() {
+            return new [] {
                 new object[] { new Exception("test"), "test" },
             };
         }
