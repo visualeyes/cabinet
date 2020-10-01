@@ -1,23 +1,40 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Cabinet.FileSystem {
     internal static class PathExtensions {
+        // https://stackoverflow.com/questions/275689/how-to-get-relative-path-from-absolute-path
         public static string MakeRelativeTo(this string fullPath, string basePath) {
-            if (!basePath.EndsWith(Path.DirectorySeparatorChar.ToString())) {
-                basePath += Path.DirectorySeparatorChar;
+            if (string.IsNullOrEmpty(fullPath)) throw new ArgumentNullException(nameof(fullPath));
+            if (string.IsNullOrEmpty(basePath)) throw new ArgumentNullException(nameof(basePath));
+
+            var baseUri = new Uri(basePath.EnsureEndsWithDirectorySeparatorChar());
+            var fullUri = new Uri(fullPath);
+
+            if (baseUri.Scheme != fullUri.Scheme) {
+                // Don't know how to handle
+                throw new NotSupportedException($"Cannot make paths with different schemes relative: {baseUri.Scheme} (base), {fullUri.Scheme} (full)");
             }
 
-            var fullPathUri = new Uri(fullPath, UriKind.Absolute);
-            var basePathUri = new Uri(basePath, UriKind.Absolute);
+            var relativeUri = baseUri.MakeRelativeUri(fullUri);
+            var relativePath = Uri.UnescapeDataString(relativeUri.ToString());
 
-            var relUri = basePathUri.MakeRelativeUri(fullPathUri);
-            return relUri.ToString();
+            if (string.Equals(fullUri.Scheme, Uri.UriSchemeFile, StringComparison.OrdinalIgnoreCase)) {
+                relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            }
+
+            return relativePath;
+        }
+
+        public static string EnsureEndsWithDirectorySeparatorChar(this string path) {
+            // Append a slash only if the path is a directory and does not have a slash.
+            if (!Path.HasExtension(path) &&
+                !path.EndsWith(Path.DirectorySeparatorChar.ToString())) {
+                return path + Path.DirectorySeparatorChar;
+            }
+
+            return path;
         }
 
         public static bool IsSameDirectory(this string path1, string path2) {

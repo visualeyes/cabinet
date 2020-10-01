@@ -594,10 +594,10 @@ namespace Cabinet.Tests.FileSystem {
         public static object[][] GetSafeTestPaths() {
             return new [] {
                 new object[] { @"c:\foo", @"file.txt", @"c:\foo\file.txt", @"file.txt" },
-                new object[] { @"c:\foo", @"bar\file.txt", @"c:\foo\bar\file.txt", @"bar/file.txt" },
-                new object[] { @"c:\foo", @"bar\baz", @"c:\foo\bar\baz", @"bar/baz" },
-                new object[] { @"c:\foo", @"./bar/baz", @"c:\foo\bar\baz", @"bar/baz" },
-                new object[] { @"c:\foo", @"../foo/bar/baz", @"c:\foo\bar\baz", @"bar/baz" },
+                new object[] { @"c:\foo", @"bar\file.txt", @"c:\foo\bar\file.txt", @"bar\file.txt" },
+                new object[] { @"c:\foo", @"bar\baz", @"c:\foo\bar\baz", @"bar\baz" },
+                new object[] { @"c:\foo", @"./bar/baz", @"c:\foo\bar\baz", @"bar\baz" },
+                new object[] { @"c:\foo", @"../foo/bar/baz", @"c:\foo\bar\baz", @"bar\baz" },
             };
         }
 
@@ -621,10 +621,10 @@ namespace Cabinet.Tests.FileSystem {
             return new [] {
                 new object[] { baseDir, files, "", true, new Dictionary<string, ItemType> {
                         { @"file.txt", ItemType.File },
-                        { @"bar/one.txt", ItemType.File },
-                        { @"bar/two.txt", ItemType.File },
-                        { @"bar/baz/three", ItemType.File },
-                        { @"foo/one.txt", ItemType.File },
+                        { @"bar\one.txt", ItemType.File },
+                        { @"bar\two.txt", ItemType.File },
+                        { @"bar\baz\three", ItemType.File },
+                        { @"foo\one.txt", ItemType.File },
                     }
                 },
                 new object[] { baseDir, files, "", false, new Dictionary<string, ItemType> {
@@ -634,19 +634,19 @@ namespace Cabinet.Tests.FileSystem {
                     }
                 },
                 new object[] { baseDir, files, "bar", true, new Dictionary<string, ItemType> {
-                        { @"bar/one.txt", ItemType.File },
-                        { @"bar/two.txt", ItemType.File },
-                        { @"bar/baz/three", ItemType.File },
+                        { @"bar\one.txt", ItemType.File },
+                        { @"bar\two.txt", ItemType.File },
+                        { @"bar\baz\three", ItemType.File },
                     }
                 },
                 new object[] { baseDir, files, "bar", false, new Dictionary<string, ItemType> {
-                        { @"bar/baz", ItemType.Directory },
-                        { @"bar/one.txt", ItemType.File },
-                        { @"bar/two.txt", ItemType.File },
+                        { @"bar\baz", ItemType.Directory },
+                        { @"bar\one.txt", ItemType.File },
+                        { @"bar\two.txt", ItemType.File },
                     }
                 },
                 new object[] { baseDir, files, @"bar\baz", false, new Dictionary<string, ItemType> {
-                        { @"bar/baz/three", ItemType.File },
+                        { @"bar\baz\three", ItemType.File },
                     }
                 },
             };
