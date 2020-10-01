@@ -58,14 +58,6 @@ namespace Cabinet.Tests.FileSystem {
             Assert.Equal(isSameDir, actualResult);
         }
 
-        [Theory]
-        [MemberData("GetTestPaths")]
-        public void Is_SubDirectory_Of(string subPath, string basePath, bool isChildOf, bool isSameDir) {
-            var actualResult = subPath.IsSubDirectoryOf(basePath);
-
-            Assert.Equal(isChildOf, actualResult);
-        }
-
         public static object[][] GetTestPaths() {
             return new [] {
                 new object[] { @"c:\foo", @"c:", false, false },
