@@ -1,11 +1,7 @@
 ﻿using Cabinet.FileSystem;
 using Moq;
 using System;
-using System.Collections.Generic;
 using System.IO.Abstractions;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Cabinet.Tests.FileSystem {
@@ -14,8 +10,9 @@ namespace Cabinet.Tests.FileSystem {
         [Theory]
         [InlineData(@"c:\foo", @"C:\foo\bar", @"bar")]
         [InlineData(@"c:\foo\", @"C:\foo\bar", @"bar")]
-        [InlineData(@"c:\foo\", @"C:\foo\bar\baz.txt", @"bar/baz.txt")]
-        public void Make_Relative(string basePath, string subPath, string expectedRelativePath) {
+        [InlineData(@"c:\foo\", @"C:\foo\bar\baz.txt", @"bar\baz.txt")]
+        [InlineData(@"c:\foo\", @"C:\foo\foo bar\baz.txt", @"foo bar\baz.txt")]
+        public void MakeRelativeTo(string basePath, string subPath, string expectedRelativePath) {
             string actual = subPath.MakeRelativeTo(basePath);
             Assert.Equal(expectedRelativePath, actual);
         }
