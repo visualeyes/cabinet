@@ -58,13 +58,6 @@ namespace Cabinet.FileSystem {
             return dir1Path.Equals(dir2Path, StringComparison.OrdinalIgnoreCase);
         }
 
-        public static bool IsSubDirectoryOf(this string subPath, string basePath) {
-            var subDir = GetDirectoryInfoBase(subPath);
-            var baseDir = GetDirectoryInfoBase(basePath);
-
-            return subDir.IsChildOf(baseDir);
-        }
-
         public static bool IsChildOf(this DirectoryInfoBase subDir, DirectoryInfoBase baseDir) {
             var isChild = false;
 
