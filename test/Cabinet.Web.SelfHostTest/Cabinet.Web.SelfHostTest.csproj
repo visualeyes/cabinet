@@ -51,7 +51,7 @@
     <PackageReference Include="Microsoft.Owin.Host.HttpListener" Version="2.0.2" />
     <PackageReference Include="Microsoft.Owin.Hosting" Version="2.0.2" />
     <PackageReference Include="Microsoft.Owin.StaticFiles" Version="3.0.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Owin" Version="1.0" />
     <PackageReference Include="Owin.Logging.Common" Version="1.0.5506.19675" />
     <PackageReference Include="System.Globalization" Version="4.0.11" />
